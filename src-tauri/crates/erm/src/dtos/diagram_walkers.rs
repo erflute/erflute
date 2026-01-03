@@ -224,14 +224,14 @@ impl From<crate::entities::diagram_walkers::CompoundUniqueKey> for CompoundUniqu
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct CompoundUniqueKeyList {
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub compound_unique_key: Option<Vec<CompoundUniqueKey>>,
+    pub compound_unique_keys: Option<Vec<CompoundUniqueKey>>,
 }
 
 impl From<crate::entities::diagram_walkers::CompoundUniqueKeyList> for CompoundUniqueKeyList {
     fn from(entity: crate::entities::diagram_walkers::CompoundUniqueKeyList) -> Self {
         Self {
-            compound_unique_key: entity
-                .compound_unique_key
+            compound_unique_keys: entity
+                .compound_unique_keys
                 .map(|v| v.into_iter().map(Into::into).collect()),
         }
     }

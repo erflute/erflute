@@ -116,7 +116,8 @@ pub struct CompoundUniqueKey {
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct CompoundUniqueKeyList {
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub compound_unique_key: Option<Vec<CompoundUniqueKey>>,
+    #[serde(rename = "compound_unique_key")]
+    pub compound_unique_keys: Option<Vec<CompoundUniqueKey>>,
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]

@@ -78,7 +78,7 @@ fn test_read_erm_file() {
                             ]),
                         },
                         compound_unique_key_list: diagram_walkers::CompoundUniqueKeyList {
-                            compound_unique_key: None
+                            compound_unique_keys: None
                         },
                     },
                     diagram_walkers::Table {
@@ -195,7 +195,7 @@ fn test_read_erm_file() {
                             ]),
                         },
                         compound_unique_key_list: diagram_walkers::CompoundUniqueKeyList {
-                            compound_unique_key: None
+                            compound_unique_keys: None
                         },
                     },
                     diagram_walkers::Table {
@@ -247,7 +247,7 @@ fn test_read_erm_file() {
                             ]),
                         },
                         compound_unique_key_list: diagram_walkers::CompoundUniqueKeyList {
-                            compound_unique_key: None
+                            compound_unique_keys: None
                         },
                     },
                     diagram_walkers::Table {
@@ -388,7 +388,7 @@ fn test_read_erm_file() {
                             ]),
                         },
                         compound_unique_key_list: diagram_walkers::CompoundUniqueKeyList {
-                            compound_unique_key: None
+                            compound_unique_keys: None
                         },
                     },
                     diagram_walkers::Table {
@@ -514,7 +514,7 @@ fn test_read_erm_file() {
                             ]),
                         },
                         compound_unique_key_list: diagram_walkers::CompoundUniqueKeyList {
-                            compound_unique_key: None
+                            compound_unique_keys: None
                         },
                     },
                     diagram_walkers::Table {
@@ -582,7 +582,7 @@ fn test_read_erm_file() {
                             ]),
                         },
                         compound_unique_key_list: diagram_walkers::CompoundUniqueKeyList {
-                            compound_unique_key: None
+                            compound_unique_keys: None
                         },
                     }
                 ]),
