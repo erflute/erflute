@@ -15,6 +15,7 @@ import {
   type Table,
 } from "@/types/domain/table";
 import { AttributeContent } from "./contents/attribute";
+import { CompoundUniqueKeyContent } from "./contents/compoundUniqueKey";
 import { ConstraintOptionContent } from "./contents/constraintOption";
 import { DescriptionContent } from "./contents/description";
 import { type TableInfoDialogProps } from "./types";
@@ -48,6 +49,14 @@ export function TableInfoDialog({
         enumArgs: column.enumArgs ? column.enumArgs.trim() : undefined,
       };
     });
+    const preparedCompoundUniqueKeys = tableData.compoundUniqueKeys
+      ?.map((key) => {
+        return {
+          name: key.name.trim(),
+          columns: key.columns.map((column) => column.trim()).filter(Boolean),
+        };
+      })
+      .filter((key) => key.name.length > 0 && key.columns.length > 0);
 
     onApply?.({
       ...data,
@@ -62,6 +71,7 @@ export function TableInfoDialog({
         : undefined,
       option: tableData.option ? tableData.option.trim() : undefined,
       columns: preparedColumns,
+      compoundUniqueKeys: preparedCompoundUniqueKeys,
     });
     onOpenChange?.(false);
   };
@@ -156,7 +166,7 @@ export function TableInfoDialog({
             value="compound-unique-key"
             className="rounded-md border border-dashed border-slate-300 bg-white p-6 text-sm text-slate-500"
           >
-            Manage compound unique keys here once configured.
+            <CompoundUniqueKeyContent data={tableData} setData={setTableData} />
           </TabsContent>
           <TabsContent
             value="index"

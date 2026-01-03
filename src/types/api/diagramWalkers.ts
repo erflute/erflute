@@ -51,6 +51,19 @@ type Columns = {
   items?: (NormalColumn | string)[];
 };
 
+type Column = {
+  columnId: string;
+};
+
+type CompoundUniqueKey = {
+  name: string;
+  columns: Column[];
+};
+
+type CompoundUniqueKeyList = {
+  compoundUniqueKeys?: CompoundUniqueKey[];
+};
+
 export type TableResponse = {
   physicalName: string;
   logicalName: string;
@@ -67,6 +80,7 @@ export type TableResponse = {
   primaryKeyName?: string;
   option?: string;
   columns: Columns;
+  compoundUniqueKeyList: CompoundUniqueKeyList;
 };
 
 export type DiagramWalkersResponse = {

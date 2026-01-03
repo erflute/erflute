@@ -14,6 +14,11 @@ type Color = {
   b: number;
 };
 
+export type CompoundUniqueKey = {
+  name: string;
+  columns: string[];
+};
+
 export type Table = {
   color: Color;
   x: number;
@@ -27,4 +32,5 @@ export type Table = {
   primaryKeyName?: string;
   option?: string;
   columns?: (Column | ColumnGroupName)[];
+  compoundUniqueKeys?: CompoundUniqueKey[];
 };

@@ -1,10 +1,12 @@
+import { parseReference } from "@/domain/parsers/referenceParser";
 import type { TableResponse } from "@/types/api/diagramWalkers";
 import type { Column } from "@/types/domain/column";
 import { parseColumnType } from "@/types/domain/columnType";
 import type { Relationship } from "@/types/domain/relationship";
-import { type Table } from "@/types/domain/table";
+import type { CompoundUniqueKey, Table } from "@/types/domain/table";
 
 export function mapTablesFrom(tableResponses: TableResponse[]): Table[] {
+  console.log("## mapTablesFrom", tableResponses);
   return tableResponses.map((table) => {
     return {
       color: {
@@ -44,6 +46,17 @@ export function mapTablesFrom(tableResponses: TableResponse[]): Table[] {
           referredColumn: item.referredColumn,
         } satisfies Column;
       }),
+      compoundUniqueKeys: table.compoundUniqueKeyList.compoundUniqueKeys?.map(
+        (uniqueKey) => {
+          return {
+            name: uniqueKey.name,
+            columns: uniqueKey.columns.map((column) => {
+              const { columnName } = parseReference(column.columnId);
+              return columnName ?? "";
+            }),
+          } satisfies CompoundUniqueKey;
+        },
+      ),
     } satisfies Table;
   });
 }
