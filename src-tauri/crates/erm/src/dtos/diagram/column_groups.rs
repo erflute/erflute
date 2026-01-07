@@ -1,3 +1,4 @@
+use crate::entities::diagram::column_groups as entities;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, PartialEq, Serialize, Deserialize, Default)]
@@ -20,8 +21,8 @@ pub struct NormalColumn {
     pub unsigned: Option<bool>,
 }
 
-impl From<crate::entities::column_groups::NormalColumn> for NormalColumn {
-    fn from(entity: crate::entities::column_groups::NormalColumn) -> Self {
+impl From<entities::NormalColumn> for NormalColumn {
+    fn from(entity: entities::NormalColumn) -> Self {
         Self {
             physical_name: entity.physical_name,
             logical_name: entity.logical_name,
@@ -40,8 +41,8 @@ pub struct Columns {
     pub normal_columns: Option<Vec<NormalColumn>>,
 }
 
-impl From<crate::entities::column_groups::Columns> for Columns {
-    fn from(entity: crate::entities::column_groups::Columns) -> Self {
+impl From<entities::Columns> for Columns {
+    fn from(entity: entities::Columns) -> Self {
         Self {
             normal_columns: entity
                 .normal_columns
@@ -57,8 +58,8 @@ pub struct ColumnGroup {
     pub columns: Columns,
 }
 
-impl From<crate::entities::column_groups::ColumnGroup> for ColumnGroup {
-    fn from(entity: crate::entities::column_groups::ColumnGroup) -> Self {
+impl From<entities::ColumnGroup> for ColumnGroup {
+    fn from(entity: entities::ColumnGroup) -> Self {
         Self {
             column_group_name: entity.column_group_name,
             columns: entity.columns.into(),
@@ -73,8 +74,8 @@ pub struct ColumnGroups {
     pub column_groups: Option<Vec<ColumnGroup>>,
 }
 
-impl From<crate::entities::column_groups::ColumnGroups> for ColumnGroups {
-    fn from(entity: crate::entities::column_groups::ColumnGroups) -> Self {
+impl From<entities::ColumnGroups> for ColumnGroups {
+    fn from(entity: entities::ColumnGroups) -> Self {
         Self {
             column_groups: entity
                 .column_groups

@@ -1,4 +1,5 @@
 import type { Cardinality } from "../domain/relationship";
+import type { CompoundUniqueKeyList } from "./compoundUniqueKeyList";
 
 export type Color = {
   r: number;
@@ -49,19 +50,6 @@ type NormalColumn = {
 
 type Columns = {
   items?: (NormalColumn | string)[];
-};
-
-type Column = {
-  columnId: string;
-};
-
-type CompoundUniqueKey = {
-  name: string;
-  columns: Column[];
-};
-
-type CompoundUniqueKeyList = {
-  compoundUniqueKeys?: CompoundUniqueKey[];
 };
 
 export type TableResponse = {

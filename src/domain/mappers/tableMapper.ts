@@ -48,9 +48,10 @@ export function mapTablesFrom(tableResponses: TableResponse[]): Table[] {
       }),
       compoundUniqueKeys: table.compoundUniqueKeyList.compoundUniqueKeys?.map(
         (uniqueKey) => {
+          console.log("## uniqueKey", uniqueKey);
           return {
             name: uniqueKey.name,
-            columns: uniqueKey.columns.map((column) => {
+            columns: uniqueKey.columns.columns.map((column) => {
               const { columnName } = parseReference(column.columnId);
               return columnName ?? "";
             }),

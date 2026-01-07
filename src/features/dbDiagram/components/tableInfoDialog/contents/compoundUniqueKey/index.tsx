@@ -9,6 +9,7 @@ import { createCompoundUniqueKeyHandlers } from "./handlers";
 import { type CompoundUniqueKeyProps } from "./types";
 
 const NEW_KEY_VALUE = "new";
+const SELECT_KEY_VALUE = "select";
 
 export function CompoundUniqueKeyContent({
   data,
@@ -16,7 +17,7 @@ export function CompoundUniqueKeyContent({
 }: CompoundUniqueKeyProps) {
   const { isReadOnly } = useViewModeStore();
   const [selectedKeyIndex, setSelectedKeyIndex] = useState<number | null>(null);
-  const [draftName, setDraftName] = useState("");
+  const [uniqueKeyName, setUniqueKeyName] = useState("");
   const [selectedColumns, setSelectedColumns] = useState<Set<string>>(
     () => new Set(),
   );
@@ -38,7 +39,7 @@ export function CompoundUniqueKeyContent({
 
   useEffect(() => {
     if (selectedKeyIndex == null) {
-      setDraftName("");
+      setUniqueKeyName("");
       setSelectedColumns(new Set());
       return;
     }
@@ -51,7 +52,7 @@ export function CompoundUniqueKeyContent({
       return;
     }
 
-    setDraftName(selectedKey.name);
+    setUniqueKeyName(selectedKey.name);
     setSelectedColumns(new Set(selectedKey.columns));
   }, [compoundUniqueKeys, selectedKeyIndex]);
 
@@ -70,7 +71,7 @@ export function CompoundUniqueKeyContent({
     handleDelete,
   } = createCompoundUniqueKeyHandlers({
     compoundUniqueKeys,
-    draftName,
+    draftName: uniqueKeyName,
     selectedColumnIds,
     selectedKeyIndex,
     newKeyValue: NEW_KEY_VALUE,
@@ -82,12 +83,12 @@ export function CompoundUniqueKeyContent({
   const addDisabled =
     isReadOnly ||
     selectedKeyIndex != null ||
-    draftName.trim().length === 0 ||
+    uniqueKeyName.trim().length === 0 ||
     selectedColumnIds.length === 0;
   const updateDisabled =
     isReadOnly ||
     selectedKeyIndex == null ||
-    draftName.trim().length === 0 ||
+    uniqueKeyName.trim().length === 0 ||
     selectedColumnIds.length === 0;
   const deleteDisabled = isReadOnly || selectedKeyIndex == null;
 
@@ -106,7 +107,11 @@ export function CompoundUniqueKeyContent({
           onChange={(event) => handleSelectKey(event.target.value)}
           className="h-9 w-full rounded-md border border-slate-300 bg-white px-2 text-sm shadow-xs focus-visible:border-blue-500 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-200"
         >
-          {!isReadOnly && <option value={NEW_KEY_VALUE}>New unique key</option>}
+          {isReadOnly ? (
+            <option value={SELECT_KEY_VALUE}>Select unique key</option>
+          ) : (
+            <option value={NEW_KEY_VALUE}>New unique key</option>
+          )}
           {compoundUniqueKeys.map((key, index) => {
             return (
               <option key={`${key.name}-${index}`} value={String(index)}>
@@ -123,9 +128,9 @@ export function CompoundUniqueKeyContent({
         </span>
         <Input
           id="compound-unique-key-name"
-          value={draftName}
+          value={uniqueKeyName}
           readOnly={isReadOnly}
-          onChange={(event) => setDraftName(event.target.value)}
+          onChange={(event) => setUniqueKeyName(event.target.value)}
           className="h-9 rounded px-2 text-sm"
         />
       </label>
