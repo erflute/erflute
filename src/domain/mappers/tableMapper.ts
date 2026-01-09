@@ -6,7 +6,6 @@ import type { Relationship } from "@/types/domain/relationship";
 import type { CompoundUniqueKey, Table } from "@/types/domain/table";
 
 export function mapTablesFrom(tableResponses: TableResponse[]): Table[] {
-  console.log("## mapTablesFrom", tableResponses);
   return tableResponses.map((table) => {
     return {
       color: {
@@ -48,7 +47,6 @@ export function mapTablesFrom(tableResponses: TableResponse[]): Table[] {
       }),
       compoundUniqueKeys: table.compoundUniqueKeyList.compoundUniqueKeys?.map(
         (uniqueKey) => {
-          console.log("## uniqueKey", uniqueKey);
           return {
             name: uniqueKey.name,
             columns: uniqueKey.columns.columns.map((column) => {
