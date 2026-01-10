@@ -1,10 +1,12 @@
 pub mod columns;
 pub mod compound_unique_key_list;
 pub mod connections;
+pub mod indexes;
 
 use columns::Columns;
 use compound_unique_key_list::CompoundUniqueKeyList;
 use connections::Connections;
+use indexes::Indexes;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
@@ -13,9 +15,6 @@ pub struct Color {
     pub g: u8,
     pub b: u8,
 }
-
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
-pub struct Indexes {}
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct TableProperties {}
