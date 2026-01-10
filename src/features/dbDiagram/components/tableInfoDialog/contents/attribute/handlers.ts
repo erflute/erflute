@@ -1,9 +1,8 @@
-import { useCallback } from "react";
 import type { Column } from "@/types/domain/column";
 import { isColumnGroupName, type ColumnGroupName } from "@/types/domain/table";
 import type { AttributeContentProps } from "./types";
 
-type UseAttributeContentHandlersParams = {
+type AttributeContentHandlers = {
   columns: (Column | ColumnGroupName)[];
   selectedColumnIndex: number | null;
   selectedInGroupIndex: number | null;
@@ -13,7 +12,7 @@ type UseAttributeContentHandlersParams = {
   setData: AttributeContentProps["setData"];
 };
 
-export function useAttributeContentHandlers({
+export function createAttributeContentHandlers({
   columns,
   selectedColumnIndex,
   selectedInGroupIndex,
@@ -21,35 +20,29 @@ export function useAttributeContentHandlers({
   setSelectedInGroupIndex,
   setAttributeView,
   setData,
-}: UseAttributeContentHandlersParams) {
-  const handleSelectColumn = useCallback(
-    (index: number | null) => {
+}: AttributeContentHandlers) {
+  const handleSelectColumn = (index: number | null) => {
+    setSelectedColumnIndex(index);
+    setSelectedInGroupIndex(null);
+  };
+
+  const handleSelectColumnGroup = (
+    columnIndex: number | null,
+    inGroupIndex: number | null,
+  ) => {
+    setSelectedColumnIndex(columnIndex);
+    setSelectedInGroupIndex(inGroupIndex);
+  };
+
+  const handleOpenDetail = (index: number) => {
+    // Just in case of normal column selected, move to detail view
+    if (!isColumnGroupName(columns[index])) {
       setSelectedColumnIndex(index);
-      setSelectedInGroupIndex(null);
-    },
-    [setSelectedColumnIndex, setSelectedInGroupIndex],
-  );
+      setAttributeView("detail");
+    }
+  };
 
-  const handleSelectColumnGroup = useCallback(
-    (columnIndex: number | null, inGroupIndex: number | null) => {
-      setSelectedColumnIndex(columnIndex);
-      setSelectedInGroupIndex(inGroupIndex);
-    },
-    [setSelectedColumnIndex, setSelectedInGroupIndex],
-  );
-
-  const handleOpenDetail = useCallback(
-    (index: number) => {
-      // Just in case of normal column selected, move to detail view
-      if (!isColumnGroupName(columns[index])) {
-        setSelectedColumnIndex(index);
-        setAttributeView("detail");
-      }
-    },
-    [setAttributeView, setSelectedColumnIndex],
-  );
-
-  const handleAddColumn = useCallback(() => {
+  const handleAddColumn = () => {
     const newColumn: Column = {
       physicalName: "",
       notNull: false,
@@ -63,9 +56,9 @@ export function useAttributeContentHandlers({
 
     setSelectedColumnIndex(nextColumns.length - 1);
     setAttributeView("detail");
-  }, [columns, setAttributeView, setData, setSelectedColumnIndex]);
+  };
 
-  const handleEditColumn = useCallback(() => {
+  const handleEditColumn = () => {
     const isEditingColumnGroup =
       selectedColumnIndex !== null && selectedInGroupIndex !== null;
     if (isEditingColumnGroup) {
@@ -75,9 +68,9 @@ export function useAttributeContentHandlers({
       return;
     }
     setAttributeView("detail");
-  }, [selectedColumnIndex, setAttributeView]);
+  };
 
-  const handleDeleteColumn = useCallback(() => {
+  const handleDeleteColumn = () => {
     if (selectedColumnIndex == null) {
       return;
     }
@@ -96,32 +89,23 @@ export function useAttributeContentHandlers({
       setSelectedColumnIndex(nextIndex);
     }
     setAttributeView("list");
-  }, [
-    columns,
-    selectedColumnIndex,
-    setAttributeView,
-    setData,
-    setSelectedColumnIndex,
-  ]);
+  };
 
-  const handleBackToColumnList = useCallback(
-    (column: Column) => {
-      setData((current) => {
-        const nextColumns = current.columns?.map((col, index) => {
-          if (index === selectedColumnIndex) {
-            return column;
-          }
-          return col;
-        });
-        return {
-          ...current,
-          columns: nextColumns,
-        };
+  const handleBackToColumnList = (column: Column) => {
+    setData((current) => {
+      const nextColumns = current.columns?.map((col, index) => {
+        if (index === selectedColumnIndex) {
+          return column;
+        }
+        return col;
       });
-      setAttributeView("list");
-    },
-    [selectedColumnIndex, setAttributeView, setData],
-  );
+      return {
+        ...current,
+        columns: nextColumns,
+      };
+    });
+    setAttributeView("list");
+  };
 
   return {
     handleSelectColumn,

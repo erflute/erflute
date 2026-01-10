@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { useViewModeStore } from "@/stores/viewModeStore";
 import { isColumnGroupName } from "@/types/domain/table";
 import { AttributeDetail } from "./detail";
-import { useAttributeContentHandlers } from "./handlers";
+import { createAttributeContentHandlers } from "./handlers";
 import { AttributeList } from "./list";
 import { type AttributeContentProps } from "./types";
 
@@ -38,7 +38,7 @@ export function AttributeContent({ data, setData }: AttributeContentProps) {
     handleEditColumn,
     handleDeleteColumn,
     handleBackToColumnList,
-  } = useAttributeContentHandlers({
+  } = createAttributeContentHandlers({
     columns,
     selectedColumnIndex,
     selectedInGroupIndex,

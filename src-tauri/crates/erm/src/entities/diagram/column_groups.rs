@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Default)]
+#[derive(Debug, PartialEq, Serialize, Deserialize, Default)]
 pub struct NormalColumn {
     pub physical_name: String,
 
@@ -20,20 +20,20 @@ pub struct NormalColumn {
     pub unsigned: Option<bool>,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct Columns {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "normal_column")]
     pub normal_columns: Option<Vec<NormalColumn>>,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct ColumnGroup {
     pub column_group_name: String,
     pub columns: Columns,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct ColumnGroups {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "column_group")]

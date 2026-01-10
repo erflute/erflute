@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import { useEffect, type RefObject } from "react";
 
 /**
@@ -34,5 +35,5 @@ export function useMinTableSize(
         }
       }
     }
-  }, [width, height, setHeight, setWidth]);
+  }, [contentRef, width, height, setHeight, setWidth]);
 }

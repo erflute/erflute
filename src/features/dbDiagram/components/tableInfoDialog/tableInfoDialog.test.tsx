@@ -63,6 +63,16 @@ it("applies the current table data and closes when OK is clicked", async () => {
     tableConstraint: "  constraint_a\nconstraint_b  ",
     primaryKeyName: "  PK_MEMBERS  ",
     option: "  option_a\noption_b  ",
+    compoundUniqueKeys: [
+      {
+        name: "  MEMBERS_NAME  ",
+        columns: ["  FIRST_NAME  ", "  LAST_NAME  ", "   "],
+      },
+      {
+        name: "   ",
+        columns: ["MEMBER_NO"],
+      },
+    ],
     columns: [
       {
         physicalName: "  AMOUNT  ",
@@ -93,6 +103,12 @@ it("applies the current table data and closes when OK is clicked", async () => {
     tableConstraint: "constraint_a\nconstraint_b",
     primaryKeyName: "PK_MEMBERS",
     option: "option_a\noption_b",
+    compoundUniqueKeys: [
+      {
+        name: "MEMBERS_NAME",
+        columns: ["FIRST_NAME", "LAST_NAME"],
+      },
+    ],
     columns: [
       expect.objectContaining({
         physicalName: "AMOUNT",

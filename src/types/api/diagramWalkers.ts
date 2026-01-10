@@ -1,4 +1,5 @@
 import type { Cardinality } from "../domain/relationship";
+import type { CompoundUniqueKeyList } from "./compoundUniqueKeyList";
 
 export type Color = {
   r: number;
@@ -67,6 +68,7 @@ export type TableResponse = {
   primaryKeyName?: string;
   option?: string;
   columns: Columns;
+  compoundUniqueKeyList: CompoundUniqueKeyList;
 };
 
 export type DiagramWalkersResponse = {
