@@ -4,10 +4,10 @@ import type { CompoundUniqueKeyProps } from "./types";
 
 type CompoundUniqueKeyHandlers = {
   compoundUniqueKeys: CompoundUniqueKey[];
-  draftName: string;
+  uniqueKeyName: string;
   selectedColumnIds: string[];
   selectedKeyIndex: number | null;
-  newKeyValue: string;
+  defaultUniqueKeyValue: string;
   setData: CompoundUniqueKeyProps["setData"];
   setSelectedKeyIndex: Dispatch<SetStateAction<number | null>>;
   setSelectedColumns: Dispatch<SetStateAction<Set<string>>>;
@@ -15,16 +15,16 @@ type CompoundUniqueKeyHandlers = {
 
 export function createCompoundUniqueKeyHandlers({
   compoundUniqueKeys,
-  draftName,
+  uniqueKeyName,
   selectedColumnIds,
   selectedKeyIndex,
-  newKeyValue,
+  defaultUniqueKeyValue,
   setData,
   setSelectedKeyIndex,
   setSelectedColumns,
 }: CompoundUniqueKeyHandlers) {
   const handleSelectKey = (value: string) => {
-    if (value === newKeyValue) {
+    if (value === defaultUniqueKeyValue) {
       setSelectedKeyIndex(null);
       return;
     }
@@ -45,7 +45,7 @@ export function createCompoundUniqueKeyHandlers({
   };
 
   const handleAdd = () => {
-    const trimmedName = draftName.trim();
+    const trimmedName = uniqueKeyName.trim();
     if (!trimmedName || selectedColumnIds.length === 0) {
       return;
     }
@@ -69,7 +69,7 @@ export function createCompoundUniqueKeyHandlers({
     if (selectedKeyIndex == null) {
       return;
     }
-    const trimmedName = draftName.trim();
+    const trimmedName = uniqueKeyName.trim();
     if (!trimmedName || selectedColumnIds.length === 0) {
       return;
     }

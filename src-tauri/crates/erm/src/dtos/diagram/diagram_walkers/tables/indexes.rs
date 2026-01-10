@@ -2,6 +2,7 @@ use crate::entities::diagram::diagram_walkers::tables::indexes as entities;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Column {
     pub column_id: String,
 
@@ -19,19 +20,21 @@ impl From<entities::Column> for Column {
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Columns {
-    pub columns: Column,
+    pub columns: Vec<Column>,
 }
 
 impl From<entities::Columns> for Columns {
     fn from(entity: entities::Columns) -> Self {
         Self {
-            columns: entity.columns.into(),
+            columns: entity.columns.into_iter().map(Into::into).collect(),
         }
     }
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Index {
     pub name: String,
 
@@ -63,6 +66,7 @@ impl From<entities::Index> for Index {
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Indexes {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub indexes: Option<Vec<Index>>,

@@ -14,6 +14,20 @@ type Color = {
   b: number;
 };
 
+export type IndexColumn = {
+  columnId: string;
+  desc?: boolean;
+};
+
+export type Index = {
+  name: string;
+  indexType: string;
+  description?: string;
+  fullText?: boolean;
+  nonUnique?: boolean;
+  columns: IndexColumn[];
+};
+
 export type CompoundUniqueKey = {
   name: string;
   columns: string[];
@@ -32,5 +46,6 @@ export type Table = {
   primaryKeyName?: string;
   option?: string;
   columns?: (Column | ColumnGroupName)[];
+  indexes?: Index[];
   compoundUniqueKeys?: CompoundUniqueKey[];
 };

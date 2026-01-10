@@ -11,7 +11,7 @@ pub struct Column {
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct Columns {
     #[serde(rename = "column")]
-    pub columns: Column,
+    pub columns: Vec<Column>,
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
@@ -36,5 +36,6 @@ pub struct Index {
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct Indexes {
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "index")]
     pub indexes: Option<Vec<Index>>,
 }

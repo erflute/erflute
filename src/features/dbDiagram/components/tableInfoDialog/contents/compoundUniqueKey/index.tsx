@@ -11,6 +11,10 @@ import { type CompoundUniqueKeyProps } from "./types";
 const NEW_KEY_VALUE = "new";
 const SELECT_KEY_VALUE = "select";
 
+function getDefaultUniqueKeyValue(isReadOnly: boolean) {
+  return isReadOnly ? SELECT_KEY_VALUE : NEW_KEY_VALUE;
+}
+
 export function CompoundUniqueKeyContent({
   data,
   setData,
@@ -71,10 +75,10 @@ export function CompoundUniqueKeyContent({
     handleDelete,
   } = createCompoundUniqueKeyHandlers({
     compoundUniqueKeys,
-    draftName: uniqueKeyName,
+    uniqueKeyName,
     selectedColumnIds,
     selectedKeyIndex,
-    newKeyValue: NEW_KEY_VALUE,
+    defaultUniqueKeyValue: getDefaultUniqueKeyValue(isReadOnly),
     setData,
     setSelectedKeyIndex,
     setSelectedColumns,
@@ -102,7 +106,9 @@ export function CompoundUniqueKeyContent({
         <select
           id="compound-unique-key-select"
           value={
-            selectedKeyIndex == null ? NEW_KEY_VALUE : String(selectedKeyIndex)
+            selectedKeyIndex == null
+              ? getDefaultUniqueKeyValue(isReadOnly)
+              : String(selectedKeyIndex)
           }
           onChange={(event) => handleSelectKey(event.target.value)}
           className="h-9 w-full rounded-md border border-slate-300 bg-white px-2 text-sm shadow-xs focus-visible:border-blue-500 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-200"
