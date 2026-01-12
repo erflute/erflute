@@ -187,7 +187,7 @@ export function IndexContent({ data, setData }: IndexContentProps) {
               }
               setSelectedIndex({
                 ...selectedIndex,
-                name: event.target.value.trim(),
+                name: event.target.value,
               });
             }}
             className="h-8 rounded text-sm w-60"
@@ -208,7 +208,7 @@ export function IndexContent({ data, setData }: IndexContentProps) {
               }
               setSelectedIndex({
                 ...selectedIndex,
-                indexType: event.target.value.trim(),
+                indexType: event.target.value,
               });
             }}
             className="h-8 w-60 rounded-md border border-slate-300 bg-white text-sm shadow-xs focus-visible:border-blue-500 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-200 disabled:bg-slate-100"
@@ -271,7 +271,7 @@ export function IndexContent({ data, setData }: IndexContentProps) {
             }
             setSelectedIndex({
               ...selectedIndex,
-              description: event.target.value.trim(),
+              description: event.target.value,
             });
           }}
           className="min-h-[64px] resize-none"
