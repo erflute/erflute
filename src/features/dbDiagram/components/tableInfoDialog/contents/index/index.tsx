@@ -72,6 +72,16 @@ export function IndexContent({ data, setData }: IndexContentProps) {
       .filter((column) => !indexColumnNames.includes(column));
   }, [columnGroups, data.columns, selectedIndex]);
 
+  useEffect(() => {
+    if (
+      selectedAvailableColumnIndex === null ||
+      selectedAvailableColumnIndex < availableColumns.length
+    ) {
+      return;
+    }
+    setSelectedAvailableColumnIndex(null);
+  }, [availableColumns.length, selectedAvailableColumnIndex]);
+
   const {
     handleSelectIndex,
     handleAddIndex,
