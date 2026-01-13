@@ -58,6 +58,20 @@ export function TableInfoDialog({
         };
       })
       .filter((key) => key.name.length > 0 && key.columns.length > 0);
+    const preparedIndexes = tableData.indexes?.map((index) => {
+      return {
+        ...index,
+        name: index.name.trim(),
+        indexType: index.indexType.trim(),
+        description: index.description ? index.description.trim() : undefined,
+        columns: index.columns.map((column) => {
+          return {
+            ...column,
+            columnId: column.columnId.trim(),
+          };
+        }),
+      };
+    });
 
     onApply?.({
       ...data,
@@ -72,6 +86,7 @@ export function TableInfoDialog({
         : undefined,
       option: tableData.option ? tableData.option.trim() : undefined,
       columns: preparedColumns,
+      indexes: preparedIndexes,
       compoundUniqueKeys: preparedCompoundUniqueKeys,
     });
     onOpenChange?.(false);
