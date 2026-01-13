@@ -73,7 +73,7 @@ export function createIndexContentHandlers({
       : [];
     setData({
       ...data,
-      indexes: [...indexes, selectedIndex],
+      indexes,
     });
   };
 

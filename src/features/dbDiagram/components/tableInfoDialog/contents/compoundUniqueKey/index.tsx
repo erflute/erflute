@@ -137,7 +137,7 @@ export function CompoundUniqueKeyContent({
           value={uniqueKeyName}
           readOnly={isReadOnly}
           onChange={(event) => setUniqueKeyName(event.target.value)}
-          className="h-9 rounded px-2 text-sm"
+          className="h-9 px-2"
         />
       </label>
 

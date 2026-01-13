@@ -173,7 +173,7 @@ export function IndexContent({ data, setData }: IndexContentProps) {
                 name: event.target.value,
               });
             }}
-            className="h-8 rounded text-sm w-60"
+            className="h-8 text-sm w-60"
           />
         </div>
 

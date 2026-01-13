@@ -60,7 +60,7 @@ export function AttributeContent({ data, setData }: AttributeContentProps) {
           </label>
           <Input
             id="table-info-physical-name"
-            className="h-8 rounded px-2 text-sm"
+            className="h-8 px-2 text-sm"
             type="text"
             value={data.physicalName}
             readOnly={isReadOnly}
@@ -79,7 +79,7 @@ export function AttributeContent({ data, setData }: AttributeContentProps) {
           </label>
           <Input
             id="table-info-logical-name"
-            className="h-8 rounded px-2 text-sm"
+            className="h-8 px-2 text-sm"
             type="text"
             value={data.logicalName ?? ""}
             readOnly={isReadOnly}

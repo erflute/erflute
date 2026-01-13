@@ -39,7 +39,7 @@ export function ConstraintOptionContent({
           value={primaryKeyName ?? ""}
           readOnly={isReadOnly}
           onChange={(event) => setPrimaryKeyName?.(event.target.value)}
-          className="h-8 rounded px-2 text-sm"
+          className="h-8 px-2 text-sm"
         />
       </label>
 

@@ -275,7 +275,7 @@ export function AttributeDetail({ column, onBack }: AttributeDetailProps) {
               <Input
                 id="table-info-column-physical-name"
                 ref={physicalNameInputRef}
-                className="text-sm h-8 rounded px-2"
+                className="h-8 px-2"
                 type="text"
                 value={currentColumn.physicalName}
                 readOnly={isReadOnly}
@@ -294,7 +294,7 @@ export function AttributeDetail({ column, onBack }: AttributeDetailProps) {
               <span className="font-medium text-slate-600">Logical Name</span>
               <Input
                 id="table-info-column-logical-name"
-                className="h-8 rounded px-2"
+                className="h-8 px-2"
                 type="text"
                 value={currentColumn.logicalName ?? ""}
                 readOnly={isReadOnly}
@@ -376,7 +376,7 @@ export function AttributeDetail({ column, onBack }: AttributeDetailProps) {
                 <span className="font-medium text-slate-600">Length</span>
                 <Input
                   id="table-info-column-length"
-                  className="h-8 rounded px-2"
+                  className="h-8 px-2"
                   type="number"
                   value={currentColumn.length ?? ""}
                   disabled={!typeSupportsLength}
@@ -399,7 +399,7 @@ export function AttributeDetail({ column, onBack }: AttributeDetailProps) {
                 <span className="font-medium text-slate-600">Decimal</span>
                 <Input
                   id="table-info-column-decimal"
-                  className="h-8 rounded px-2"
+                  className="h-8 px-2"
                   type="number"
                   value={currentColumn.decimal ?? ""}
                   disabled={!typeSupportsDecimal}
@@ -456,7 +456,7 @@ export function AttributeDetail({ column, onBack }: AttributeDetailProps) {
               </span>
               <Input
                 id="table-info-column-enum-args"
-                className="h-8 rounded border border-slate-300 px-2 shadow-inner focus:border-blue-500 focus:outline-hidden focus:ring-2 focus:ring-blue-200"
+                className="h-8 px-2"
                 type="text"
                 value={currentColumn.enumArgs ?? ""}
                 disabled={!typeSupportsEnumArgs}
@@ -479,7 +479,7 @@ export function AttributeDetail({ column, onBack }: AttributeDetailProps) {
               <span className="font-medium text-slate-600">Default Value</span>
               <Input
                 id="table-info-column-default-value"
-                className="h-8 rounded border border-slate-300 px-2 shadow-inner focus:border-blue-500 focus:outline-hidden focus:ring-2 focus:ring-blue-200"
+                className="h-8 px-2"
                 type="text"
                 value={currentColumn.defaultValue ?? ""}
                 readOnly={isReadOnly}
@@ -501,7 +501,7 @@ export function AttributeDetail({ column, onBack }: AttributeDetailProps) {
               <span className="font-medium text-slate-600">Description</span>
               <Textarea
                 id="table-info-column-description"
-                className="min-h-18 rounded px-2 py-2"
+                className="min-h-18 px-2 py-2"
                 value={currentColumn.description ?? ""}
                 readOnly={isReadOnly}
                 onChange={(event) =>
