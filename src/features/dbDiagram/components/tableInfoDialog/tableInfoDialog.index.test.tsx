@@ -201,7 +201,6 @@ describe("when editing is allowed", () => {
     expect(add).toBeEnabled();
     expect(update).toBeDisabled();
     expect(deleteButton).toBeDisabled();
-    expect(screen.getByLabelText("Table Name")).toHaveValue("MEMBERS");
     expect(screen.getByLabelText("Index Name")).toHaveValue("IX_MEMBERS_XXX");
     expect(screen.getByLabelText("Index Type")).toHaveValue("BTREE");
     expect(screen.getByLabelText("Mark index as unique")).not.toBeChecked();

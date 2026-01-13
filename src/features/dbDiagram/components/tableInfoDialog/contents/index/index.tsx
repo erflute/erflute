@@ -155,23 +155,6 @@ export function IndexContent({ data, setData }: IndexContentProps) {
         </div>
       </label>
 
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-4">
-          <label
-            className="font-medium text-slate-600"
-            htmlFor="index-table-name"
-          >
-            Table Name
-          </label>
-          <Input
-            id="index-table-name"
-            value={data.physicalName}
-            readOnly
-            className="h-8 rounded px-2 text-sm md:flex-1"
-          />
-        </div>
-      </div>
-
       <div className="flex justify-between">
         <div className="flex gap-4 items-center">
           <label className="font-medium text-slate-600" htmlFor="index-name">
@@ -281,7 +264,7 @@ export function IndexContent({ data, setData }: IndexContentProps) {
       <div className="grid gap-4 md:grid-cols-[minmax(0,320px)_auto_minmax(0,320px)_auto]">
         <div className="flex flex-col gap-2">
           <span className="font-medium text-slate-600">Available columns</span>
-          <div className="h-34 overflow-hidden rounded-md border border-slate-200 bg-white">
+          <div className="h-40 overflow-hidden rounded-md border border-slate-200 bg-white">
             <div className="h-full overflow-y-auto">
               <table className="min-w-full table-fixed divide-y divide-slate-200 text-sm">
                 <colgroup>
@@ -351,7 +334,7 @@ export function IndexContent({ data, setData }: IndexContentProps) {
         <div className="flex flex-col gap-2">
           <span className="font-medium text-slate-600">Index Column</span>
           <div className="flex gap-2">
-            <div className="h-34 flex-1 overflow-hidden rounded-md border border-slate-200 bg-white">
+            <div className="h-40 flex-1 overflow-hidden rounded-md border border-slate-200 bg-white">
               <div className="h-full overflow-y-auto">
                 <table className="min-w-full table-fixed divide-y divide-slate-200 text-sm">
                   <colgroup>
