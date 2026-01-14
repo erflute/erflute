@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import { parseReference } from "@/domain/parsers/referenceParser";
 import { useViewModeStore } from "@/stores/viewModeStore";
 import type { Column } from "@/types/domain/column";
 import { isColumnGroupName } from "@/types/domain/table";
@@ -10,6 +11,10 @@ import { type CompoundUniqueKeyProps } from "./types";
 
 const NEW_KEY_VALUE = "new";
 const SELECT_KEY_VALUE = "select";
+
+function getDefaultUniqueKeyValue(isReadOnly: boolean) {
+  return isReadOnly ? SELECT_KEY_VALUE : NEW_KEY_VALUE;
+}
 
 export function CompoundUniqueKeyContent({
   data,
@@ -53,7 +58,16 @@ export function CompoundUniqueKeyContent({
     }
 
     setUniqueKeyName(selectedKey.name);
-    setSelectedColumns(new Set(selectedKey.columns));
+    setSelectedColumns(
+      new Set(
+        selectedKey.columns
+          .map((column) => {
+            const { columnName } = parseReference(column);
+            return columnName;
+          })
+          .filter((columnName) => columnName !== undefined),
+      ),
+    );
   }, [compoundUniqueKeys, selectedKeyIndex]);
 
   const selectedColumnIds = useMemo(() => {
@@ -70,14 +84,14 @@ export function CompoundUniqueKeyContent({
     handleUpdate,
     handleDelete,
   } = createCompoundUniqueKeyHandlers({
-    compoundUniqueKeys,
-    draftName: uniqueKeyName,
+    uniqueKeyName,
+    defaultUniqueKeyValue: getDefaultUniqueKeyValue(isReadOnly),
     selectedColumnIds,
-    selectedKeyIndex,
-    newKeyValue: NEW_KEY_VALUE,
-    setData,
-    setSelectedKeyIndex,
     setSelectedColumns,
+    selectedKeyIndex,
+    setSelectedKeyIndex,
+    data,
+    setData,
   });
 
   const addDisabled =
@@ -102,7 +116,9 @@ export function CompoundUniqueKeyContent({
         <select
           id="compound-unique-key-select"
           value={
-            selectedKeyIndex == null ? NEW_KEY_VALUE : String(selectedKeyIndex)
+            selectedKeyIndex == null
+              ? getDefaultUniqueKeyValue(isReadOnly)
+              : String(selectedKeyIndex)
           }
           onChange={(event) => handleSelectKey(event.target.value)}
           className="h-9 w-full rounded-md border border-slate-300 bg-white px-2 text-sm shadow-xs focus-visible:border-blue-500 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-200"
@@ -131,7 +147,7 @@ export function CompoundUniqueKeyContent({
           value={uniqueKeyName}
           readOnly={isReadOnly}
           onChange={(event) => setUniqueKeyName(event.target.value)}
-          className="h-9 rounded px-2 text-sm"
+          className="h-9 px-2"
         />
       </label>
 

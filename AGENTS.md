@@ -32,6 +32,12 @@ component_name/
   (e.g., “when the dialog is open”, “with invalid input”).  
   If a single test can stand alone, do not create a wrapping `describe` at all.
 
+- Tests should have a clear and single behavioral flow.
+  Do not mix multiple UI interactions and assertions in a way that blurs the Given / When / Then structure.
+  In particular, avoid tests where assertions are followed by additional userEvent interactions within the same test.
+  If a test requires another user interaction after an assertion, it should be split into a separate test case.
+  Each test is expected to represent one coherent user scenario, expressed through its structure rather than explanatory comments.
+
 ### Testing library
 
 - Avoid selecting elements by passing `id` values to `getByLabelText`.

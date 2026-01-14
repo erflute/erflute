@@ -18,6 +18,7 @@ const createTableResponse = (
   color: { r: 10, g: 20, b: 30 },
   connections: { relationships: [] },
   columns: { items: [] },
+  indexes: {},
   compoundUniqueKeyList: {},
   ...overrides,
 });
@@ -34,8 +35,8 @@ describe("with populated columns", () => {
               name: "users_unique",
               columns: {
                 columns: [
-                  { columnId: "public.users.id" },
-                  { columnId: "public.users.email" },
+                  { columnId: "table.users.id" },
+                  { columnId: "table.users.email" },
                 ],
               },
             },
@@ -77,7 +78,7 @@ describe("with populated columns", () => {
         compoundUniqueKeys: [
           {
             name: "users_unique",
-            columns: ["id", "email"],
+            columns: ["table.users.id", "table.users.email"],
           },
         ],
         columns: [

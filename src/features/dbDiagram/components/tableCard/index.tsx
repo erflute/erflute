@@ -45,6 +45,7 @@ export function TableCard({
     () => flatColumnsFrom(data.columns ?? [], columnGroups),
     [columnGroups, data.columns],
   );
+  const indexes = useMemo(() => data.indexes ?? [], [data.indexes]);
 
   // Ref to the variable table content used to determine the TableCard size.
   // Only the content area is measured to keep the TableCard dimensions
@@ -108,6 +109,21 @@ export function TableCard({
                 <span>{formatColumnLabel(column)}</span>
               </p>
             ))}
+            {indexes.length > 0 && (
+              <div className="mt-1 border-t border-dashed border-slate-300 pt-1 text-[0.625rem] leading-4 text-slate-700">
+                <p className="whitespace-nowrap pl-2">
+                  &lt;&lt; index &gt;&gt;
+                </p>
+                {indexes.map((index, indexPosition) => (
+                  <p
+                    key={`${index.name}-${indexPosition}`}
+                    className="whitespace-nowrap pl-5"
+                  >
+                    {index.name}
+                  </p>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

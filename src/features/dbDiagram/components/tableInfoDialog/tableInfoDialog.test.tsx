@@ -90,6 +90,21 @@ it("applies the current table data and closes when OK is clicked", async () => {
         enumArgs: undefined,
       },
     ],
+    indexes: [
+      {
+        name: "  IDX_MEMBERS_AMOUNT  ",
+        indexType: "  BTREE  ",
+        description: "  Index description  ",
+        nonUnique: true,
+        fullText: false,
+        columns: [
+          {
+            columnId: "  MEMBERS.AMOUNT  ",
+            desc: true,
+          },
+        ],
+      },
+    ],
   });
 
   await user.click(screen.getByRole("button", { name: "OK" }));
@@ -107,6 +122,21 @@ it("applies the current table data and closes when OK is clicked", async () => {
       {
         name: "MEMBERS_NAME",
         columns: ["FIRST_NAME", "LAST_NAME"],
+      },
+    ],
+    indexes: [
+      {
+        name: "IDX_MEMBERS_AMOUNT",
+        indexType: "BTREE",
+        description: "Index description",
+        nonUnique: true,
+        fullText: false,
+        columns: [
+          {
+            columnId: "MEMBERS.AMOUNT",
+            desc: true,
+          },
+        ],
       },
     ],
     columns: [

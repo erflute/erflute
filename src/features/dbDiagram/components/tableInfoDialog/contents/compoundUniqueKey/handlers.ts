@@ -1,30 +1,31 @@
 import type { Dispatch, SetStateAction } from "react";
+import { stringifyReference } from "@/domain/parsers/referenceParser";
 import type { CompoundUniqueKey } from "@/types/domain/table";
 import type { CompoundUniqueKeyProps } from "./types";
 
 type CompoundUniqueKeyHandlers = {
-  compoundUniqueKeys: CompoundUniqueKey[];
-  draftName: string;
+  uniqueKeyName: string;
+  defaultUniqueKeyValue: string;
   selectedColumnIds: string[];
-  selectedKeyIndex: number | null;
-  newKeyValue: string;
-  setData: CompoundUniqueKeyProps["setData"];
-  setSelectedKeyIndex: Dispatch<SetStateAction<number | null>>;
   setSelectedColumns: Dispatch<SetStateAction<Set<string>>>;
+  selectedKeyIndex: number | null;
+  setSelectedKeyIndex: Dispatch<SetStateAction<number | null>>;
+  data: CompoundUniqueKeyProps["data"];
+  setData: CompoundUniqueKeyProps["setData"];
 };
 
 export function createCompoundUniqueKeyHandlers({
-  compoundUniqueKeys,
-  draftName,
+  uniqueKeyName,
+  defaultUniqueKeyValue,
   selectedColumnIds,
-  selectedKeyIndex,
-  newKeyValue,
-  setData,
-  setSelectedKeyIndex,
   setSelectedColumns,
+  selectedKeyIndex,
+  setSelectedKeyIndex,
+  data,
+  setData,
 }: CompoundUniqueKeyHandlers) {
   const handleSelectKey = (value: string) => {
-    if (value === newKeyValue) {
+    if (value === defaultUniqueKeyValue) {
       setSelectedKeyIndex(null);
       return;
     }
@@ -45,14 +46,19 @@ export function createCompoundUniqueKeyHandlers({
   };
 
   const handleAdd = () => {
-    const trimmedName = draftName.trim();
+    const trimmedName = uniqueKeyName.trim();
     if (!trimmedName || selectedColumnIds.length === 0) {
       return;
     }
 
     const nextKey: CompoundUniqueKey = {
       name: trimmedName,
-      columns: selectedColumnIds,
+      columns: selectedColumnIds.map((columnId) =>
+        stringifyReference({
+          tableName: data.physicalName,
+          columnName: columnId,
+        }),
+      ),
     };
 
     setData((prev) => {
@@ -62,14 +68,14 @@ export function createCompoundUniqueKeyHandlers({
         compoundUniqueKeys: nextKeys,
       };
     });
-    setSelectedKeyIndex(compoundUniqueKeys.length);
+    setSelectedKeyIndex(data.compoundUniqueKeys?.length ?? 0);
   };
 
   const handleUpdate = () => {
     if (selectedKeyIndex == null) {
       return;
     }
-    const trimmedName = draftName.trim();
+    const trimmedName = uniqueKeyName.trim();
     if (!trimmedName || selectedColumnIds.length === 0) {
       return;
     }
@@ -80,7 +86,12 @@ export function createCompoundUniqueKeyHandlers({
       }
       nextKeys[selectedKeyIndex] = {
         name: trimmedName,
-        columns: selectedColumnIds,
+        columns: selectedColumnIds.map((columnId) =>
+          stringifyReference({
+            tableName: data.physicalName,
+            columnName: columnId,
+          }),
+        ),
       };
       return {
         ...prev,
@@ -108,7 +119,10 @@ export function createCompoundUniqueKeyHandlers({
       if (prevIndex == null) {
         return null;
       }
-      if (compoundUniqueKeys.length <= 1) {
+      if (
+        data.compoundUniqueKeys?.length &&
+        data.compoundUniqueKeys.length <= 1
+      ) {
         return null;
       }
       return Math.max(0, prevIndex - 1);

@@ -1,9 +1,13 @@
-import { parseReference } from "@/domain/parsers/referenceParser";
 import type { TableResponse } from "@/types/api/diagramWalkers";
 import type { Column } from "@/types/domain/column";
 import { parseColumnType } from "@/types/domain/columnType";
 import type { Relationship } from "@/types/domain/relationship";
-import type { CompoundUniqueKey, Table } from "@/types/domain/table";
+import type {
+  CompoundUniqueKey,
+  Index,
+  IndexColumn,
+  Table,
+} from "@/types/domain/table";
 
 export function mapTablesFrom(tableResponses: TableResponse[]): Table[] {
   return tableResponses.map((table) => {
@@ -45,14 +49,26 @@ export function mapTablesFrom(tableResponses: TableResponse[]): Table[] {
           referredColumn: item.referredColumn,
         } satisfies Column;
       }),
+      indexes: table.indexes.indexes?.map((index) => {
+        return {
+          name: index.name,
+          indexType: index.indexType,
+          description: index.description,
+          fullText: index.fullText,
+          nonUnique: index.nonUnique,
+          columns: index.columns.columns.map((column) => {
+            return {
+              columnId: column.columnId,
+              desc: column.desc,
+            } satisfies IndexColumn;
+          }),
+        } satisfies Index;
+      }),
       compoundUniqueKeys: table.compoundUniqueKeyList.compoundUniqueKeys?.map(
         (uniqueKey) => {
           return {
             name: uniqueKey.name,
-            columns: uniqueKey.columns.columns.map((column) => {
-              const { columnName } = parseReference(column.columnId);
-              return columnName ?? "";
-            }),
+            columns: uniqueKey.columns.columns.map((column) => column.columnId),
           } satisfies CompoundUniqueKey;
         },
       ),

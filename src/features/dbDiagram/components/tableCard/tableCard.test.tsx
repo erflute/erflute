@@ -81,3 +81,28 @@ it("calls the header double-click handler", async () => {
 
   expect(handleHeaderDoubleClick).toHaveBeenCalledTimes(1);
 });
+
+it("renders index names when indexes exist", () => {
+  const table = createTable({
+    indexes: [
+      {
+        name: "IX_users_test",
+        indexType: "BTREE",
+        nonUnique: true,
+        columns: [],
+      },
+      {
+        name: "IX_users_test2",
+        indexType: "BTREE",
+        nonUnique: true,
+        columns: [],
+      },
+    ],
+  });
+
+  render(<TableCard data={table} />);
+
+  expect(screen.getByText("<< index >>")).toBeInTheDocument();
+  expect(screen.getByText("IX_users_test")).toBeInTheDocument();
+  expect(screen.getByText("IX_users_test2")).toBeInTheDocument();
+});

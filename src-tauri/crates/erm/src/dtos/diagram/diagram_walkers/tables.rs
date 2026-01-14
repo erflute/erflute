@@ -1,11 +1,13 @@
 pub mod columns;
 pub mod compound_unique_key_list;
 pub mod connections;
+pub mod indexes;
 
 use crate::entities::diagram::diagram_walkers::tables as entities;
 use columns::Columns;
 use compound_unique_key_list::CompoundUniqueKeyList;
 use connections::Connections;
+use indexes::Indexes;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
@@ -52,6 +54,8 @@ pub struct Table {
 
     pub columns: Columns,
 
+    pub indexes: Indexes,
+
     pub compound_unique_key_list: CompoundUniqueKeyList,
 }
 
@@ -73,6 +77,7 @@ impl From<entities::Table> for Table {
             primary_key_name: entity.primary_key_name,
             option: entity.option,
             columns: entity.columns.into(),
+            indexes: entity.indexes.into(),
             compound_unique_key_list: entity.compound_unique_key_list.into(),
         }
     }

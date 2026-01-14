@@ -18,6 +18,7 @@ import { AttributeContent } from "./contents/attribute";
 import { CompoundUniqueKeyContent } from "./contents/compoundUniqueKey";
 import { ConstraintOptionContent } from "./contents/constraintOption";
 import { DescriptionContent } from "./contents/description";
+import { IndexContent } from "./contents/index";
 import { type TableInfoDialogProps } from "./types";
 
 export function TableInfoDialog({
@@ -57,6 +58,20 @@ export function TableInfoDialog({
         };
       })
       .filter((key) => key.name.length > 0 && key.columns.length > 0);
+    const preparedIndexes = tableData.indexes?.map((index) => {
+      return {
+        ...index,
+        name: index.name.trim(),
+        indexType: index.indexType.trim(),
+        description: index.description ? index.description.trim() : undefined,
+        columns: index.columns.map((column) => {
+          return {
+            ...column,
+            columnId: column.columnId.trim(),
+          };
+        }),
+      };
+    });
 
     onApply?.({
       ...data,
@@ -71,6 +86,7 @@ export function TableInfoDialog({
         : undefined,
       option: tableData.option ? tableData.option.trim() : undefined,
       columns: preparedColumns,
+      indexes: preparedIndexes,
       compoundUniqueKeys: preparedCompoundUniqueKeys,
     });
     onOpenChange?.(false);
@@ -172,7 +188,7 @@ export function TableInfoDialog({
             value="index"
             className="rounded-md border border-dashed border-slate-300 bg-white p-6 text-sm text-slate-500"
           >
-            Index configuration will be implemented soon.
+            <IndexContent data={tableData} setData={setTableData} />
           </TabsContent>
           <TabsContent
             value="advanced-settings"
@@ -181,7 +197,7 @@ export function TableInfoDialog({
             Advanced settings are not yet available for this table.
           </TabsContent>
         </Tabs>
-        <DialogFooter className="mt-4">
+        <DialogFooter>
           <Button
             type="button"
             variant="outline"
