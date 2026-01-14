@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import { parseReference } from "@/domain/parsers/referenceParser";
 import { useViewModeStore } from "@/stores/viewModeStore";
 import type { Column } from "@/types/domain/column";
 import { isColumnGroupName } from "@/types/domain/table";
@@ -57,7 +58,16 @@ export function CompoundUniqueKeyContent({
     }
 
     setUniqueKeyName(selectedKey.name);
-    setSelectedColumns(new Set(selectedKey.columns));
+    setSelectedColumns(
+      new Set(
+        selectedKey.columns
+          .map((column) => {
+            const { columnName } = parseReference(column);
+            return columnName;
+          })
+          .filter((columnName) => columnName !== undefined),
+      ),
+    );
   }, [compoundUniqueKeys, selectedKeyIndex]);
 
   const selectedColumnIds = useMemo(() => {
@@ -74,14 +84,14 @@ export function CompoundUniqueKeyContent({
     handleUpdate,
     handleDelete,
   } = createCompoundUniqueKeyHandlers({
-    compoundUniqueKeys,
     uniqueKeyName,
-    selectedColumnIds,
-    selectedKeyIndex,
     defaultUniqueKeyValue: getDefaultUniqueKeyValue(isReadOnly),
-    setData,
-    setSelectedKeyIndex,
+    selectedColumnIds,
     setSelectedColumns,
+    selectedKeyIndex,
+    setSelectedKeyIndex,
+    data,
+    setData,
   });
 
   const addDisabled =

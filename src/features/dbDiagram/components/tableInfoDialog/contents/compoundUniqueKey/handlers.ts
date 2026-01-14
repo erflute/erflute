@@ -1,27 +1,28 @@
 import type { Dispatch, SetStateAction } from "react";
+import { stringifyReference } from "@/domain/parsers/referenceParser";
 import type { CompoundUniqueKey } from "@/types/domain/table";
 import type { CompoundUniqueKeyProps } from "./types";
 
 type CompoundUniqueKeyHandlers = {
-  compoundUniqueKeys: CompoundUniqueKey[];
   uniqueKeyName: string;
-  selectedColumnIds: string[];
-  selectedKeyIndex: number | null;
   defaultUniqueKeyValue: string;
-  setData: CompoundUniqueKeyProps["setData"];
-  setSelectedKeyIndex: Dispatch<SetStateAction<number | null>>;
+  selectedColumnIds: string[];
   setSelectedColumns: Dispatch<SetStateAction<Set<string>>>;
+  selectedKeyIndex: number | null;
+  setSelectedKeyIndex: Dispatch<SetStateAction<number | null>>;
+  data: CompoundUniqueKeyProps["data"];
+  setData: CompoundUniqueKeyProps["setData"];
 };
 
 export function createCompoundUniqueKeyHandlers({
-  compoundUniqueKeys,
   uniqueKeyName,
-  selectedColumnIds,
-  selectedKeyIndex,
   defaultUniqueKeyValue,
-  setData,
-  setSelectedKeyIndex,
+  selectedColumnIds,
   setSelectedColumns,
+  selectedKeyIndex,
+  setSelectedKeyIndex,
+  data,
+  setData,
 }: CompoundUniqueKeyHandlers) {
   const handleSelectKey = (value: string) => {
     if (value === defaultUniqueKeyValue) {
@@ -52,7 +53,12 @@ export function createCompoundUniqueKeyHandlers({
 
     const nextKey: CompoundUniqueKey = {
       name: trimmedName,
-      columns: selectedColumnIds,
+      columns: selectedColumnIds.map((columnId) =>
+        stringifyReference({
+          tableName: data.physicalName,
+          columnName: columnId,
+        }),
+      ),
     };
 
     setData((prev) => {
@@ -62,7 +68,7 @@ export function createCompoundUniqueKeyHandlers({
         compoundUniqueKeys: nextKeys,
       };
     });
-    setSelectedKeyIndex(compoundUniqueKeys.length);
+    setSelectedKeyIndex(data.compoundUniqueKeys?.length ?? 0);
   };
 
   const handleUpdate = () => {
@@ -80,7 +86,12 @@ export function createCompoundUniqueKeyHandlers({
       }
       nextKeys[selectedKeyIndex] = {
         name: trimmedName,
-        columns: selectedColumnIds,
+        columns: selectedColumnIds.map((columnId) =>
+          stringifyReference({
+            tableName: data.physicalName,
+            columnName: columnId,
+          }),
+        ),
       };
       return {
         ...prev,
@@ -108,7 +119,10 @@ export function createCompoundUniqueKeyHandlers({
       if (prevIndex == null) {
         return null;
       }
-      if (compoundUniqueKeys.length <= 1) {
+      if (
+        data.compoundUniqueKeys?.length &&
+        data.compoundUniqueKeys.length <= 1
+      ) {
         return null;
       }
       return Math.max(0, prevIndex - 1);

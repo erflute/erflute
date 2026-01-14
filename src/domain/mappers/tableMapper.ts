@@ -1,4 +1,3 @@
-import { parseReference } from "@/domain/parsers/referenceParser";
 import type { TableResponse } from "@/types/api/diagramWalkers";
 import type { Column } from "@/types/domain/column";
 import { parseColumnType } from "@/types/domain/columnType";
@@ -69,10 +68,7 @@ export function mapTablesFrom(tableResponses: TableResponse[]): Table[] {
         (uniqueKey) => {
           return {
             name: uniqueKey.name,
-            columns: uniqueKey.columns.columns.map((column) => {
-              const { columnName } = parseReference(column.columnId);
-              return columnName ?? "";
-            }),
+            columns: uniqueKey.columns.columns.map((column) => column.columnId),
           } satisfies CompoundUniqueKey;
         },
       ),

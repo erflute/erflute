@@ -179,7 +179,9 @@ describe("when editing is allowed", () => {
   it("updates the selected unique key name and columns", async () => {
     const user = userEvent.setup();
     renderEditableTableInfoDialog({
-      compoundUniqueKeys: [{ name: "UK_MEMBERS", columns: ["ID"] }],
+      compoundUniqueKeys: [
+        { name: "UK_MEMBERS", columns: ["table.MEMBERS.ID"] },
+      ],
     });
 
     const { select, nameInput } = await openCompoundUniqueKeyTab(user);
