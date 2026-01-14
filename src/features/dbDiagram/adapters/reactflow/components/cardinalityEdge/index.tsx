@@ -1,11 +1,13 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   BaseEdge,
   getStraightPath,
+  useReactFlow,
   useStore,
   type Edge,
   type EdgeProps,
 } from "@xyflow/react";
+import { RelationInfoDialog } from "@/features/dbDiagram/components/relationInfoDialog";
 import { Cardinality, type Relationship } from "@/types/domain/relationship";
 import { getEdgeParams } from "./edgeParams";
 import { buildSymbols, cardinalityToSymbolPartKinds } from "./symbol";
@@ -18,8 +20,10 @@ export function CardinalityEdge({
   markerEnd,
   style,
 }: EdgeProps<Edge<Relationship>>) {
+  const { setEdges } = useReactFlow();
   const sourceNode = useStore((s) => s.nodeLookup.get(source));
   const targetNode = useStore((s) => s.nodeLookup.get(target));
+  const [relationInfoDialogOpen, setRelationInfoDialogOpen] = useState(false);
   if (!sourceNode || !targetNode) {
     return null;
   }
@@ -101,6 +105,11 @@ export function CardinalityEdge({
 
   const symbols = [...sourceSymbols, ...targetSymbols];
 
+  // BaseEdge is used for rendering the edge path, but relying on its onDoubleClick can be unreliable:
+  // - event handlers may not be forwarded to the underlying SVG <path> depending on library implementation,
+  // - the edge's visible stroke is thin and easy to miss,
+  // - other SVG elements can overlap the edge and steal pointer events.
+  // We therefore add a dedicated (invisible) interaction path to ensure double-click is captured.
   return (
     <>
       <BaseEdge
@@ -109,7 +118,33 @@ export function CardinalityEdge({
         style={style}
         markerEnd={markerEnd}
       />
+      <path
+        d={straightPath}
+        fill="none"
+        strokeOpacity={0}
+        strokeWidth={24}
+        pointerEvents="stroke"
+        onDoubleClick={(e) => {
+          e.stopPropagation();
+          setRelationInfoDialogOpen(true);
+        }}
+        className="cursor-pointer"
+      />
       {symbols}
+      {data && (
+        <RelationInfoDialog
+          data={data}
+          open={relationInfoDialogOpen}
+          onOpenChange={setRelationInfoDialogOpen}
+          onApply={(data) => {
+            setEdges((edgs) =>
+              edgs.map((edge) =>
+                edge.id === id ? { ...edge, data: data } : edge,
+              ),
+            );
+          }}
+        />
+      )}
     </>
   );
 }

@@ -1,4 +1,4 @@
-import type { Cardinality } from "../domain/relationship";
+import type { Cardinality, ReferenceOperation } from "../domain/relationship";
 import type { CompoundUniqueKeyList } from "./compoundUniqueKeyList";
 import type { Indexes } from "./indexes";
 
@@ -24,8 +24,10 @@ type Relationship = {
   parentCardinality: Cardinality;
   childCardinality: Cardinality;
   referenceForPk: boolean;
-  onDeleteAction: string;
-  onUpdateAction: string;
+  onDeleteAction?: ReferenceOperation;
+  onUpdateAction?: ReferenceOperation;
+  referredSimpleUniqueColumn?: string;
+  referredCompoundUniqueKey?: string;
 };
 
 type Connections = {

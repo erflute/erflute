@@ -40,8 +40,18 @@ pub struct Relationship {
     pub parent_cardinality: String,
     pub child_cardinality: String,
     pub reference_for_pk: bool,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub on_delete_action: Option<String>,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub on_update_action: Option<String>,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub referred_simple_unique_column: Option<String>,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub referred_compound_unique_key: Option<String>,
 }
 
 impl From<entities::Relationship> for Relationship {
@@ -56,6 +66,8 @@ impl From<entities::Relationship> for Relationship {
             reference_for_pk: entity.reference_for_pk,
             on_delete_action: entity.on_delete_action,
             on_update_action: entity.on_update_action,
+            referred_simple_unique_column: entity.referred_simple_unique_column,
+            referred_compound_unique_key: entity.referred_compound_unique_key,
         }
     }
 }
