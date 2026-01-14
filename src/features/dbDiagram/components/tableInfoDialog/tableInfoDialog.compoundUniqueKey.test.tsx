@@ -112,7 +112,7 @@ describe("when editing is allowed", () => {
       ],
     });
 
-    const { nameInput } = await openCompoundUniqueKeyTab(user);
+    await openCompoundUniqueKeyTab(user);
 
     expect(screen.getByText("ID")).toBeInTheDocument();
     expect(screen.getByText("EMAIL")).toBeInTheDocument();
@@ -120,8 +120,6 @@ describe("when editing is allowed", () => {
     expect(screen.getByRole("button", { name: "Add" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "Update" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "Delete" })).toBeDisabled();
-
-    await user.type(nameInput, "UK_MEMBERS_EMAIL");
   });
 
   it("enables Add once the name and a column are selected", async () => {
@@ -176,7 +174,7 @@ describe("when editing is allowed", () => {
     expect(screen.getByRole("button", { name: "Delete" })).toBeEnabled();
   });
 
-  it("updates the selected unique key name and columns", async () => {
+  it("populates the name and columns when a unique key is selected", async () => {
     const user = userEvent.setup();
     renderEditableTableInfoDialog({
       compoundUniqueKeys: [
@@ -191,6 +189,19 @@ describe("when editing is allowed", () => {
     expect(nameInput).toHaveValue("UK_MEMBERS");
     expect(getColumnCheckbox("ID")).toBeChecked();
     expect(getColumnCheckbox("EMAIL")).not.toBeChecked();
+  });
+
+  it("updates the selected unique key name and columns", async () => {
+    const user = userEvent.setup();
+    renderEditableTableInfoDialog({
+      compoundUniqueKeys: [
+        { name: "UK_MEMBERS", columns: ["table.MEMBERS.ID"] },
+      ],
+    });
+
+    const { select, nameInput } = await openCompoundUniqueKeyTab(user);
+
+    await user.selectOptions(select, "0");
 
     await user.clear(nameInput);
     await user.type(nameInput, "UK_MEMBERS_EMAIL");
