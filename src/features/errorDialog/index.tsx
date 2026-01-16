@@ -24,7 +24,7 @@ function normalizeError(
     };
   }
   if (typeof error === "string") {
-    return { message: error };
+    return { message: defaultMessage, details: error };
   }
   if (typeof error === "object" && error !== null) {
     try {
