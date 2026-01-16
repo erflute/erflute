@@ -20,8 +20,8 @@ pub struct Relationship {
     pub parent_cardinality: String,
     pub child_cardinality: String,
     pub reference_for_pk: bool,
-    pub on_delete_action: String,
-    pub on_update_action: String,
+    pub on_delete_action: Option<String>,
+    pub on_update_action: Option<String>,
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize, Default)]

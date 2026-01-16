@@ -110,8 +110,8 @@ fn test_read_erm_file() {
                                     parent_cardinality: "1".to_string(),
                                     child_cardinality: "0..1".to_string(),
                                     reference_for_pk: true,
-                                    on_delete_action: "RESTRICT".to_string(),
-                                    on_update_action: "RESTRICT".to_string(),
+                                    on_delete_action: Some("RESTRICT".to_string()),
+                                    on_update_action: Some("RESTRICT".to_string()),
                                 },
                                 connections::Relationship {
                                     name: "FK_MEMBER_PROFILES_MST_GENDER".to_string(),
@@ -125,8 +125,8 @@ fn test_read_erm_file() {
                                     parent_cardinality: "1".to_string(),
                                     child_cardinality: "0..n".to_string(),
                                     reference_for_pk: true,
-                                    on_delete_action: "RESTRICT".to_string(),
-                                    on_update_action: "RESTRICT".to_string(),
+                                    on_delete_action: Some("RESTRICT".to_string()),
+                                    on_update_action: Some("RESTRICT".to_string()),
                                 }
                             ])
                         },
@@ -258,8 +258,8 @@ fn test_read_erm_file() {
                                 parent_cardinality: "0..1".to_string(),
                                 child_cardinality: "0..n".to_string(),
                                 reference_for_pk: true,
-                                on_delete_action: "RESTRICT".to_string(),
-                                on_update_action: "RESTRICT".to_string(),
+                                on_delete_action: Some("RESTRICT".to_string()),
+                                on_update_action: Some("RESTRICT".to_string()),
                             }])
                         },
                         table_constraint: None,
@@ -379,8 +379,8 @@ fn test_read_erm_file() {
                                     parent_cardinality: "1".to_string(),
                                     child_cardinality: "1..n".to_string(),
                                     reference_for_pk: true,
-                                    on_delete_action: "RESTRICT".to_string(),
-                                    on_update_action: "RESTRICT".to_string(),
+                                    on_delete_action: Some("RESTRICT".to_string()),
+                                    on_update_action: Some("RESTRICT".to_string()),
                                 },
                                 connections::Relationship {
                                     name: "FK_POST_REPLIES_MEMBERS".to_string(),
@@ -394,8 +394,8 @@ fn test_read_erm_file() {
                                     parent_cardinality: "0..1".to_string(),
                                     child_cardinality: "0..n".to_string(),
                                     reference_for_pk: true,
-                                    on_delete_action: "RESTRICT".to_string(),
-                                    on_update_action: "RESTRICT".to_string(),
+                                    on_delete_action: Some("RESTRICT".to_string()),
+                                    on_update_action: Some("RESTRICT".to_string()),
                                 },
                             ])
                         },
@@ -489,8 +489,8 @@ fn test_read_erm_file() {
                                 parent_cardinality: "1".to_string(),
                                 child_cardinality: "0..1".to_string(),
                                 reference_for_pk: true,
-                                on_delete_action: "RESTRICT".to_string(),
-                                on_update_action: "RESTRICT".to_string(),
+                                on_delete_action: Some("RESTRICT".to_string()),
+                                on_update_action: Some("RESTRICT".to_string()),
                             }])
                         },
                         table_constraint: None,
