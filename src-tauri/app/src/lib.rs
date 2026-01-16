@@ -3,7 +3,7 @@ use erm::dtos::diagram::Diagram;
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
 fn load_diagram(filename: &str) -> Result<Diagram, String> {
-    erm::open(&filename).map_err(|e| e.to_string())
+    erm::open(filename).map_err(|e| format!("failed to open {}:\n\t{}", filename, e))
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
