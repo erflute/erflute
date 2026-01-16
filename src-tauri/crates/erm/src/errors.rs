@@ -6,5 +6,5 @@ pub enum Error {
     Io(#[from] std::io::Error),
 
     #[error("Parse error: {0}")]
-    Parse(#[from] quick_xml::errors::serialize::DeError),
+    Parse(#[from] quick_xml::de::DeError),
 }

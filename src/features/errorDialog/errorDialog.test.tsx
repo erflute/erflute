@@ -22,7 +22,9 @@ it("renders the default title and context details for string errors", () => {
   render(<ErrorDialog />);
 
   expect(screen.getByText("Something went wrong")).toBeInTheDocument();
-  expect(screen.getByText("Network unreachable")).toBeInTheDocument();
+  expect(
+    screen.getByText(/Fetching diagram from disk[\s\S]*Network unreachable/),
+  ).toBeInTheDocument();
   expect(screen.getByText("Details")).toBeInTheDocument();
   expect(
     screen.getByText("Fetching diagram from disk", { exact: false }),
