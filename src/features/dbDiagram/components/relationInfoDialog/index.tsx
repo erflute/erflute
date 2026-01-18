@@ -26,17 +26,16 @@ const REFERENCE_OPERATION_OPTIONS = [
   ReferenceOperation.SetDefault,
 ];
 
-const CARDINALITY_OPTIONS = [
+const PARENT_CARDINALITY_OPTIONS = [Cardinality.One, Cardinality.ZeroOne];
+
+const CHILD_CARDINALITY_OPTIONS = [
   Cardinality.One,
   Cardinality.ZeroOne,
   Cardinality.OneN,
   Cardinality.ZeroN,
 ];
 
-function getReferenceTable(data?: Relationship) {
-  if (!data) {
-    return "";
-  }
+function getReferenceTable(data: Relationship) {
   const { tableName } = parseReference(data.source);
   return tableName ?? "";
 }
@@ -51,8 +50,8 @@ export function RelationInfoDialog({
   const { isReadOnly } = useViewModeStore();
   const [constName, setConstName] = useState<string>(data.name);
   const [referenceOperation, setReferenceOperation] = useState({
-    onUpdate: data.onDeleteAction ?? NO_ACTION,
-    onDelete: data.onUpdateAction ?? NO_ACTION,
+    onDelete: data.onDeleteAction ?? NO_ACTION,
+    onUpdate: data.onUpdateAction ?? NO_ACTION,
   });
   const [referredColumn, setReferredColumn] = useState(data.referredColumn);
   const [multiplicity, setMultiplicity] = useState({
@@ -191,7 +190,7 @@ export function RelationInfoDialog({
                   }
                   className="h-9 rounded-md border border-slate-300 bg-white px-2 text-sm shadow-xs focus-visible:border-blue-500 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-200"
                 >
-                  {CARDINALITY_OPTIONS.map((option) => (
+                  {PARENT_CARDINALITY_OPTIONS.map((option) => (
                     <option key={option} value={option}>
                       {option}
                     </option>
@@ -219,7 +218,7 @@ export function RelationInfoDialog({
                   }
                   className="h-9 rounded-md border border-slate-300 bg-white px-2 text-sm shadow-xs focus-visible:border-blue-500 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-200"
                 >
-                  {CARDINALITY_OPTIONS.map((option) => (
+                  {CHILD_CARDINALITY_OPTIONS.map((option) => (
                     <option key={option} value={option}>
                       {option}
                     </option>
