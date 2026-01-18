@@ -1,11 +1,12 @@
 import { type Edge, type Node } from "@xyflow/react";
+import { stringifyReference } from "@/domain/parsers/referenceParser";
 import type { Relationship } from "@/types/domain/relationship";
 import { type Table } from "@/types/domain/table";
 
-export function createNodes(tables: Table[]): Node[] {
+export function createNodes(tables: Table[]): Node<Table>[] {
   return tables.map((table) => {
     return {
-      id: `table.${table.physicalName}`,
+      id: stringifyReference({ tableName: table.physicalName }),
       type: "table",
       position: {
         x: table.x,
@@ -18,7 +19,9 @@ export function createNodes(tables: Table[]): Node[] {
   });
 }
 
-export function createEdges(relationships: Relationship[]): Edge[] {
+export function createEdges(
+  relationships: Relationship[],
+): Edge<Relationship>[] {
   return relationships.map((relationship) => {
     return {
       id: relationship.name,

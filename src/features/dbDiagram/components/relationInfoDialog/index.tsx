@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -48,16 +48,36 @@ export function RelationInfoDialog({
 }: RelationInfoDialogProps) {
   const { open, onOpenChange, ...dialogProps } = props;
   const { isReadOnly } = useViewModeStore();
-  const [constName, setConstName] = useState<string>(data.name);
+  const [constName, setConstName] = useState<string>("");
   const [referenceOperation, setReferenceOperation] = useState({
-    onDelete: data.onDeleteAction ?? NO_ACTION,
-    onUpdate: data.onUpdateAction ?? NO_ACTION,
+    onUpdate: NO_ACTION,
+    onDelete: NO_ACTION,
   });
-  const [referredColumn, setReferredColumn] = useState(data.referredColumn);
-  const [multiplicity, setMultiplicity] = useState({
-    parent: data.parentCardinality,
-    child: data.childCardinality,
+  const [referredColumn, setReferredColumn] = useState("");
+  const [multiplicity, setMultiplicity] = useState<{
+    parent: Cardinality;
+    child: Cardinality;
+  }>({
+    parent: Cardinality.One,
+    child: Cardinality.One,
   });
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    setConstName(data.name);
+    setReferenceOperation({
+      onDelete: data.onDeleteAction ?? NO_ACTION,
+      onUpdate: data.onUpdateAction ?? NO_ACTION,
+    });
+    setReferredColumn(data.referredColumn);
+    setMultiplicity({
+      parent: data.parentCardinality,
+      child: data.childCardinality,
+    });
+  }, [data, open]);
 
   const handleApply = () => {
     onApply?.({

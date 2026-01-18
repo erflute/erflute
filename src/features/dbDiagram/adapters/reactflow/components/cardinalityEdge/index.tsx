@@ -8,6 +8,7 @@ import {
   type EdgeProps,
 } from "@xyflow/react";
 import { RelationInfoDialog } from "@/features/dbDiagram/components/relationInfoDialog";
+import { useDiagramStore } from "@/stores/diagramStore";
 import { Cardinality, type Relationship } from "@/types/domain/relationship";
 import { getEdgeParams } from "./edgeParams";
 import { buildSymbols, cardinalityToSymbolPartKinds } from "./symbol";
@@ -21,6 +22,9 @@ export function CardinalityEdge({
   style,
 }: EdgeProps<Edge<Relationship>>) {
   const { setEdges } = useReactFlow();
+  const updateRelationship = useDiagramStore(
+    (state) => state.updateRelationship,
+  );
   const sourceNode = useStore((s) => s.nodeLookup.get(source));
   const targetNode = useStore((s) => s.nodeLookup.get(target));
   const [relationInfoDialogOpen, setRelationInfoDialogOpen] = useState(false);
@@ -136,10 +140,17 @@ export function CardinalityEdge({
           data={data}
           open={relationInfoDialogOpen}
           onOpenChange={setRelationInfoDialogOpen}
-          onApply={(data) => {
-            setEdges((edgs) =>
-              edgs.map((edge) =>
-                edge.id === id ? { ...edge, data: data } : edge,
+          onApply={(updatedRelationship) => {
+            updateRelationship(updatedRelationship, id);
+            setEdges((edges) =>
+              edges.map((edge) =>
+                edge.id === id
+                  ? {
+                      ...edge,
+                      id: updatedRelationship.name,
+                      data: updatedRelationship,
+                    }
+                  : edge,
               ),
             );
           }}

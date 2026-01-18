@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -29,6 +29,12 @@ export function TableInfoDialog({
 }: TableInfoDialogProps) {
   const { open, onOpenChange, ...dialogProps } = props;
   const [tableData, setTableData] = useState<Table>(data);
+
+  useEffect(() => {
+    if (open) {
+      setTableData(data);
+    }
+  }, [open, data]);
 
   const handleApply = () => {
     const columns = tableData.columns || [];
