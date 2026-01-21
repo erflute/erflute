@@ -22,6 +22,8 @@ export const useDiagramStore = create<DiagramStore>((set) => ({
   tables: [],
   relationships: [],
   columnGroups: [],
+  // Version counters are reserved for full list replacements (setTables/setRelationships),
+  // so incremental updates do not trigger expensive full refreshes.
   tablesVersion: 0,
   relationshipsVersion: 0,
   setTables: (tables: Table[]) =>
