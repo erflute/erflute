@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -30,11 +30,24 @@ export function TableInfoDialog({
   const { open, onOpenChange, ...dialogProps } = props;
   const [tableData, setTableData] = useState<Table>(data);
 
+  // This timeout ref is used to keep the closing transition animation smooth
+  const deferredActionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
+
   useEffect(() => {
     if (open) {
       setTableData(data);
     }
   }, [open, data]);
+
+  useEffect(() => {
+    return () => {
+      if (deferredActionTimeoutRef.current) {
+        clearTimeout(deferredActionTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleApply = () => {
     const columns = tableData.columns || [];
@@ -79,7 +92,7 @@ export function TableInfoDialog({
       };
     });
 
-    onApply?.({
+    const preparedTable = {
       ...data,
       physicalName: tableData.physicalName.trim(),
       logicalName: tableData.logicalName.trim(),
@@ -94,13 +107,24 @@ export function TableInfoDialog({
       columns: preparedColumns,
       indexes: preparedIndexes,
       compoundUniqueKeys: preparedCompoundUniqueKeys,
-    });
+    };
     onOpenChange?.(false);
+    if (deferredActionTimeoutRef.current) {
+      clearTimeout(deferredActionTimeoutRef.current);
+    }
+    deferredActionTimeoutRef.current = setTimeout(() => {
+      onApply?.(preparedTable);
+    }, 200);
   };
 
   const handleCancel = () => {
-    onCancel?.();
     onOpenChange?.(false);
+    if (deferredActionTimeoutRef.current) {
+      clearTimeout(deferredActionTimeoutRef.current);
+    }
+    deferredActionTimeoutRef.current = setTimeout(() => {
+      onCancel?.();
+    }, 200);
   };
 
   return (

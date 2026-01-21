@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -48,6 +48,11 @@ export function RelationInfoDialog({
 }: RelationInfoDialogProps) {
   const { open, onOpenChange, ...dialogProps } = props;
   const { isReadOnly } = useViewModeStore();
+
+  // This timeout ref is used to keep the closing transition animation smooth
+  const deferredActionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
   const [constName, setConstName] = useState<string>("");
   const [referenceOperation, setReferenceOperation] = useState({
     onUpdate: NO_ACTION,
@@ -79,8 +84,16 @@ export function RelationInfoDialog({
     });
   }, [data, open]);
 
+  useEffect(() => {
+    return () => {
+      if (deferredActionTimeoutRef.current) {
+        clearTimeout(deferredActionTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const handleApply = () => {
-    onApply?.({
+    const preparedRelationship = {
       ...data,
       name: constName.trim(),
       onUpdateAction:
@@ -94,13 +107,24 @@ export function RelationInfoDialog({
       referredColumn,
       parentCardinality: multiplicity.parent,
       childCardinality: multiplicity.child,
-    });
+    };
     onOpenChange?.(false);
+    if (deferredActionTimeoutRef.current) {
+      clearTimeout(deferredActionTimeoutRef.current);
+    }
+    deferredActionTimeoutRef.current = setTimeout(() => {
+      onApply?.(preparedRelationship);
+    }, 200);
   };
 
   const handleCancel = () => {
-    onCancel?.();
     onOpenChange?.(false);
+    if (deferredActionTimeoutRef.current) {
+      clearTimeout(deferredActionTimeoutRef.current);
+    }
+    deferredActionTimeoutRef.current = setTimeout(() => {
+      onCancel?.();
+    }, 200);
   };
 
   return (

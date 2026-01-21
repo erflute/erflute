@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useViewModeStore } from "@/stores/viewModeStore";
 import { ColumnType } from "@/types/domain/columnType";
@@ -54,8 +54,13 @@ beforeEach(() => {
   useViewModeStore.setState(initialViewModeState);
 });
 
+afterEach(() => {
+  jest.useRealTimers();
+});
+
 it("applies the current table data and closes when OK is clicked", async () => {
-  const user = userEvent.setup();
+  jest.useFakeTimers();
+  const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
   const { onApply } = renderTableInfoDialog({
     physicalName: "  MEMBERS  ",
     logicalName: "  Members  ",
@@ -109,6 +114,10 @@ it("applies the current table data and closes when OK is clicked", async () => {
 
   await user.click(screen.getByRole("button", { name: "OK" }));
 
+  act(() => {
+    jest.runAllTimers();
+  });
+
   expect(onApply).toHaveBeenCalledTimes(1);
   const appliedTable = onApply.mock.calls[0][0];
   expect(appliedTable).toMatchObject({
@@ -159,10 +168,15 @@ it("applies the current table data and closes when OK is clicked", async () => {
 });
 
 it("cancels and closes when Cancel is clicked", async () => {
-  const user = userEvent.setup();
+  jest.useFakeTimers();
+  const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
   const { onApply, onCancel, onOpenChange } = renderTableInfoDialog();
 
   await user.click(screen.getByRole("button", { name: "Cancel" }));
+
+  act(() => {
+    jest.runAllTimers();
+  });
 
   expect(onApply).not.toHaveBeenCalled();
   expect(onCancel).toHaveBeenCalledTimes(1);

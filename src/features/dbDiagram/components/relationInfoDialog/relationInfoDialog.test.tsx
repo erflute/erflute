@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { act, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useViewModeStore } from "@/stores/viewModeStore";
 import {
@@ -73,8 +73,17 @@ function getSectionByHeading(text: string) {
   return section;
 }
 
+function setupUserWithFakeTimers() {
+  jest.useFakeTimers();
+  return userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+}
+
 beforeEach(() => {
   useViewModeStore.setState(initialViewModeState);
+});
+
+afterEach(() => {
+  jest.useRealTimers();
 });
 
 it("renders relationship values in the dialog", () => {
@@ -123,12 +132,16 @@ it("maps NO ACTION selections to undefined on apply", async () => {
     onDeleteAction: ReferenceOperation.Restrict,
     onUpdateAction: ReferenceOperation.Restrict,
   });
-  const user = userEvent.setup();
+  const user = setupUserWithFakeTimers();
   const { onUpdateSelect, onDeleteSelect } = getReferenceOperationSelects();
 
   await user.selectOptions(onUpdateSelect, "NO ACTION");
   await user.selectOptions(onDeleteSelect, "NO ACTION");
   await user.click(screen.getByRole("button", { name: "OK" }));
+
+  act(() => {
+    jest.runAllTimers();
+  });
 
   expect(onApply).toHaveBeenCalledWith(
     expect.objectContaining({
@@ -144,12 +157,16 @@ it("applies reference operation selections", async () => {
     onDeleteAction: ReferenceOperation.Restrict,
     onUpdateAction: ReferenceOperation.Restrict,
   });
-  const user = userEvent.setup();
+  const user = setupUserWithFakeTimers();
   const { onUpdateSelect, onDeleteSelect } = getReferenceOperationSelects();
 
   await user.selectOptions(onUpdateSelect, ReferenceOperation.Cascade);
   await user.selectOptions(onDeleteSelect, ReferenceOperation.SetNull);
   await user.click(screen.getByRole("button", { name: "OK" }));
+
+  act(() => {
+    jest.runAllTimers();
+  });
 
   expect(onApply).toHaveBeenCalledWith(
     expect.objectContaining({
@@ -162,11 +179,15 @@ it("applies reference operation selections", async () => {
 it("applies constraint name updates when confirmed", async () => {
   setEditable();
   const { onApply } = renderRelationInfoDialog();
-  const user = userEvent.setup();
+  const user = setupUserWithFakeTimers();
 
   await user.clear(screen.getByLabelText("Constraint Name"));
   await user.type(screen.getByLabelText("Constraint Name"), "fk_items_orders");
   await user.click(screen.getByRole("button", { name: "OK" }));
+
+  act(() => {
+    jest.runAllTimers();
+  });
 
   expect(onApply).toHaveBeenCalledWith(
     expect.objectContaining({ name: "fk_items_orders" }),
@@ -176,7 +197,7 @@ it("applies constraint name updates when confirmed", async () => {
 it("applies referred column and multiplicity selections", async () => {
   setEditable();
   const { onApply } = renderRelationInfoDialog();
-  const user = userEvent.setup();
+  const user = setupUserWithFakeTimers();
   const parentSection = getSectionByHeading("Parent");
   const childSection = getSectionByHeading("Child");
 
@@ -200,6 +221,10 @@ it("applies referred column and multiplicity selections", async () => {
   );
   await user.click(screen.getByRole("button", { name: "OK" }));
 
+  act(() => {
+    jest.runAllTimers();
+  });
+
   expect(onApply).toHaveBeenCalledWith(
     expect.objectContaining({
       referredColumn: "UUID",
@@ -212,9 +237,13 @@ it("applies referred column and multiplicity selections", async () => {
 it("closes without applying changes when canceled", async () => {
   setEditable();
   const { onApply, onCancel, onOpenChange } = renderRelationInfoDialog();
-  const user = userEvent.setup();
+  const user = setupUserWithFakeTimers();
 
   await user.click(screen.getByRole("button", { name: "Cancel" }));
+
+  act(() => {
+    jest.runAllTimers();
+  });
 
   expect(onApply).not.toHaveBeenCalled();
   expect(onCancel).toHaveBeenCalled();
