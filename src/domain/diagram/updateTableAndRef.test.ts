@@ -1,7 +1,7 @@
-import { updateTableAndRefBy } from "./updateTableAndRefBy";
 import { Cardinality } from "@/types/domain/relationship";
 import type { Relationship } from "@/types/domain/relationship";
 import type { Table } from "@/types/domain/table";
+import { updateTableAndRef } from "./updateTable";
 
 const createTable = (overrides: Partial<Table> = {}): Table => ({
   color: { r: 0, g: 0, b: 0 },
@@ -19,8 +19,8 @@ const createRelationship = (
   overrides: Partial<Relationship> = {},
 ): Relationship => ({
   name: "RELATIONSHIP_A",
-  source: "table.TABLE_A.id",
-  target: "table.TABLE_B.id",
+  source: "table.TABLE_A",
+  target: "table.TABLE_B",
   fkColumnNames: ["id"],
   parentCardinality: Cardinality.One,
   childCardinality: Cardinality.ZeroN,
@@ -33,7 +33,7 @@ it("returns null when the previous table name does not exist", () => {
   const tables = [createTable({ physicalName: "TABLE_A" })];
   const relationships = [createRelationship()];
 
-  const result = updateTableAndRefBy({
+  const result = updateTableAndRef({
     tables,
     relationships,
     table: createTable({ physicalName: "TABLE_B" }),
@@ -50,7 +50,7 @@ it("replaces the table without changing relationships when the name is unchanged
   ];
   const relationships = [createRelationship()];
 
-  const result = updateTableAndRefBy({
+  const result = updateTableAndRef({
     tables,
     relationships,
     table: createTable({ physicalName: "TABLE_A", logicalName: "New Name" }),
@@ -71,17 +71,17 @@ it("renames references that use the previous table name", () => {
   const relationships = [
     createRelationship({
       name: "REL_SOURCE",
-      source: "table.OLD_TABLE.id",
-      target: "table.OTHER_TABLE.id",
+      source: "table.OLD_TABLE",
+      target: "table.OTHER_TABLE",
     }),
     createRelationship({
       name: "REL_TARGET",
-      source: "table.OTHER_TABLE.id",
-      target: "table.OLD_TABLE.code",
+      source: "table.OTHER_TABLE",
+      target: "table.OLD_TABLE",
     }),
   ];
 
-  const result = updateTableAndRefBy({
+  const result = updateTableAndRef({
     tables,
     relationships,
     table: createTable({ physicalName: "NEW_TABLE" }),
@@ -93,13 +93,13 @@ it("renames references that use the previous table name", () => {
     relationships: [
       createRelationship({
         name: "REL_SOURCE",
-        source: "table.NEW_TABLE.id",
-        target: "table.OTHER_TABLE.id",
+        source: "table.NEW_TABLE",
+        target: "table.OTHER_TABLE",
       }),
       createRelationship({
         name: "REL_TARGET",
-        source: "table.OTHER_TABLE.id",
-        target: "table.NEW_TABLE.code",
+        source: "table.OTHER_TABLE",
+        target: "table.NEW_TABLE",
       }),
     ],
   });

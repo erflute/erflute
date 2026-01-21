@@ -1,6 +1,6 @@
-import { parseReference, stringifyReference } from "../parsers/referenceParser";
 import type { Relationship } from "@/types/domain/relationship";
 import type { Table } from "@/types/domain/table";
+import { parseReference, stringifyReference } from "../parsers/referenceParser";
 
 type UpdateTableParams = {
   tables: Table[];
@@ -19,18 +19,17 @@ const renameReference = (
   previousPhysicalName: string,
   nextPhysicalName: string,
 ) => {
-  const { prefix, tableName, columnName } = parseReference(reference);
+  const { prefix, tableName } = parseReference(reference);
   if (tableName !== previousPhysicalName) {
     return reference;
   }
   return stringifyReference({
     prefix,
     tableName: nextPhysicalName,
-    columnName,
   });
 };
 
-export const updateTableAndRefBy = ({
+export const updateTableAndRef = ({
   tables,
   relationships,
   table,

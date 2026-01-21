@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import { updateRelationshipBy } from "@/domain/diagram/updateRelationshipBy";
-import { updateTableAndRefBy } from "@/domain/diagram/updateTableAndRefBy";
+import { updateRelation } from "@/domain/diagram/updateRelation";
+import { updateTableAndRef } from "@/domain/diagram/updateTable";
 import type { ColumnGroup } from "@/types/domain/columnGroup";
 import type { Relationship } from "@/types/domain/relationship";
 import type { Table } from "@/types/domain/table";
@@ -30,7 +30,7 @@ export const useDiagramStore = create<DiagramStore>((set) => ({
     set((state) => ({ tables, tablesVersion: state.tablesVersion + 1 })),
   updateTable: (table: Table, previousPhysicalName: string) =>
     set((state) => {
-      const result = updateTableAndRefBy({
+      const result = updateTableAndRef({
         tables: state.tables,
         relationships: state.relationships,
         table,
@@ -51,7 +51,7 @@ export const useDiagramStore = create<DiagramStore>((set) => ({
     })),
   updateRelationship: (relationship: Relationship, previousName: string) =>
     set((state) => {
-      const nextRelationships = updateRelationshipBy({
+      const nextRelationships = updateRelation({
         relationships: state.relationships,
         relationship,
         previousName,
