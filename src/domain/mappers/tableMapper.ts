@@ -8,6 +8,7 @@ import type {
   IndexColumn,
   Table,
 } from "@/types/domain/table";
+import { parseReference } from "../parsers/referenceParser";
 
 export function mapTablesFrom(tableResponses: TableResponse[]): Table[] {
   return tableResponses.map((table) => {
@@ -76,6 +77,32 @@ export function mapTablesFrom(tableResponses: TableResponse[]): Table[] {
   });
 }
 
+function getPrimaryKey(source: string, tables: TableResponse[]): string {
+  const { tableName } = parseReference(source);
+  const sourceTable = tables.find((table) => table.physicalName === tableName)!;
+  return sourceTable.columns
+    .items!.filter((item) => typeof item !== "string")
+    .find((item) => item.primaryKey)!.physicalName;
+}
+
+function getReferredColumnOptions(
+  source: string,
+  tables: TableResponse[],
+): string[] {
+  const { tableName } = parseReference(source);
+  const sourceTable = tables.find((table) => table.physicalName === tableName)!;
+  const columnNames =
+    sourceTable.columns.items
+      ?.filter((item) => typeof item !== "string")
+      .filter((item) => item.primaryKey || item.uniqueKey)
+      .map((item) => item.physicalName) ?? [];
+  const coumpoundUniqueKeyNames =
+    sourceTable.compoundUniqueKeyList.compoundUniqueKeys?.map(
+      (uniqueKey) => uniqueKey.name,
+    ) ?? [];
+  return [...columnNames, ...coumpoundUniqueKeyNames];
+}
+
 export function mapRelationshipsFrom(
   tableResponses: TableResponse[],
 ): Relationship[] {
@@ -87,8 +114,21 @@ export function mapRelationshipsFrom(
         name: relationship.name,
         source: relationship.source,
         target: relationship.target,
+        fkColumnNames: relationship.fkColumns.fkColumn.map(
+          (column) => column.fkColumnName,
+        ),
         parentCardinality: relationship.parentCardinality,
         childCardinality: relationship.childCardinality,
+        referredColumn: relationship.referenceForPk
+          ? getPrimaryKey(relationship.source, tableResponses)
+          : (relationship.referredSimpleUniqueColumn ??
+            relationship.referredCompoundUniqueKey!),
+        referredColumnOptions: getReferredColumnOptions(
+          relationship.source,
+          tableResponses,
+        ),
+        onDeleteAction: relationship.onDeleteAction,
+        onUpdateAction: relationship.onUpdateAction,
       } satisfies Relationship;
     });
 }

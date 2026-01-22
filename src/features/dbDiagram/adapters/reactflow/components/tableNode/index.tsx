@@ -3,16 +3,26 @@ import {
   Handle,
   Position,
   useReactFlow,
+  type Edge,
   type Node,
   type NodeProps,
 } from "@xyflow/react";
+import { updateRelationAndRefs } from "@/domain/diagram/updateRelation";
+import { stringifyReference } from "@/domain/parsers/referenceParser";
 import { TableCard } from "@/features/dbDiagram/components/tableCard";
 import { TableInfoDialog } from "@/features/dbDiagram/components/tableInfoDialog";
+import { useDiagramStore } from "@/stores/diagramStore";
+import type { Relationship } from "@/types/domain/relationship";
 import type { Table } from "@/types/domain/table";
 
 export function TableNode({ id, width, height, data }: NodeProps<Node<Table>>) {
-  const { setNodes } = useReactFlow();
+  const { setEdges, setNodes } = useReactFlow<
+    Node<Table>,
+    Edge<Relationship>
+  >();
+  const updateTable = useDiagramStore((state) => state.updateTable);
   const [tableInfoDialogOpen, setTableInfoDialogOpen] = useState(false);
+  const tablePhysicalName = data.physicalName;
   return (
     <>
       <TableCard
@@ -51,12 +61,53 @@ export function TableNode({ id, width, height, data }: NodeProps<Node<Table>>) {
         data={data}
         open={tableInfoDialogOpen}
         onOpenChange={setTableInfoDialogOpen}
-        onApply={(data) => {
-          setNodes((nds) =>
-            nds.map((node) =>
-              node.id === id ? { ...node, data: data } : node,
-            ),
+        onApply={(updatedTable) => {
+          updateTable(updatedTable, tablePhysicalName);
+          const currentNodeId = stringifyReference({
+            tableName: tablePhysicalName,
+          });
+          const nextNodeId = stringifyReference({
+            tableName: updatedTable.physicalName,
+          });
+          setNodes((nodes) =>
+            nodes.map((node) => {
+              if (node.id !== currentNodeId) {
+                return node;
+              }
+              return {
+                ...node,
+                id: nextNodeId,
+                width: updatedTable.width,
+                height: updatedTable.height,
+                data: updatedTable,
+              };
+            }),
           );
+          if (currentNodeId !== nextNodeId) {
+            setEdges((edges) =>
+              edges.map((edge) => {
+                const source =
+                  edge.source === currentNodeId ? nextNodeId : edge.source;
+                const target =
+                  edge.target === currentNodeId ? nextNodeId : edge.target;
+                const nextData = edge.data
+                  ? updateRelationAndRefs({
+                      nextTableName: updatedTable.physicalName,
+                      relationship: edge.data,
+                      previousTableName: tablePhysicalName,
+                    })
+                  : edge.data;
+                if (
+                  source === edge.source &&
+                  target === edge.target &&
+                  nextData === edge.data
+                ) {
+                  return edge;
+                }
+                return { ...edge, source, target, data: nextData };
+              }),
+            );
+          }
         }}
       />
     </>

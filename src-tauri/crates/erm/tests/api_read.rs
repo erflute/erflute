@@ -112,6 +112,8 @@ fn test_read_erm_file() {
                                     reference_for_pk: true,
                                     on_delete_action: Some("RESTRICT".to_string()),
                                     on_update_action: Some("RESTRICT".to_string()),
+                                    referred_simple_unique_column: None,
+                                    referred_compound_unique_key: None,
                                 },
                                 connections::Relationship {
                                     name: "FK_MEMBER_PROFILES_MST_GENDER".to_string(),
@@ -127,6 +129,8 @@ fn test_read_erm_file() {
                                     reference_for_pk: true,
                                     on_delete_action: Some("RESTRICT".to_string()),
                                     on_update_action: Some("RESTRICT".to_string()),
+                                    referred_simple_unique_column: None,
+                                    referred_compound_unique_key: None,
                                 }
                             ])
                         },
@@ -260,6 +264,8 @@ fn test_read_erm_file() {
                                 reference_for_pk: true,
                                 on_delete_action: Some("RESTRICT".to_string()),
                                 on_update_action: Some("RESTRICT".to_string()),
+                                referred_simple_unique_column: None,
+                                referred_compound_unique_key: None,
                             }])
                         },
                         table_constraint: None,
@@ -381,6 +387,8 @@ fn test_read_erm_file() {
                                     reference_for_pk: true,
                                     on_delete_action: Some("RESTRICT".to_string()),
                                     on_update_action: Some("RESTRICT".to_string()),
+                                    referred_simple_unique_column: None,
+                                    referred_compound_unique_key: None,
                                 },
                                 connections::Relationship {
                                     name: "FK_POST_REPLIES_MEMBERS".to_string(),
@@ -396,6 +404,8 @@ fn test_read_erm_file() {
                                     reference_for_pk: true,
                                     on_delete_action: Some("RESTRICT".to_string()),
                                     on_update_action: Some("RESTRICT".to_string()),
+                                    referred_simple_unique_column: None,
+                                    referred_compound_unique_key: None,
                                 },
                             ])
                         },
@@ -491,6 +501,8 @@ fn test_read_erm_file() {
                                 reference_for_pk: true,
                                 on_delete_action: Some("RESTRICT".to_string()),
                                 on_update_action: Some("RESTRICT".to_string()),
+                                referred_simple_unique_column: None,
+                                referred_compound_unique_key: None,
                             }])
                         },
                         table_constraint: None,

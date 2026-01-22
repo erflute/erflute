@@ -6,8 +6,11 @@ function createRelationship(overrides?: Partial<Relationship>): Relationship {
     name: "fk_orders_users",
     source: "ORDERS",
     target: "USERS",
+    fkColumnNames: [],
     parentCardinality: "1",
     childCardinality: "0..n",
+    referredColumn: "ID",
+    referredColumnOptions: ["ID"],
     ...overrides,
   };
 }

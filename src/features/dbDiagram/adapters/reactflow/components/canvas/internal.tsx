@@ -37,16 +37,27 @@ function getSettings(isReadOnly: boolean, diagramMode: DiagramMode | null) {
 
 export const Internal = () => {
   const { isReadOnly, diagramMode } = useViewModeStore();
-  const tables = useDiagramStore((state) => state.tables);
-  const relationships = useDiagramStore((state) => state.relationships);
-  const [nodes, setNodes, onNodesChange] = useNodesState(createNodes(tables));
-  const [edges, setEdges] = useEdgesState(createEdges(relationships));
+  const tablesVersion = useDiagramStore((state) => state.tablesVersion);
+  const relationshipsVersion = useDiagramStore(
+    (state) => state.relationshipsVersion,
+  );
+  const [nodes, setNodes, onNodesChange] = useNodesState(
+    createNodes(useDiagramStore.getState().tables),
+  );
+  const [edges, setEdges, onEdgesChange] = useEdgesState(
+    createEdges(useDiagramStore.getState().relationships),
+  );
   const settings = getSettings(isReadOnly, diagramMode);
   const { addNodes, screenToFlowPosition } = useReactFlow();
+
   useEffect(() => {
-    setNodes(createNodes(tables));
-    setEdges(createEdges(relationships));
-  }, [tables, relationships]);
+    setNodes(createNodes(useDiagramStore.getState().tables));
+  }, [setNodes, tablesVersion]);
+
+  useEffect(() => {
+    setEdges(createEdges(useDiagramStore.getState().relationships));
+  }, [relationshipsVersion, setEdges]);
+
   const handleClickInTableMode = createClickInTableModeHandler(
     addNodes,
     screenToFlowPosition,
@@ -80,6 +91,7 @@ export const Internal = () => {
         }}
         onPaneClick={handlePaneClick}
         onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
         nodesDraggable={settings.nodesDraggable}
         nodesConnectable={settings.nodesConnectable}
         elementsSelectable={settings.elementsSelectable}
