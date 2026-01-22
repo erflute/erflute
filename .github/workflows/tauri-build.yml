@@ -47,6 +47,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          uploadWorkflowArtifacts: true
           args: --verbose
 
       - name: Build and draft release (tag)
