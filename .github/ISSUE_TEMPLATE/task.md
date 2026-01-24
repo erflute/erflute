@@ -13,10 +13,6 @@ It will be reviewed and expanded when the project matures and external contribut
 
 <!-- Short description of the task -->
 
-## Goal
-
-<!-- What should be achieved by completing this task -->
-
 ## To-Do
 
 <!-- Break down the task if necessary -->
