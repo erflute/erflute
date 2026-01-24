@@ -11,7 +11,7 @@ use erm::dtos::diagram::diagram_walkers::tables::connections;
 use erm::dtos::diagram::diagram_walkers::tables::indexes;
 use erm::open;
 
-// TODO: Add test cases of detailed condition for each field in https://github.com/s-kai273/ersflute/issues/22
+// TODO: Add test cases of detailed condition for each field in https://github.com/s-kai273/erflute/issues/22
 
 #[test]
 fn test_read_erm_file() {
