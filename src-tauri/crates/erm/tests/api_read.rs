@@ -102,6 +102,7 @@ fn test_read_erm_file() {
                                     name: "FK_MEMBER_PROFILES_MEMBERS".to_string(),
                                     source: "table.MEMBERS".to_string(),
                                     target: "table.MEMBER_PROFILES".to_string(),
+                                    bendpoints: None,
                                     fk_columns: connections::FkColumns {
                                         fk_column: vec![connections::FkColumn {
                                             fk_column_name: "MEMBER_ID".to_string(),
@@ -119,6 +120,7 @@ fn test_read_erm_file() {
                                     name: "FK_MEMBER_PROFILES_MST_GENDER".to_string(),
                                     source: "table.MST_GENDER".to_string(),
                                     target: "table.MEMBER_PROFILES".to_string(),
+                                    bendpoints: None,
                                     fk_columns: connections::FkColumns {
                                         fk_column: vec![connections::FkColumn {
                                             fk_column_name: "GENDER_ID".to_string(),
@@ -254,6 +256,7 @@ fn test_read_erm_file() {
                                 name: "FK_MEMBER_POSTS_MEMBERS".to_string(),
                                 source: "table.MEMBERS".to_string(),
                                 target: "table.POSTS".to_string(),
+                                bendpoints: None,
                                 fk_columns: connections::FkColumns {
                                     fk_column: vec![connections::FkColumn {
                                         fk_column_name: "MEMBER_ID".to_string(),
@@ -377,6 +380,7 @@ fn test_read_erm_file() {
                                     name: "FK_POST_REPLIES_POST_THREADS".to_string(),
                                     source: "table.POST_THREADS".to_string(),
                                     target: "table.POST_REPLIES".to_string(),
+                                    bendpoints: None,
                                     fk_columns: connections::FkColumns {
                                         fk_column: vec![connections::FkColumn {
                                             fk_column_name: "POST_THREAD_ID".to_string(),
@@ -394,6 +398,7 @@ fn test_read_erm_file() {
                                     name: "FK_POST_REPLIES_MEMBERS".to_string(),
                                     source: "table.MEMBERS".to_string(),
                                     target: "table.POST_REPLIES".to_string(),
+                                    bendpoints: None,
                                     fk_columns: connections::FkColumns {
                                         fk_column: vec![connections::FkColumn {
                                             fk_column_name: "MEMBER_ID".to_string(),
@@ -491,6 +496,7 @@ fn test_read_erm_file() {
                                 name: "FK_POST_THREADS_MEMBER_POSTS".to_string(),
                                 source: "table.POSTS".to_string(),
                                 target: "table.POST_THREADS".to_string(),
+                                bendpoints: None,
                                 fk_columns: connections::FkColumns {
                                     fk_column: vec![connections::FkColumn {
                                         fk_column_name: "POST_ID".to_string(),
