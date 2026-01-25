@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import {
   BaseEdge,
-  getStraightPath,
   useReactFlow,
   useStore,
   type Edge,
@@ -11,6 +10,7 @@ import { RelationInfoDialog } from "@/features/dbDiagram/components/relationInfo
 import { useDiagramStore } from "@/stores/diagramStore";
 import { Cardinality, type Relationship } from "@/types/domain/relationship";
 import { getEdgeParams } from "./edgeParams";
+import { getPaths } from "./path";
 import { buildSymbols, cardinalityToSymbolPartKinds } from "./symbol";
 
 export function CardinalityEdge({
@@ -31,7 +31,7 @@ export function CardinalityEdge({
   if (!sourceNode || !targetNode) {
     return null;
   }
-  const { sx, sy, tx, ty } = useMemo(
+  const { sourcePos, targetPos } = useMemo(
     () => getEdgeParams(sourceNode, targetNode),
     [
       sourceNode.id,
@@ -47,27 +47,11 @@ export function CardinalityEdge({
     ],
   );
 
-  const [straightPath] = getStraightPath({
-    sourceX: sx,
-    sourceY: sy,
-    targetX: tx,
-    targetY: ty,
-  });
+  const paths = getPaths(sourcePos, targetPos, data?.bendpoints);
 
-  const dx = tx - sx;
-  const dy = ty - sy;
+  const dx = targetPos.x - sourcePos.x;
+  const dy = targetPos.y - sourcePos.y;
   const length = Math.hypot(dx, dy);
-
-  if (length <= 0.0001) {
-    return (
-      <BaseEdge
-        id={id}
-        path={straightPath}
-        style={style}
-        markerEnd={markerEnd}
-      />
-    );
-  }
 
   const dirX = dx / length;
   const dirY = dy / length;
@@ -84,8 +68,8 @@ export function CardinalityEdge({
   const childCardinality = data?.childCardinality ?? Cardinality.One;
 
   const sourceSymbols = buildSymbols(
-    sx,
-    sy,
+    sourcePos.x,
+    sourcePos.y,
     dirX,
     dirY,
     cardinalityToSymbolPartKinds(parentCardinality),
@@ -96,8 +80,8 @@ export function CardinalityEdge({
   );
 
   const targetSymbols = buildSymbols(
-    tx,
-    ty,
+    targetPos.x,
+    targetPos.y,
     -dirX,
     -dirY,
     cardinalityToSymbolPartKinds(childCardinality),
@@ -116,24 +100,23 @@ export function CardinalityEdge({
   // We therefore add a dedicated (invisible) interaction path to ensure double-click is captured.
   return (
     <>
-      <BaseEdge
-        id={id}
-        path={straightPath}
-        style={style}
-        markerEnd={markerEnd}
-      />
-      <path
-        d={straightPath}
-        fill="none"
-        strokeOpacity={0}
-        strokeWidth={24}
-        pointerEvents="stroke"
-        onDoubleClick={(e) => {
-          e.stopPropagation();
-          setRelationInfoDialogOpen(true);
-        }}
-        className="cursor-pointer"
-      />
+      {paths.map((p) => (
+        <>
+          <BaseEdge path={p} style={style} markerEnd={markerEnd} />
+          <path
+            d={p}
+            fill="none"
+            strokeOpacity={0}
+            strokeWidth={24}
+            pointerEvents="stroke"
+            onDoubleClick={(e) => {
+              e.stopPropagation();
+              setRelationInfoDialogOpen(true);
+            }}
+            className="cursor-pointer"
+          />
+        </>
+      ))}
       {symbols}
       {data && (
         <RelationInfoDialog

@@ -93,9 +93,7 @@ export function getEdgeParams(sourceNode: Node, targetNode: Node) {
   const t = getIntersectionOnRect(sc, tRect);
 
   return {
-    sx: s.x,
-    sy: s.y,
-    tx: t.x,
-    ty: t.y,
+    sourcePos: s,
+    targetPos: t,
   };
 }
