@@ -1,13 +1,7 @@
-import { type Node } from "@xyflow/react";
-
-function getNodeCenter(node: Node) {
-  const x = node.position.x + (node.measured?.width ?? node.width ?? 0) / 2;
-  const y = node.position.y + (node.measured?.height ?? node.height ?? 0) / 2;
-  return { x, y };
-}
+import { type Node, type XYPosition } from "@xyflow/react";
 
 function getIntersectionOnRect(
-  from: { x: number; y: number },
+  from: XYPosition,
   rect: {
     x: number;
     y: number;
@@ -73,27 +67,12 @@ function getIntersectionOnRect(
   }
 }
 
-export function getEdgeParams(sourceNode: Node, targetNode: Node) {
-  const sc = getNodeCenter(sourceNode);
-  const tc = getNodeCenter(targetNode);
-  const sRect = {
-    x: sourceNode.position.x,
-    y: sourceNode.position.y,
-    w: sourceNode.measured?.width ?? sourceNode.width ?? 0,
-    h: sourceNode.measured?.height ?? sourceNode.height ?? 0,
+export function getEdgeParams(node: Node, targetPos: XYPosition): XYPosition {
+  const nodeRect = {
+    x: node.position.x,
+    y: node.position.y,
+    w: node.measured?.width ?? node.width ?? 0,
+    h: node.measured?.height ?? node.height ?? 0,
   };
-  const tRect = {
-    x: targetNode.position.x,
-    y: targetNode.position.y,
-    w: targetNode.measured?.width ?? targetNode.width ?? 0,
-    h: targetNode.measured?.height ?? targetNode.height ?? 0,
-  };
-
-  const s = getIntersectionOnRect(tc, sRect);
-  const t = getIntersectionOnRect(sc, tRect);
-
-  return {
-    sourcePos: s,
-    targetPos: t,
-  };
+  return getIntersectionOnRect(targetPos, nodeRect);
 }

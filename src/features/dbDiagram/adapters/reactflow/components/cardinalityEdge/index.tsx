@@ -1,17 +1,46 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   BaseEdge,
   useReactFlow,
   useStore,
   type Edge,
   type EdgeProps,
+  type Node,
+  type XYPosition,
 } from "@xyflow/react";
 import { RelationInfoDialog } from "@/features/dbDiagram/components/relationInfoDialog";
 import { useDiagramStore } from "@/stores/diagramStore";
-import { Cardinality, type Relationship } from "@/types/domain/relationship";
+import {
+  Cardinality,
+  type Bendpoint,
+  type Relationship,
+} from "@/types/domain/relationship";
 import { getEdgeParams } from "./edgeParams";
 import { getPaths } from "./path";
 import { buildSymbols, cardinalityToSymbolPartKinds } from "./symbol";
+
+function getNeabyPositions(
+  sourceNode: Node,
+  targetNode: Node,
+  bendpoints?: Bendpoint[],
+): {
+  sourceNearbyPos: XYPosition;
+  targetNearbyPos: XYPosition;
+} {
+  if (!bendpoints || bendpoints.length == 0) {
+    return {
+      sourceNearbyPos: targetNode.position,
+      targetNearbyPos: sourceNode.position,
+    };
+  }
+  return {
+    sourceNearbyPos: { x: bendpoints[0].x, y: bendpoints[0].y },
+    targetNearbyPos: {
+      x: bendpoints[bendpoints.length - 1].x,
+      y: bendpoints[bendpoints.length - 1].y,
+    },
+  };
+}
 
 export function CardinalityEdge({
   id,
@@ -31,21 +60,13 @@ export function CardinalityEdge({
   if (!sourceNode || !targetNode) {
     return null;
   }
-  const { sourcePos, targetPos } = useMemo(
-    () => getEdgeParams(sourceNode, targetNode),
-    [
-      sourceNode.id,
-      sourceNode.position.x,
-      sourceNode.position.y,
-      sourceNode.measured?.width,
-      sourceNode.measured?.height,
-      targetNode.id,
-      targetNode.position.x,
-      targetNode.position.y,
-      targetNode.measured?.width,
-      targetNode.measured?.height,
-    ],
+  const { sourceNearbyPos, targetNearbyPos } = getNeabyPositions(
+    sourceNode,
+    targetNode,
+    data?.bendpoints,
   );
+  const sourcePos = getEdgeParams(sourceNode, sourceNearbyPos);
+  const targetPos = getEdgeParams(targetNode, targetNearbyPos);
 
   const paths = getPaths(sourcePos, targetPos, data?.bendpoints);
 
