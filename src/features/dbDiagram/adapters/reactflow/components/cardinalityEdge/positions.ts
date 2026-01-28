@@ -1,4 +1,5 @@
 import { type Node, type XYPosition } from "@xyflow/react";
+import { type Bendpoint } from "@/types/domain/relationship";
 
 function getIntersectionOnRect(
   from: XYPosition,
@@ -67,7 +68,7 @@ function getIntersectionOnRect(
   }
 }
 
-export function getEdgeParams(node: Node, targetPos: XYPosition): XYPosition {
+export function getEdgePos(node: Node, targetPos: XYPosition): XYPosition {
   const nodeRect = {
     x: node.position.x,
     y: node.position.y,
@@ -75,4 +76,27 @@ export function getEdgeParams(node: Node, targetPos: XYPosition): XYPosition {
     h: node.measured?.height ?? node.height ?? 0,
   };
   return getIntersectionOnRect(targetPos, nodeRect);
+}
+
+export function getNeabyPositions(
+  sourceNode: Node,
+  targetNode: Node,
+  bendpoints?: Bendpoint[],
+): {
+  sourceNearbyPos: XYPosition;
+  targetNearbyPos: XYPosition;
+} {
+  if (!bendpoints || bendpoints.length == 0) {
+    return {
+      sourceNearbyPos: targetNode.position,
+      targetNearbyPos: sourceNode.position,
+    };
+  }
+  return {
+    sourceNearbyPos: { x: bendpoints[0].x, y: bendpoints[0].y },
+    targetNearbyPos: {
+      x: bendpoints[bendpoints.length - 1].x,
+      y: bendpoints[bendpoints.length - 1].y,
+    },
+  };
 }

@@ -5,42 +5,17 @@ import {
   useStore,
   type Edge,
   type EdgeProps,
-  type Node,
-  type XYPosition,
 } from "@xyflow/react";
 import { RelationInfoDialog } from "@/features/dbDiagram/components/relationInfoDialog";
 import { useDiagramStore } from "@/stores/diagramStore";
-import {
-  Cardinality,
-  type Bendpoint,
-  type Relationship,
-} from "@/types/domain/relationship";
-import { getEdgeParams } from "./edgeParams";
+import { Cardinality, type Relationship } from "@/types/domain/relationship";
 import { getPaths } from "./path";
-import { buildSymbols, cardinalityToSymbolPartKinds } from "./symbol";
-
-function getNeabyPositions(
-  sourceNode: Node,
-  targetNode: Node,
-  bendpoints?: Bendpoint[],
-): {
-  sourceNearbyPos: XYPosition;
-  targetNearbyPos: XYPosition;
-} {
-  if (!bendpoints || bendpoints.length == 0) {
-    return {
-      sourceNearbyPos: targetNode.position,
-      targetNearbyPos: sourceNode.position,
-    };
-  }
-  return {
-    sourceNearbyPos: { x: bendpoints[0].x, y: bendpoints[0].y },
-    targetNearbyPos: {
-      x: bendpoints[bendpoints.length - 1].x,
-      y: bendpoints[bendpoints.length - 1].y,
-    },
-  };
-}
+import { getEdgePos, getNeabyPositions } from "./positions";
+import {
+  buildSymbols,
+  cardinalityToSymbolPartKinds,
+  getDirAndLength,
+} from "./symbol";
 
 export function CardinalityEdge({
   id,
@@ -60,22 +35,34 @@ export function CardinalityEdge({
   if (!sourceNode || !targetNode) {
     return null;
   }
+  if (
+    !!data?.bendpoints &&
+    data.bendpoints.length > 0 &&
+    data.bendpoints.some((bp) => bp.relative)
+  ) {
+    // When bendpoints are for self relationship, render no edge temporally.
+    // This should be handled by https://github.com/erflute/erflute/issues/53
+    return null;
+  }
   const { sourceNearbyPos, targetNearbyPos } = getNeabyPositions(
     sourceNode,
     targetNode,
     data?.bendpoints,
   );
-  const sourcePos = getEdgeParams(sourceNode, sourceNearbyPos);
-  const targetPos = getEdgeParams(targetNode, targetNearbyPos);
+  const sourcePos = getEdgePos(sourceNode, sourceNearbyPos);
+  const targetPos = getEdgePos(targetNode, targetNearbyPos);
 
   const paths = getPaths(sourcePos, targetPos, data?.bendpoints);
 
-  const dx = targetPos.x - sourcePos.x;
-  const dy = targetPos.y - sourcePos.y;
-  const length = Math.hypot(dx, dy);
-
-  const dirX = dx / length;
-  const dirY = dy / length;
+  const noBendpoints = !data?.bendpoints || data?.bendpoints.length == 0;
+  const { dir: sourceDir, length: sourceLength } = getDirAndLength(
+    sourcePos,
+    noBendpoints ? targetPos : sourceNearbyPos,
+  );
+  const { dir: targetDir, length: targetLength } = getDirAndLength(
+    targetPos,
+    noBendpoints ? sourcePos : targetNearbyPos,
+  );
 
   const strokeColor =
     (style && typeof style.stroke === "string" ? style.stroke : undefined) ??
@@ -91,11 +78,11 @@ export function CardinalityEdge({
   const sourceSymbols = buildSymbols(
     sourcePos.x,
     sourcePos.y,
-    dirX,
-    dirY,
+    sourceDir.x,
+    sourceDir.y,
     cardinalityToSymbolPartKinds(parentCardinality),
     "source",
-    length,
+    sourceLength,
     strokeColor,
     strokeWidth,
   );
@@ -103,11 +90,11 @@ export function CardinalityEdge({
   const targetSymbols = buildSymbols(
     targetPos.x,
     targetPos.y,
-    -dirX,
-    -dirY,
+    targetDir.x,
+    targetDir.y,
     cardinalityToSymbolPartKinds(childCardinality),
     "target",
-    length,
+    targetLength,
     strokeColor,
     strokeWidth,
   );

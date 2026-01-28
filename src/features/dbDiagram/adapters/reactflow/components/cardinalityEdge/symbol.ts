@@ -1,5 +1,6 @@
 import { createElement } from "react";
 import type { ReactElement } from "react";
+import { type XYPosition } from "@xyflow/react";
 import { Cardinality } from "@/types/domain/relationship";
 
 const DEFAULT_OFFSET = 16;
@@ -145,4 +146,24 @@ function shouldUseAdjacentSpacing(
     (current === "crowfoot" && (next === "line" || next === "circle")) ||
     ((current === "line" || current === "circle") && next === "crowfoot")
   );
+}
+
+export function getDirAndLength(sourcePos: XYPosition, targetPos: XYPosition) {
+  const dx = targetPos.x - sourcePos.x;
+  const dy = targetPos.y - sourcePos.y;
+  const length = Math.hypot(dx, dy);
+
+  if (length < 1e-6) {
+    return {
+      dir: { x: 0, y: 0 } as XYPosition,
+      length,
+    };
+  }
+
+  const dirX = dx / length;
+  const dirY = dy / length;
+  return {
+    dir: { x: dirX, y: dirY } as XYPosition,
+    length,
+  };
 }
