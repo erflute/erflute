@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import {
   BaseEdge,
   useReactFlow,
@@ -108,9 +108,13 @@ export function CardinalityEdge({
   // We therefore add a dedicated (invisible) interaction path to ensure double-click is captured.
   return (
     <>
-      {paths.map((p) => (
-        <>
-          <BaseEdge path={p} style={style} markerEnd={markerEnd} />
+      {paths.map((p, i) => (
+        <Fragment key={`${i}-${p}`}>
+          <BaseEdge
+            path={p}
+            style={style}
+            markerEnd={i == paths.length - 1 ? markerEnd : undefined}
+          />
           <path
             d={p}
             fill="none"
@@ -123,7 +127,7 @@ export function CardinalityEdge({
             }}
             className="cursor-pointer"
           />
-        </>
+        </Fragment>
       ))}
       {symbols}
       {data && (
