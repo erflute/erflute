@@ -78,6 +78,15 @@ export function getEdgePos(node: Node, targetPos: XYPosition): XYPosition {
   return getIntersectionOnRect(targetPos, nodeRect);
 }
 
+function getNodeCenter(node: Node): XYPosition {
+  const width = node.measured?.width ?? node.width ?? 0;
+  const height = node.measured?.height ?? node.height ?? 0;
+  return {
+    x: node.position.x + width / 2,
+    y: node.position.y + height / 2,
+  };
+}
+
 export function getNeabyPositions(
   sourceNode: Node,
   targetNode: Node,
@@ -88,8 +97,8 @@ export function getNeabyPositions(
 } {
   if (!bendpoints || bendpoints.length == 0) {
     return {
-      sourceNearbyPos: targetNode.position,
-      targetNearbyPos: sourceNode.position,
+      sourceNearbyPos: getNodeCenter(targetNode),
+      targetNearbyPos: getNodeCenter(sourceNode),
     };
   }
   return {
