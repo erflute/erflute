@@ -1,13 +1,8 @@
-import { type Node } from "@xyflow/react";
-
-function getNodeCenter(node: Node) {
-  const x = node.position.x + (node.measured?.width ?? node.width ?? 0) / 2;
-  const y = node.position.y + (node.measured?.height ?? node.height ?? 0) / 2;
-  return { x, y };
-}
+import { type Node, type XYPosition } from "@xyflow/react";
+import { type Bendpoint } from "@/types/domain/relationship";
 
 function getIntersectionOnRect(
-  from: { x: number; y: number },
+  from: XYPosition,
   rect: {
     x: number;
     y: number;
@@ -73,29 +68,44 @@ function getIntersectionOnRect(
   }
 }
 
-export function getEdgeParams(sourceNode: Node, targetNode: Node) {
-  const sc = getNodeCenter(sourceNode);
-  const tc = getNodeCenter(targetNode);
-  const sRect = {
-    x: sourceNode.position.x,
-    y: sourceNode.position.y,
-    w: sourceNode.measured?.width ?? sourceNode.width ?? 0,
-    h: sourceNode.measured?.height ?? sourceNode.height ?? 0,
+export function getEdgePos(node: Node, targetPos: XYPosition): XYPosition {
+  const nodeRect = {
+    x: node.position.x,
+    y: node.position.y,
+    w: node.measured?.width ?? node.width ?? 0,
+    h: node.measured?.height ?? node.height ?? 0,
   };
-  const tRect = {
-    x: targetNode.position.x,
-    y: targetNode.position.y,
-    w: targetNode.measured?.width ?? targetNode.width ?? 0,
-    h: targetNode.measured?.height ?? targetNode.height ?? 0,
-  };
+  return getIntersectionOnRect(targetPos, nodeRect);
+}
 
-  const s = getIntersectionOnRect(tc, sRect);
-  const t = getIntersectionOnRect(sc, tRect);
-
+function getNodeCenter(node: Node): XYPosition {
+  const width = node.measured?.width ?? node.width ?? 0;
+  const height = node.measured?.height ?? node.height ?? 0;
   return {
-    sx: s.x,
-    sy: s.y,
-    tx: t.x,
-    ty: t.y,
+    x: node.position.x + width / 2,
+    y: node.position.y + height / 2,
+  };
+}
+
+export function getNeabyPositions(
+  sourceNode: Node,
+  targetNode: Node,
+  bendpoints?: Bendpoint[],
+): {
+  sourceNearbyPos: XYPosition;
+  targetNearbyPos: XYPosition;
+} {
+  if (!bendpoints || bendpoints.length == 0) {
+    return {
+      sourceNearbyPos: getNodeCenter(targetNode),
+      targetNearbyPos: getNodeCenter(sourceNode),
+    };
+  }
+  return {
+    sourceNearbyPos: { x: bendpoints[0].x, y: bendpoints[0].y },
+    targetNearbyPos: {
+      x: bendpoints[bendpoints.length - 1].x,
+      y: bendpoints[bendpoints.length - 1].y,
+    },
   };
 }

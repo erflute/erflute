@@ -1,7 +1,6 @@
-import { useMemo, useState } from "react";
+import { Fragment, useState } from "react";
 import {
   BaseEdge,
-  getStraightPath,
   useReactFlow,
   useStore,
   type Edge,
@@ -10,8 +9,13 @@ import {
 import { RelationInfoDialog } from "@/features/dbDiagram/components/relationInfoDialog";
 import { useDiagramStore } from "@/stores/diagramStore";
 import { Cardinality, type Relationship } from "@/types/domain/relationship";
-import { getEdgeParams } from "./edgeParams";
-import { buildSymbols, cardinalityToSymbolPartKinds } from "./symbol";
+import { getPaths } from "./path";
+import { getEdgePos, getNeabyPositions } from "./positions";
+import {
+  buildSymbols,
+  cardinalityToSymbolPartKinds,
+  getDirAndLength,
+} from "./symbol";
 
 export function CardinalityEdge({
   id,
@@ -31,46 +35,34 @@ export function CardinalityEdge({
   if (!sourceNode || !targetNode) {
     return null;
   }
-  const { sx, sy, tx, ty } = useMemo(
-    () => getEdgeParams(sourceNode, targetNode),
-    [
-      sourceNode.id,
-      sourceNode.position.x,
-      sourceNode.position.y,
-      sourceNode.measured?.width,
-      sourceNode.measured?.height,
-      targetNode.id,
-      targetNode.position.x,
-      targetNode.position.y,
-      targetNode.measured?.width,
-      targetNode.measured?.height,
-    ],
-  );
-
-  const [straightPath] = getStraightPath({
-    sourceX: sx,
-    sourceY: sy,
-    targetX: tx,
-    targetY: ty,
-  });
-
-  const dx = tx - sx;
-  const dy = ty - sy;
-  const length = Math.hypot(dx, dy);
-
-  if (length <= 0.0001) {
-    return (
-      <BaseEdge
-        id={id}
-        path={straightPath}
-        style={style}
-        markerEnd={markerEnd}
-      />
-    );
+  if (
+    !!data?.bendpoints &&
+    data.bendpoints.length > 0 &&
+    data.bendpoints.some((bp) => bp.relative)
+  ) {
+    // When bendpoints are for self relationship, render no edge temporally.
+    // This should be handled by https://github.com/erflute/erflute/issues/53
+    return null;
   }
+  const { sourceNearbyPos, targetNearbyPos } = getNeabyPositions(
+    sourceNode,
+    targetNode,
+    data?.bendpoints,
+  );
+  const sourcePos = getEdgePos(sourceNode, sourceNearbyPos);
+  const targetPos = getEdgePos(targetNode, targetNearbyPos);
 
-  const dirX = dx / length;
-  const dirY = dy / length;
+  const paths = getPaths(sourcePos, targetPos, data?.bendpoints);
+
+  const noBendpoints = !data?.bendpoints || data?.bendpoints.length == 0;
+  const { dir: sourceDir, length: sourceLength } = getDirAndLength(
+    sourcePos,
+    noBendpoints ? targetPos : sourceNearbyPos,
+  );
+  const { dir: targetDir, length: targetLength } = getDirAndLength(
+    targetPos,
+    noBendpoints ? sourcePos : targetNearbyPos,
+  );
 
   const strokeColor =
     (style && typeof style.stroke === "string" ? style.stroke : undefined) ??
@@ -84,25 +76,25 @@ export function CardinalityEdge({
   const childCardinality = data?.childCardinality ?? Cardinality.One;
 
   const sourceSymbols = buildSymbols(
-    sx,
-    sy,
-    dirX,
-    dirY,
+    sourcePos.x,
+    sourcePos.y,
+    sourceDir.x,
+    sourceDir.y,
     cardinalityToSymbolPartKinds(parentCardinality),
     "source",
-    length,
+    sourceLength,
     strokeColor,
     strokeWidth,
   );
 
   const targetSymbols = buildSymbols(
-    tx,
-    ty,
-    -dirX,
-    -dirY,
+    targetPos.x,
+    targetPos.y,
+    targetDir.x,
+    targetDir.y,
     cardinalityToSymbolPartKinds(childCardinality),
     "target",
-    length,
+    targetLength,
     strokeColor,
     strokeWidth,
   );
@@ -116,24 +108,27 @@ export function CardinalityEdge({
   // We therefore add a dedicated (invisible) interaction path to ensure double-click is captured.
   return (
     <>
-      <BaseEdge
-        id={id}
-        path={straightPath}
-        style={style}
-        markerEnd={markerEnd}
-      />
-      <path
-        d={straightPath}
-        fill="none"
-        strokeOpacity={0}
-        strokeWidth={24}
-        pointerEvents="stroke"
-        onDoubleClick={(e) => {
-          e.stopPropagation();
-          setRelationInfoDialogOpen(true);
-        }}
-        className="cursor-pointer"
-      />
+      {paths.map((p, i) => (
+        <Fragment key={`${i}-${p}`}>
+          <BaseEdge
+            path={p}
+            style={style}
+            markerEnd={i == paths.length - 1 ? markerEnd : undefined}
+          />
+          <path
+            d={p}
+            fill="none"
+            strokeOpacity={0}
+            strokeWidth={24}
+            pointerEvents="stroke"
+            onDoubleClick={(e) => {
+              e.stopPropagation();
+              setRelationInfoDialogOpen(true);
+            }}
+            className="cursor-pointer"
+          />
+        </Fragment>
+      ))}
       {symbols}
       {data && (
         <RelationInfoDialog

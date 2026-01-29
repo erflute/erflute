@@ -16,10 +16,17 @@ type FkColumns = {
   fkColumn: FkColumn[];
 };
 
+type Bendpoint = {
+  relative: boolean;
+  x: number;
+  y: number;
+};
+
 type Relationship = {
   name: string;
   source: string;
   target: string;
+  bendpoints?: Bendpoint[];
   fkColumns: FkColumns;
   parentCardinality: Cardinality;
   childCardinality: Cardinality;

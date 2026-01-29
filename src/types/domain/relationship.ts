@@ -7,6 +7,12 @@ export const Cardinality = {
 
 export type Cardinality = (typeof Cardinality)[keyof typeof Cardinality];
 
+export type Bendpoint = {
+  relative: boolean;
+  x: number;
+  y: number;
+};
+
 export const ReferenceOperation = {
   Restrict: "RESTRICT",
   Cascade: "CASCADE",
@@ -21,6 +27,7 @@ export type Relationship = {
   name: string;
   source: string;
   target: string;
+  bendpoints?: Bendpoint[];
   fkColumnNames: string[];
   parentCardinality: Cardinality;
   childCardinality: Cardinality;

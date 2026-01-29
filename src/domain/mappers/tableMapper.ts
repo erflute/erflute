@@ -114,6 +114,7 @@ export function mapRelationshipsFrom(
         name: relationship.name,
         source: relationship.source,
         target: relationship.target,
+        bendpoints: relationship.bendpoints,
         fkColumnNames: relationship.fkColumns.fkColumn.map(
           (column) => column.fkColumnName,
         ),

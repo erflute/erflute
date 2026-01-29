@@ -3,6 +3,24 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub struct Bendpoint {
+    pub relative: bool,
+    pub x: u16,
+    pub y: u16,
+}
+
+impl From<entities::Bendpoint> for Bendpoint {
+    fn from(entity: entities::Bendpoint) -> Self {
+        Self {
+            relative: entity.relative,
+            x: entity.x,
+            y: entity.y,
+        }
+    }
+}
+
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct FkColumn {
     pub fk_column_name: String,
 }
@@ -34,11 +52,20 @@ impl From<entities::FkColumns> for FkColumns {
 #[serde(rename_all = "camelCase")]
 pub struct Relationship {
     pub name: String,
+
     pub source: String,
+
     pub target: String,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bendpoints: Option<Vec<Bendpoint>>,
+
     pub fk_columns: FkColumns,
+
     pub parent_cardinality: String,
+
     pub child_cardinality: String,
+
     pub reference_for_pk: bool,
 
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -60,6 +87,9 @@ impl From<entities::Relationship> for Relationship {
             name: entity.name,
             source: entity.source,
             target: entity.target,
+            bendpoints: entity
+                .bendpoints
+                .map(|v| v.into_iter().map(Into::into).collect()),
             fk_columns: entity.fk_columns.into(),
             parent_cardinality: entity.parent_cardinality,
             child_cardinality: entity.child_cardinality,
