@@ -3,6 +3,8 @@ import type { ReactElement } from "react";
 import { type XYPosition } from "@xyflow/react";
 import { Cardinality } from "@/types/domain/relationship";
 
+const STROKE_COLOR = "var(--xy-edge-stroke, var(--xy-edge-stroke-default))";
+
 const DEFAULT_OFFSET = 16;
 const SYMBOL_SPACING = 6;
 const LINE_LENGTH = 10;
@@ -36,8 +38,6 @@ export function buildSymbols(
   symbolPartKinds: SymbolPartKind[],
   keyPrefix: string,
   pathLength: number,
-  strokeColor: string,
-  strokeWidth?: number,
 ): ReactElement[] {
   const symbols: ReactElement[] = [];
 
@@ -83,8 +83,7 @@ export function buildSymbols(
           createElement("path", {
             key: `${keyPrefix}-line-${index}`,
             d: `M ${startX} ${startY} L ${endX} ${endY}`,
-            stroke: strokeColor,
-            strokeWidth,
+            stroke: STROKE_COLOR,
             fill: "none",
           }),
         );
@@ -97,7 +96,8 @@ export function buildSymbols(
             cx: centerX,
             cy: centerY,
             r: CIRCLE_RADIUS,
-            fill: strokeColor,
+            stroke: STROKE_COLOR,
+            fill: STROKE_COLOR,
           }),
         );
         break;
@@ -116,8 +116,7 @@ export function buildSymbols(
           createElement("path", {
             key: `${keyPrefix}-crowfoot-${index}`,
             d: `M ${leftX} ${leftY} L ${tipX} ${tipY} L ${rightX} ${rightY}`,
-            stroke: strokeColor,
-            strokeWidth,
+            stroke: STROKE_COLOR,
             fill: "none",
             strokeLinejoin: "round",
           }),
