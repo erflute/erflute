@@ -44,7 +44,12 @@ export function OneToManyEdge({
   const sourcePos = getEdgePos(sourceNode, sourceNearbyPos);
   const targetPos = getEdgePos(targetNode, targetNearbyPos);
 
-  const paths = getPaths(sourcePos, targetPos, data?.bendpoints);
+  const paths = getPaths([
+    sourcePos,
+    ...(data?.bendpoints ? data.bendpoints : []),
+    targetPos,
+  ]);
+  // const paths = getPaths(sourcePos, targetPos, data?.bendpoints);
 
   const noBendpoints = !data?.bendpoints || data?.bendpoints.length == 0;
   const { dir: sourceDir, length: sourceLength } = getDirAndLength(
