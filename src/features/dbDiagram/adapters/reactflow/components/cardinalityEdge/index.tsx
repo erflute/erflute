@@ -64,6 +64,7 @@ export function CardinalityEdge({
             d={p}
             fill="none"
             strokeOpacity={0}
+            stroke="transparent"
             strokeWidth={24}
             pointerEvents="stroke"
             onDoubleClick={(e) => {
