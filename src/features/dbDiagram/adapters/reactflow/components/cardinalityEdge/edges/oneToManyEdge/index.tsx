@@ -11,12 +11,12 @@ import { RelationInfoDialog } from "@/features/dbDiagram/components/relationInfo
 import { useDiagramStore } from "@/stores/diagramStore";
 import { Cardinality, type Relationship } from "@/types/domain/relationship";
 import { getPaths } from "../../path";
-import { getEdgePos, getNeabyPositions } from "../../positions";
 import {
   buildSymbols,
   cardinalityToSymbolPartKinds,
   getDirAndLength,
 } from "../../symbol";
+import { getEdgePos, getNeabyPositions } from "./positions";
 
 export function OneToManyEdge({
   id,
@@ -49,7 +49,6 @@ export function OneToManyEdge({
     ...(data?.bendpoints ? data.bendpoints : []),
     targetPos,
   ]);
-  // const paths = getPaths(sourcePos, targetPos, data?.bendpoints);
 
   const noBendpoints = !data?.bendpoints || data?.bendpoints.length == 0;
   const { dir: sourceDir, length: sourceLength } = getDirAndLength(

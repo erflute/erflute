@@ -4,15 +4,12 @@ import { OneToManyEdge } from "./edges/oneToManyEdge";
 import { SelfEdge } from "./edges/selfEdge";
 
 export function CardinalityEdge({
-  data,
+  source,
+  target,
   ...props
 }: EdgeProps<Edge<Relationship>>) {
-  if (
-    !!data?.bendpoints &&
-    data.bendpoints.length > 0 &&
-    data.bendpoints.some((bp) => bp.relative)
-  ) {
-    return <SelfEdge data={data} {...props} />;
+  if (source === target) {
+    return <SelfEdge source={source} target={target} {...props} />;
   }
-  return <OneToManyEdge data={data} {...props} />;
+  return <OneToManyEdge source={source} target={target} {...props} />;
 }
