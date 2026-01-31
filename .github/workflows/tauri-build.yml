@@ -28,6 +28,12 @@ jobs:
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Add macOS Rust targets
+        if: matrix.os == 'macos-latest'
+        run: |
+          rustup target add aarch64-apple-darwin
+          rustup target add x86_64-apple-darwin
+
       - name: Install Linux dependencies
         if: matrix.os == 'ubuntu-latest'
         run: |
@@ -41,13 +47,23 @@ jobs:
       - name: Install frontend dependencies
         run: npm ci
 
-      - name: Build (manual)
-        if: github.event_name == 'workflow_dispatch'
+      - name: Build (manual, macOS)
+        if: github.event_name == 'workflow_dispatch' && matrix.os == 'macos-latest'
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          args: ${{ matrix.os == 'macos-latest' && '--verbose --target universal-apple-darwin' || '--verbose' }}
+          args: --verbose --target universal-apple-darwin
+          includeDebug: false
+          includeRelease: true
+
+      - name: Build (manual, non-macOS)
+        if: github.event_name == 'workflow_dispatch' && matrix.os != 'macos-latest'
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: --verbose
           includeDebug: false
           includeRelease: true
 
@@ -70,8 +86,8 @@ jobs:
             src-tauri/target/release/*.AppImage
           if-no-files-found: error
 
-      - name: Build and draft release (tag)
-        if: startsWith(github.ref, 'refs/tags/')
+      - name: Build and draft release (tag, macOS)
+        if: startsWith(github.ref, 'refs/tags/') && matrix.os == 'macos-latest'
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -80,4 +96,16 @@ jobs:
           releaseName: ersflute ${{ github.ref_name }}
           releaseDraft: true
           prerelease: false
-          args: ${{ matrix.os == 'macos-latest' && '--verbose --target universal-apple-darwin' || '--verbose' }}
+          args: --verbose --target universal-apple-darwin
+
+      - name: Build and draft release (tag, non-macOS)
+        if: startsWith(github.ref, 'refs/tags/') && matrix.os != 'macos-latest'
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: ersflute ${{ github.ref_name }}
+          releaseDraft: true
+          prerelease: false
+          args: --verbose
