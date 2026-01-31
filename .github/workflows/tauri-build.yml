@@ -47,7 +47,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          args: --verbose
+          args: ${{ matrix.os == 'macos-latest' && '--verbose --target universal-apple-darwin' || '--verbose' }}
           includeDebug: false
           includeRelease: true
 
@@ -77,4 +77,4 @@ jobs:
           releaseName: ersflute ${{ github.ref_name }}
           releaseDraft: true
           prerelease: false
-          args: --verbose
+          args: ${{ matrix.os == 'macos-latest' && '--verbose --target universal-apple-darwin' || '--verbose' }}
