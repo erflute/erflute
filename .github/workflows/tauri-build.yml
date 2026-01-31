@@ -47,7 +47,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          args: --verbose
+          args: ${{ matrix.os == 'macos-latest' && '--verbose --target universal-apple-darwin' || '--verbose' }}
           includeDebug: false
           includeRelease: true
 
@@ -57,6 +57,9 @@ jobs:
         with:
           name: tauri-bundles-${{ matrix.os }}
           path: |
+            src-tauri/target/universal-apple-darwin/release/bundle/**/*
+            src-tauri/target/universal-apple-darwin/release/*.dmg
+            src-tauri/target/universal-apple-darwin/release/*.app
             src-tauri/target/release/bundle/**/*
             src-tauri/target/release/*.exe
             src-tauri/target/release/*.msi
@@ -77,4 +80,4 @@ jobs:
           releaseName: ersflute ${{ github.ref_name }}
           releaseDraft: true
           prerelease: false
-          args: --verbose
+          args: ${{ matrix.os == 'macos-latest' && '--verbose --target universal-apple-darwin' || '--verbose' }}
