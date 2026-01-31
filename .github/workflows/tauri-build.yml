@@ -57,6 +57,9 @@ jobs:
         with:
           name: tauri-bundles-${{ matrix.os }}
           path: |
+            src-tauri/target/universal-apple-darwin/release/bundle/**/*
+            src-tauri/target/universal-apple-darwin/release/*.dmg
+            src-tauri/target/universal-apple-darwin/release/*.app
             src-tauri/target/release/bundle/**/*
             src-tauri/target/release/*.exe
             src-tauri/target/release/*.msi
