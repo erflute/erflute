@@ -5,12 +5,14 @@ use serde::{Deserialize, Serialize};
 #[serde(rename_all = "camelCase")]
 pub struct DiagramSettings {
     pub database: String,
+    pub view_mode: u8,
 }
 
 impl From<entities::DiagramSettings> for DiagramSettings {
     fn from(entity: entities::DiagramSettings) -> Self {
         Self {
             database: entity.database,
+            view_mode: entity.view_mode,
         }
     }
 }
