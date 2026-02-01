@@ -3,22 +3,34 @@ import { updateRelation } from "@/domain/diagram/updateRelation";
 import { updateTableAndRef } from "@/domain/diagram/updateTable";
 import type { ColumnGroup } from "@/types/domain/columnGroup";
 import type { Relationship } from "@/types/domain/relationship";
+import { ViewMode, type Settings } from "@/types/domain/settings";
 import type { Table } from "@/types/domain/table";
 
+const initialSettings: Settings = {
+  database: "",
+  viewMode: ViewMode.Logical,
+};
+
 type DiagramStore = {
+  settings: Settings;
   tables: Table[];
   relationships: Relationship[];
   columnGroups: ColumnGroup[];
   tablesVersion: number;
   relationshipsVersion: number;
+  setSettings: (settings: Settings) => void;
   setTables: (tables: Table[]) => void;
   updateTable: (table: Table, previousPhysicalName: string) => void;
   setRelationships: (relationships: Relationship[]) => void;
-  updateRelationship: (relationship: Relationship, previousName: string) => void;
+  updateRelationship: (
+    relationship: Relationship,
+    previousName: string,
+  ) => void;
   setColumnGroups: (columnGroups: ColumnGroup[]) => void;
 };
 
 export const useDiagramStore = create<DiagramStore>((set) => ({
+  settings: initialSettings,
   tables: [],
   relationships: [],
   columnGroups: [],
@@ -26,6 +38,7 @@ export const useDiagramStore = create<DiagramStore>((set) => ({
   // so incremental updates do not trigger expensive full refreshes.
   tablesVersion: 0,
   relationshipsVersion: 0,
+  setSettings: (settings: Settings) => set({ settings }),
   setTables: (tables: Table[]) =>
     set((state) => ({ tables, tablesVersion: state.tablesVersion + 1 })),
   updateTable: (table: Table, previousPhysicalName: string) =>

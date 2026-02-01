@@ -8,7 +8,7 @@ pub struct DiagramSettings {
     pub database: String,
     // notation: String,
     // notation_level: u32,
-    // view_mode: u32,
+    pub view_mode: u8,
 }
 
 // impl DiagramSetting {

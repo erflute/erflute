@@ -7,15 +7,37 @@ import { useDiagramStore } from "@/stores/diagramStore";
 import { useViewModeStore } from "@/stores/viewModeStore";
 import type { Column } from "@/types/domain/column";
 import type { ColumnGroup } from "@/types/domain/columnGroup";
+import { ViewMode } from "@/types/domain/settings";
 import { isColumnGroupName, type ColumnGroupName } from "@/types/domain/table";
 import type { TableCardProps } from "./types";
 import { useMinTableSize } from "./useMinTableSize";
 
-function formatColumnLabel(column: Column) {
-  if (column.columnType) {
-    return `${column.physicalName}: ${formatColumnType(column)}`;
+function formatName(
+  viewMode: ViewMode,
+  physicalName: string,
+  logicalName?: string,
+) {
+  if (viewMode === ViewMode.Logical) {
+    return logicalName || physicalName;
   }
-  return column.physicalName;
+
+  if (viewMode === ViewMode.LogicalPhysical) {
+    return logicalName ? `${logicalName}/${physicalName}` : physicalName;
+  }
+
+  return physicalName;
+}
+
+function formatColumnLabel(column: Column, viewMode: ViewMode) {
+  const nameLabel = formatName(
+    viewMode,
+    column.physicalName,
+    column.logicalName,
+  );
+  if (column.columnType) {
+    return `${nameLabel}: ${formatColumnType(column)}`;
+  }
+  return nameLabel;
 }
 
 function flatColumnsFrom(
@@ -40,6 +62,7 @@ export function TableCard({
   onHeaderDoubleClick,
 }: TableCardProps) {
   const { isReadOnly } = useViewModeStore();
+  const viewMode = useDiagramStore((state) => state.settings.viewMode);
   const columnGroups = useDiagramStore((state) => state.columnGroups);
   const flatColumns = useMemo(
     () => flatColumnsFrom(data.columns ?? [], columnGroups),
@@ -68,7 +91,9 @@ export function TableCard({
         onDoubleClick={onHeaderDoubleClick}
         className="flex items-center justify-center h-5 cursor-pointer"
       >
-        <h1 className="text-sm">{data.physicalName}</h1>
+        <h1 className="text-sm">
+          {formatName(viewMode, data.physicalName, data.logicalName)}
+        </h1>
       </div>
       <div className="nodrag flex-1 w-full h-full px-1 pb-1">
         <div className="w-full h-full bg-white">
@@ -106,7 +131,7 @@ export function TableCard({
                     />
                   )}
                 </span>
-                <span>{formatColumnLabel(column)}</span>
+                <span>{formatColumnLabel(column, viewMode)}</span>
               </p>
             ))}
             {indexes.length > 0 && (

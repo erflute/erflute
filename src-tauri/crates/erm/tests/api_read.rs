@@ -21,6 +21,7 @@ fn test_read_erm_file() {
         diagram::Diagram {
             diagram_settings: diagram_settings::DiagramSettings {
                 database: "MySQL".to_string(),
+                view_mode: 1,
             },
             diagram_walkers: diagram_walkers::DiagramWalkers {
                 tables: Some(vec![
