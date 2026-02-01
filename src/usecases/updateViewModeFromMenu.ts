@@ -1,8 +1,7 @@
-import { loadDiagram } from "@/api/diagram";
 import { useDiagramStore } from "@/stores/diagramStore";
 import { useErmFileStore } from "@/stores/ermFileStore";
 
-export async function applyDiagramFromFile(filePath: string) {
+export async function updateViewMode(filePath: string) {
   const { settings, tables, relationships, columnGroups } =
     await loadDiagram(filePath);
   const { setSettings, setTables, setRelationships, setColumnGroups } =

@@ -1,4 +1,3 @@
-import { loadDiagram } from "@/api/diagram";
 import { useDiagramStore } from "@/stores/diagramStore";
 import { useErmFileStore } from "@/stores/ermFileStore";
 
