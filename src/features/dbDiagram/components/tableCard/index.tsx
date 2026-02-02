@@ -78,7 +78,7 @@ export function TableCard({
   return (
     <div
       className={cn(
-        "flex flex-col min-h-0 rounded-sm",
+        "flex flex-col min-h-0 rounded-sm border border-slate-400",
         isReadOnly && "nopan nodrag cursor-default",
       )}
       style={{
