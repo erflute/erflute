@@ -197,3 +197,56 @@ it("renders index names when indexes exist", () => {
   expect(screen.getByText("IX_users_test")).toBeInTheDocument();
   expect(screen.getByText("IX_users_test2")).toBeInTheDocument();
 });
+
+it("adds a unique marker after the column type for unique columns", () => {
+  const table = createTable({
+    columns: [
+      {
+        physicalName: "id",
+        columnType: ColumnType.IntN,
+        length: 11,
+        unique: true,
+      },
+    ],
+  });
+  useDiagramStore.setState({
+    ...useDiagramStore.getState(),
+    settings: { ...initialDiagramState.settings, viewMode: ViewMode.Physical },
+  });
+
+  render(<TableCard data={table} />);
+
+  expect(screen.getByText("id: int(11) (U)")).toBeInTheDocument();
+});
+
+it("adds a compound unique marker after the column type for compound unique keys", () => {
+  const table = createTable({
+    columns: [
+      {
+        physicalName: "id",
+        columnType: ColumnType.IntN,
+        length: 11,
+      },
+      {
+        physicalName: "email",
+        columnType: ColumnType.VarCharN,
+        length: 255,
+      },
+    ],
+    compoundUniqueKeys: [
+      {
+        name: "UK_users_contact",
+        columns: ["table.users.id", "table.users.email"],
+      },
+    ],
+  });
+  useDiagramStore.setState({
+    ...useDiagramStore.getState(),
+    settings: { ...initialDiagramState.settings, viewMode: ViewMode.Physical },
+  });
+
+  render(<TableCard data={table} />);
+
+  expect(screen.getByText("id: int(11) (U+)")).toBeInTheDocument();
+  expect(screen.getByText("email: varchar(255) (U+)")).toBeInTheDocument();
+});
