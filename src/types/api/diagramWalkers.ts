@@ -41,7 +41,7 @@ type Connections = {
   relationships: Relationship[];
 };
 
-type NormalColumn = {
+export type NormalColumn = {
   physicalName: string;
   logicalName?: string;
   description?: string;
