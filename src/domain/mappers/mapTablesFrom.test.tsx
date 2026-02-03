@@ -123,6 +123,42 @@ describe("with populated columns", () => {
       ColumnType.VarCharN,
     );
   });
+
+  it("uses the referred column type when the column type is omitted", () => {
+    const [referencedTable, referencingTable] = mapTablesFrom([
+      createTableResponse({
+        physicalName: "users",
+        columns: {
+          items: [
+            {
+              physicalName: "id",
+              columnType: "int",
+              notNull: true,
+            },
+          ],
+        },
+      }),
+      createTableResponse({
+        physicalName: "posts",
+        columns: {
+          items: [
+            {
+              physicalName: "user_id",
+              referredColumn: "table.users.id",
+              notNull: true,
+            },
+          ],
+        },
+      }),
+    ]);
+
+    expect((referencedTable.columns?.[0] as Column)?.columnType).toBe(
+      ColumnType.Int,
+    );
+    expect((referencingTable.columns?.[0] as Column)?.columnType).toBe(
+      ColumnType.Int,
+    );
+  });
 });
 
 describe("without normal columns", () => {

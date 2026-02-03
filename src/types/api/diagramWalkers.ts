@@ -41,13 +41,14 @@ type Connections = {
   relationships: Relationship[];
 };
 
-type NormalColumn = {
+export type NormalColumn = {
   physicalName: string;
   logicalName?: string;
   description?: string;
   columnType?: string;
   length?: number;
   decimal?: number;
+  args?: string;
   unsigned?: boolean;
   notNull?: boolean;
   uniqueKey?: boolean;

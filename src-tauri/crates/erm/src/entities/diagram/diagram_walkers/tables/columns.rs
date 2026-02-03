@@ -21,6 +21,9 @@ pub struct NormalColumn {
     pub decimal: Option<u16>,
 
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub args: Option<String>,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub unsigned: Option<bool>,
 
     #[serde(default, skip_serializing_if = "Option::is_none")]

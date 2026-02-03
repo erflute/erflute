@@ -1,5 +1,6 @@
 import { useMemo, useRef } from "react";
 import { CheckCircleIcon, KeyIcon } from "@heroicons/react/16/solid";
+import { parseReference } from "@/domain/parsers/referenceParser";
 import { findGroupFromName } from "@/features/dbDiagram/domain/findGroupFromName";
 import { formatColumnType } from "@/features/dbDiagram/domain/formatColumnType";
 import { cn } from "@/lib/utils";
@@ -28,14 +29,18 @@ function formatName(
   return physicalName;
 }
 
-function formatColumnLabel(column: Column, viewMode: ViewMode) {
+function formatColumnLabel(
+  column: Column,
+  viewMode: ViewMode,
+  uniqueSuffix: string,
+) {
   const nameLabel = formatName(
     viewMode,
     column.physicalName,
     column.logicalName,
   );
   if (column.columnType) {
-    return `${nameLabel}: ${formatColumnType(column)}`;
+    return `${nameLabel}: ${formatColumnType(column)}${uniqueSuffix}`;
   }
   return nameLabel;
 }
@@ -51,6 +56,40 @@ function flatColumnsFrom(
     }
     return [column];
   });
+}
+
+function getUniqueSuffix(column: Column, compoundUniqueColumns: Set<string>) {
+  if (compoundUniqueColumns.has(column.physicalName)) {
+    return " (U+)";
+  }
+  if (column.unique) {
+    return " (U)";
+  }
+  return "";
+}
+
+function renderKeyIcon(column: Column) {
+  if (column.primaryKey) {
+    return (
+      <KeyIcon
+        aria-label={`Column ${column.physicalName} is primary key`}
+        width={10}
+        height={10}
+        className="text-yellow-500"
+      />
+    );
+  }
+  if (!!column.referredColumn) {
+    return (
+      <KeyIcon
+        aria-label={`Column ${column.physicalName} is foreign key`}
+        width={10}
+        height={10}
+        className="text-gray-400"
+      />
+    );
+  }
+  return undefined;
 }
 
 export function TableCard({
@@ -69,6 +108,18 @@ export function TableCard({
     [columnGroups, data.columns],
   );
   const indexes = useMemo(() => data.indexes ?? [], [data.indexes]);
+  const compoundUniqueColumns = useMemo(() => {
+    const names = new Set<string>();
+    data.compoundUniqueKeys?.forEach((key) => {
+      key.columns.forEach((columnReference) => {
+        const { columnName } = parseReference(columnReference);
+        if (columnName) {
+          names.add(columnName);
+        }
+      });
+    });
+    return names;
+  }, [data.compoundUniqueKeys]);
 
   // Ref to the variable table content used to determine the TableCard size.
   // Only the content area is measured to keep the TableCard dimensions
@@ -78,7 +129,7 @@ export function TableCard({
   return (
     <div
       className={cn(
-        "flex flex-col min-h-0 rounded-sm",
+        "flex flex-col min-h-0 rounded-sm border border-slate-400",
         isReadOnly && "nopan nodrag cursor-default",
       )}
       style={{
@@ -104,22 +155,7 @@ export function TableCard({
                 className="flex items-center text-[0.625rem] leading-5 whitespace-nowrap"
               >
                 <span className="flex items-center justify-center w-4 h-4">
-                  {column.primaryKey && (
-                    <KeyIcon
-                      aria-label={`Column ${column.physicalName} is primary key`}
-                      width={10}
-                      height={10}
-                      className="text-yellow-500"
-                    />
-                  )}
-                  {!!column.referredColumn && (
-                    <KeyIcon
-                      aria-label={`Column ${column.physicalName} is foreign key`}
-                      width={10}
-                      height={10}
-                      className="text-gray-400"
-                    />
-                  )}
+                  {renderKeyIcon(column)}
                 </span>
                 <span className="flex items-center justify-center w-4 h-4">
                   {column.notNull && (
@@ -131,7 +167,13 @@ export function TableCard({
                     />
                   )}
                 </span>
-                <span>{formatColumnLabel(column, viewMode)}</span>
+                <span>
+                  {formatColumnLabel(
+                    column,
+                    viewMode,
+                    getUniqueSuffix(column, compoundUniqueColumns),
+                  )}
+                </span>
               </p>
             ))}
             {indexes.length > 0 && (

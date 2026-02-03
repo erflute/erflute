@@ -1,6 +1,6 @@
-import type { TableResponse } from "@/types/api/diagramWalkers";
+import type { NormalColumn, TableResponse } from "@/types/api/diagramWalkers";
 import type { Column } from "@/types/domain/column";
-import { parseColumnType } from "@/types/domain/columnType";
+import { parseColumnType, type ColumnType } from "@/types/domain/columnType";
 import type { Relationship } from "@/types/domain/relationship";
 import type {
   CompoundUniqueKey,
@@ -10,7 +10,40 @@ import type {
 } from "@/types/domain/table";
 import { parseReference } from "../parsers/referenceParser";
 
+function getColumnType(
+  item: NormalColumn,
+  tableResponses: TableResponse[],
+): ColumnType | undefined {
+  if (item.columnType) {
+    return parseColumnType(item.columnType);
+  }
+  if (item.referredColumn) {
+    const { tableName, columnName } = parseReference(item.referredColumn);
+    if (!tableName || !columnName) {
+      return undefined;
+    }
+    const table = tableResponses.find(
+      (table) => tableName === table.physicalName,
+    );
+    if (!table) {
+      return undefined;
+    }
+    const items = table.columns.items;
+    if (!items) {
+      return undefined;
+    }
+    const column = items
+      .filter((clm) => typeof clm !== "string")
+      .find((clm) => columnName === clm.physicalName);
+    return column?.columnType ? parseColumnType(column.columnType) : undefined;
+  }
+  return undefined;
+}
+
 export function mapTablesFrom(tableResponses: TableResponse[]): Table[] {
+  if (!tableResponses) {
+    return [];
+  }
   return tableResponses.map((table) => {
     return {
       color: {
@@ -36,11 +69,10 @@ export function mapTablesFrom(tableResponses: TableResponse[]): Table[] {
           physicalName: item.physicalName,
           logicalName: item.logicalName,
           description: item.description,
-          columnType: item.columnType
-            ? parseColumnType(item.columnType)
-            : undefined,
+          columnType: getColumnType(item, tableResponses),
           length: item.length,
           decimal: item.decimal,
+          enumArgs: item.args,
           unsigned: item.unsigned,
           notNull: item.notNull,
           unique: item.uniqueKey,

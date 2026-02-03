@@ -21,15 +21,25 @@ export function useMinTableSize(
   useEffect(() => {
     if (contentRef.current) {
       if (typeof width === "number" && setWidth) {
-        // minWidth = left padding (4px) + right padding (4px) + content width
-        const minWidth = 4 + 4 + contentRef.current.clientWidth;
+        // minWidth = left padding (4px) + right padding (4px)
+        // + left/right border (1px each) + extra breathing room (2px)
+        // + content width (rounded up to avoid sub-pixel overflow)
+        const contentWidth = Math.ceil(
+          contentRef.current.getBoundingClientRect().width,
+        );
+        const minWidth = 4 + 4 + 2 + 2 + contentWidth;
         if (width < minWidth) {
           setWidth(minWidth);
         }
       }
       if (typeof height === "number" && setHeight) {
-        // minHeight = header height (20px) + bottom padding (4px) + content height
-        const minHeight = 20 + 4 + contentRef.current.clientHeight;
+        // minHeight = header height (20px) + bottom padding (4px)
+        // + top/bottom border (1px each) + extra breathing room (2px)
+        // + content height (rounded up to avoid sub-pixel overflow)
+        const contentHeight = Math.ceil(
+          contentRef.current.getBoundingClientRect().height,
+        );
+        const minHeight = 20 + 4 + 2 + 2 + contentHeight;
         if (height < minHeight) {
           setHeight(minHeight);
         }
