@@ -24,9 +24,16 @@ function getColumnType(
     }
     const table = tableResponses.find(
       (table) => tableName === table.physicalName,
-    )!;
-    const column = table.columns.items
-      ?.filter((clm) => typeof clm !== "string")
+    );
+    if (!table) {
+      return undefined;
+    }
+    const items = table.columns.items;
+    if (!items) {
+      return undefined;
+    }
+    const column = items
+      .filter((clm) => typeof clm !== "string")
       .find((clm) => columnName === clm.physicalName);
     return column?.columnType ? parseColumnType(column.columnType) : undefined;
   }
