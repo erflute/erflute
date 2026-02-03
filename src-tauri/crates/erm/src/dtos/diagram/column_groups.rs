@@ -9,7 +9,19 @@ pub struct NormalColumn {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub logical_name: Option<String>,
 
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+
     pub column_type: String,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub length: Option<u16>,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub decimal: Option<u16>,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub args: Option<String>,
 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub not_null: Option<bool>,
@@ -19,6 +31,9 @@ pub struct NormalColumn {
 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub unsigned: Option<bool>,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub default_value: Option<String>,
 }
 
 impl From<entities::NormalColumn> for NormalColumn {
@@ -26,10 +41,15 @@ impl From<entities::NormalColumn> for NormalColumn {
         Self {
             physical_name: entity.physical_name,
             logical_name: entity.logical_name,
+            description: entity.description,
             column_type: entity.column_type,
+            length: entity.length,
+            decimal: entity.decimal,
+            args: entity.args,
             not_null: entity.not_null,
             unique_key: entity.unique_key,
             unsigned: entity.unsigned,
+            default_value: entity.default_value,
         }
     }
 }

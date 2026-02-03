@@ -14,10 +14,15 @@ export function mapColumnGroupsFrom(
         return {
           physicalName: column.physicalName,
           logicalName: column.logicalName,
+          description: column.description,
           columnType: parseColumnType(column.columnType),
+          length: column.length,
+          decimal: column.decimal,
+          enumArgs: column.args,
           notNull: column.notNull,
           unique: column.uniqueKey,
           unsigned: column.unsigned,
+          defaultValue: column.defaultValue,
         } satisfies Column;
       }),
     } satisfies ColumnGroup;

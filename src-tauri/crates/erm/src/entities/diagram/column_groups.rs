@@ -7,8 +7,20 @@ pub struct NormalColumn {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub logical_name: Option<String>,
 
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+
     #[serde(rename = "type")]
     pub column_type: String,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub length: Option<u16>,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub decimal: Option<u16>,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub args: Option<String>,
 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub not_null: Option<bool>,
@@ -18,6 +30,9 @@ pub struct NormalColumn {
 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub unsigned: Option<bool>,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub default_value: Option<String>,
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
