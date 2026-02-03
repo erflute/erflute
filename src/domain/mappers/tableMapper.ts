@@ -65,6 +65,7 @@ export function mapTablesFrom(tableResponses: TableResponse[]): Table[] {
           columnType: getColumnType(item, tableResponses),
           length: item.length,
           decimal: item.decimal,
+          enumArgs: item.args,
           unsigned: item.unsigned,
           notNull: item.notNull,
           unique: item.uniqueKey,

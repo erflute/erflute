@@ -22,6 +22,9 @@ pub struct NormalColumn {
     pub decimal: Option<u16>,
 
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub args: Option<String>,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub unsigned: Option<bool>,
 
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -55,6 +58,7 @@ impl From<entities::NormalColumn> for NormalColumn {
             column_type: entity.column_type,
             length: entity.length,
             decimal: entity.decimal,
+            args: entity.args,
             unsigned: entity.unsigned,
             not_null: entity.not_null,
             unique_key: entity.unique_key,

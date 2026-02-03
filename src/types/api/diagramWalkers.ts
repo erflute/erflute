@@ -48,6 +48,7 @@ export type NormalColumn = {
   columnType?: string;
   length?: number;
   decimal?: number;
+  args?: string;
   unsigned?: boolean;
   notNull?: boolean;
   uniqueKey?: boolean;
