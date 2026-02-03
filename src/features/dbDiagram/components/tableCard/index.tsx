@@ -68,6 +68,30 @@ function getUniqueSuffix(column: Column, compoundUniqueColumns: Set<string>) {
   return "";
 }
 
+function renderKeyIcon(column: Column) {
+  if (column.primaryKey) {
+    return (
+      <KeyIcon
+        aria-label={`Column ${column.physicalName} is primary key`}
+        width={10}
+        height={10}
+        className="text-yellow-500"
+      />
+    );
+  }
+  if (!!column.referredColumn) {
+    return (
+      <KeyIcon
+        aria-label={`Column ${column.physicalName} is foreign key`}
+        width={10}
+        height={10}
+        className="text-gray-400"
+      />
+    );
+  }
+  return undefined;
+}
+
 export function TableCard({
   width,
   height,
@@ -131,22 +155,7 @@ export function TableCard({
                 className="flex items-center text-[0.625rem] leading-5 whitespace-nowrap"
               >
                 <span className="flex items-center justify-center w-4 h-4">
-                  {column.primaryKey && (
-                    <KeyIcon
-                      aria-label={`Column ${column.physicalName} is primary key`}
-                      width={10}
-                      height={10}
-                      className="text-yellow-500"
-                    />
-                  )}
-                  {!!column.referredColumn && (
-                    <KeyIcon
-                      aria-label={`Column ${column.physicalName} is foreign key`}
-                      width={10}
-                      height={10}
-                      className="text-gray-400"
-                    />
-                  )}
+                  {renderKeyIcon(column)}
                 </span>
                 <span className="flex items-center justify-center w-4 h-4">
                   {column.notNull && (
