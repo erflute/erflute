@@ -16,8 +16,11 @@ ERD Modeling Tool for Startup & Incremental Development as Desktop Application
     - Windows (nvm-windows): https://github.com/coreybutler/nvm-windows
   - Alternative: install directly from the official installer.
     - https://nodejs.org/en/download
+- pnpm is recommended.
+  - Install: https://pnpm.io/installation
 - To run the Tauri desktop app, install the Rust toolchain and Tauri prerequisites for your OS.
   - Rust (rustup): https://rustup.rs/
+  - Rust itself can be installed with rustup alone.
   - Tauri prerequisites: https://tauri.app/start/prerequisites/
 
 ## Setup
@@ -25,25 +28,25 @@ ERD Modeling Tool for Startup & Incremental Development as Desktop Application
 1. Install dependencies
 
 ```bash
-npm install
+pnpm install
 ```
 
 2. Run the web app in development mode
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 3. Build the production web assets
 
 ```bash
-npm run build
+pnpm build
 ```
 
 4. (Optional) Run the Tauri desktop app
 
 ```bash
-npm run tauri dev
+pnpm tauri dev
 ```
 
 ## License
