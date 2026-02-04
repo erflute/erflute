@@ -30,19 +30,7 @@ ERD Modeling Tool for Startup & Incremental Development as Desktop Application
 pnpm install
 ```
 
-2. Run the web app in development mode
-
-```bash
-pnpm dev
-```
-
-3. Build the production web assets
-
-```bash
-pnpm build
-```
-
-4. (Optional) Run the Tauri desktop app
+2. Run the Tauri desktop app
 
 ```bash
 pnpm tauri dev
