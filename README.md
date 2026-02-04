@@ -12,16 +12,15 @@ ERD Modeling Tool for Startup & Incremental Development as Desktop Application
 
 - Node.js 20+ is recommended.
   - Recommended: use a version manager.
-    - macOS/Linux (nvm): https://github.com/nvm-sh/nvm
-    - Windows (nvm-windows): https://github.com/coreybutler/nvm-windows
+    - macOS/Linux (nvm): [https://github.com/nvm-sh/nvm](https://github.com/nvm-sh/nvm)
+    - Windows (nvm-windows): [https://github.com/coreybutler/nvm-windows](https://github.com/coreybutler/nvm-windows)
   - Alternative: install directly from the official installer.
-    - https://nodejs.org/en/download
+    - [https://nodejs.org/en/download](https://nodejs.org/en/download)
 - pnpm is recommended.
-  - Install: https://pnpm.io/installation
+  - Install: [https://pnpm.io/installation](https://pnpm.io/installation)
 - To run the Tauri desktop app, install the Rust toolchain and Tauri prerequisites for your OS.
-  - Rust (rustup): https://rustup.rs/
-  - Rust itself can be installed with rustup alone.
-  - Tauri prerequisites: https://tauri.app/start/prerequisites/
+  - Rust (rustup): [https://rustup.rs/](https://rustup.rs/)
+  - Tauri prerequisites: [https://tauri.app/start/prerequisites/](https://tauri.app/start/prerequisites/)
 
 ## Setup
 
@@ -51,4 +50,4 @@ pnpm tauri dev
 
 ## License
 
-MIT. See `LICENSE`.
+MIT. See [LICENSE](LICENSE).
