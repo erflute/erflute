@@ -3,7 +3,7 @@
   "productName": "erflute",
   "version": "0.1.0",
   "identifier": "com.skai273.erflute",
-  "mainBinaryName": "app",
+  "mainBinaryName": "erflute",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
