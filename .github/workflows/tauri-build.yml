@@ -82,33 +82,33 @@ jobs:
           includeDebug: false
           includeRelease: true
 
-      - name: Upload build artifacts (manual, macOS)
+      - name: Prepare build artifacts (manual, macOS)
         if: github.event_name == 'workflow_dispatch' && matrix.os == 'macos-latest'
-        uses: actions/upload-artifact@v4
-        with:
-          name: tauri-bundles-${{ matrix.os }}
-          path: |
-            src-tauri/target/universal-apple-darwin/release/bundle/dmg/*.dmg
-          if-no-files-found: error
+        run: |
+          mkdir -p dist-artifacts
+          cp src-tauri/target/universal-apple-darwin/release/bundle/dmg/*.dmg dist-artifacts/
 
-      - name: Upload build artifacts (manual, Windows)
+      - name: Prepare build artifacts (manual, Windows)
         if: github.event_name == 'workflow_dispatch' && matrix.os == 'windows-latest'
-        uses: actions/upload-artifact@v4
-        with:
-          name: tauri-bundles-${{ matrix.os }}
-          path: |
-            src-tauri/target/release/bundle/msi/*.msi
-          if-no-files-found: error
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist-artifacts | Out-Null
+          Copy-Item "src-tauri/target/release/bundle/msi/*.msi" -Destination "dist-artifacts"
 
-      - name: Upload build artifacts (manual, Linux)
+      - name: Prepare build artifacts (manual, Linux)
         if: github.event_name == 'workflow_dispatch' && matrix.os == 'ubuntu-latest'
+        run: |
+          mkdir -p dist-artifacts
+          cp src-tauri/target/release/bundle/deb/*.deb dist-artifacts/
+          cp src-tauri/target/release/bundle/rpm/*.rpm dist-artifacts/
+          cp src-tauri/target/release/bundle/appimage/*.AppImage dist-artifacts/
+
+      - name: Upload build artifacts (manual)
+        if: github.event_name == 'workflow_dispatch'
         uses: actions/upload-artifact@v4
         with:
           name: tauri-bundles-${{ matrix.os }}
-          path: |
-            src-tauri/target/release/bundle/deb/*.deb
-            src-tauri/target/release/bundle/rpm/*.rpm
-            src-tauri/target/release/bundle/appimage/*.AppImage
+          path: dist-artifacts/*
           if-no-files-found: error
 
       - name: Build and draft release (tag, macOS)
