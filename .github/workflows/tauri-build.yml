@@ -88,7 +88,7 @@ jobs:
         with:
           name: tauri-bundles-${{ matrix.os }}
           path: |
-            src-tauri/target/universal-apple-darwin/release/*.dmg
+            src-tauri/target/universal-apple-darwin/release/bundle/dmg/*.dmg
           if-no-files-found: error
 
       - name: Upload build artifacts (manual, Windows)
@@ -97,7 +97,7 @@ jobs:
         with:
           name: tauri-bundles-${{ matrix.os }}
           path: |
-            src-tauri/target/release/*.msi
+            src-tauri/target/release/bundle/msi/*.msi
           if-no-files-found: error
 
       - name: Upload build artifacts (manual, Linux)
@@ -106,9 +106,9 @@ jobs:
         with:
           name: tauri-bundles-${{ matrix.os }}
           path: |
-            src-tauri/target/release/*.deb
-            src-tauri/target/release/*.rpm
-            src-tauri/target/release/*.AppImage
+            src-tauri/target/release/bundle/deb/*.deb
+            src-tauri/target/release/bundle/rpm/*.rpm
+            src-tauri/target/release/bundle/appimage/*.AppImage
           if-no-files-found: error
 
       - name: Build and draft release (tag, macOS)
