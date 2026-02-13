@@ -11,6 +11,7 @@ pub struct VTable {
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct VTables {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "vtable")]
-    pub vtables: Vec<VTable>,
+    pub vtables: Option<Vec<VTable>>,
 }

@@ -26,13 +26,16 @@ impl From<entities::VTable> for VTable {
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct VTables {
-    pub vtables: Vec<VTable>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub vtables: Option<Vec<VTable>>,
 }
 
 impl From<entities::VTables> for VTables {
     fn from(entity: entities::VTables) -> Self {
         Self {
-            vtables: entity.vtables.into_iter().map(Into::into).collect(),
+            vtables: entity
+                .vtables
+                .map(|v| v.into_iter().map(Into::into).collect()),
         }
     }
 }
