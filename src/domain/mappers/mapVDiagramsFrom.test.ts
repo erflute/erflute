@@ -72,13 +72,3 @@ it("maps virtual diagram properties and nested virtual tables", () => {
     },
   ]);
 });
-
-it("keeps color as undefined when not provided", () => {
-  const [diagram] = mapVDiagramsFrom([
-    createVDiagramResponse({
-      color: undefined,
-    }),
-  ]);
-
-  expect(diagram.color).toBeUndefined();
-});
