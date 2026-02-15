@@ -1,5 +1,5 @@
 /* istanbul ignore file */
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Canvas } from "@/features/dbDiagram/adapters/reactflow/components/canvas";
 import { useDiagramStore } from "@/stores/diagramStore";
@@ -9,6 +9,7 @@ const getVDiagramTabValue = (vdiagramName: string) => `vdiagram:${vdiagramName}`
 
 export function DbDiagram() {
   const vdiagrams = useDiagramStore((state) => state.vdiagrams);
+  const [selectedTab, setSelectedTab] = useState(MAIN_DIAGRAM_TAB);
   const diagramTabs = useMemo(() => {
     return vdiagrams.map((vdiagram) => {
       return {
@@ -18,9 +19,18 @@ export function DbDiagram() {
       };
     });
   }, [vdiagrams]);
+  const tabValues = useMemo(() => {
+    return [MAIN_DIAGRAM_TAB, ...diagramTabs.map((diagramTab) => diagramTab.value)];
+  }, [diagramTabs]);
+
+  useEffect(() => {
+    if (!tabValues.includes(selectedTab)) {
+      setSelectedTab(MAIN_DIAGRAM_TAB);
+    }
+  }, [selectedTab, tabValues]);
 
   return (
-    <Tabs className="h-full w-full gap-0" defaultValue={MAIN_DIAGRAM_TAB}>
+    <Tabs className="h-full w-full gap-0" onValueChange={setSelectedTab} value={selectedTab}>
       <TabsContent
         className="mt-0 min-h-0 flex-1 overflow-hidden border border-slate-300 border-b-0 bg-white"
         value={MAIN_DIAGRAM_TAB}
