@@ -30,6 +30,7 @@ pub struct VDiagram {
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct VDiagrams {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "vdiagram")]
-    pub vdiagrams: Vec<VDiagram>,
+    pub vdiagrams: Option<Vec<VDiagram>>,
 }
