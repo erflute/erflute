@@ -1,5 +1,5 @@
 import "@xyflow/react/dist/style.css";
-import { useEffect } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { MouseEvent } from "react";
 import {
   Background,
@@ -8,19 +8,26 @@ import {
   useEdgesState,
   useNodesState,
   useReactFlow,
+  type Node,
+  type NodeProps,
 } from "@xyflow/react";
 import {
   createEdges,
   createNodes,
 } from "@/features/dbDiagram/adapters/reactflow/mappers";
 import { modeSettings } from "@/features/dbDiagram/adapters/reactflow/modeSettings";
+import { TableInfoDialog } from "@/features/dbDiagram/components/tableInfoDialog";
 import { cn } from "@/lib/utils";
 import { useDiagramStore } from "@/stores/diagramStore";
 import { useViewModeStore } from "@/stores/viewModeStore";
 import { DiagramMode } from "@/types/domain/diagramMode";
+import type { Table } from "@/types/domain/table";
 import { CardinalityEdge } from "../cardinalityEdge";
 import { TableNode } from "../tableNode";
-import { createClickInTableModeHandler } from "./handlers";
+import {
+  createClickInTableModeHandler,
+  createTableInfoDialogHandlers,
+} from "./handlers";
 
 function getSettings(isReadOnly: boolean, diagramMode: DiagramMode | null) {
   if (isReadOnly || !diagramMode) {
@@ -37,6 +44,7 @@ function getSettings(isReadOnly: boolean, diagramMode: DiagramMode | null) {
 
 export const Internal = () => {
   const { isReadOnly, diagramMode } = useViewModeStore();
+  const updateTable = useDiagramStore((state) => state.updateTable);
   const tablesVersion = useDiagramStore((state) => state.tablesVersion);
   const relationshipsVersion = useDiagramStore(
     (state) => state.relationshipsVersion,
@@ -49,6 +57,80 @@ export const Internal = () => {
   );
   const settings = getSettings(isReadOnly, diagramMode);
   const { addNodes, screenToFlowPosition } = useReactFlow();
+  const [tidNodeId, setTidNodeId] = useState<string | null>(null);
+  const [tableInfoDialogOpen, setTableInfoDialogOpen] = useState(false);
+  const dialogNodeClearTimeoutRef = useRef<ReturnType<
+    typeof setTimeout
+  > | null>(null);
+
+  const clearTidNode = () => {
+    if (dialogNodeClearTimeoutRef.current) {
+      clearTimeout(dialogNodeClearTimeoutRef.current);
+      dialogNodeClearTimeoutRef.current = null;
+    }
+    setTidNodeId(null);
+  };
+
+  const scheduleTidNodeClear = () => {
+    if (dialogNodeClearTimeoutRef.current) {
+      clearTimeout(dialogNodeClearTimeoutRef.current);
+    }
+    // TableInfoDialog defers handlers after close animation, so keep context briefly.
+    dialogNodeClearTimeoutRef.current = setTimeout(() => {
+      setTidNodeId(null);
+      dialogNodeClearTimeoutRef.current = null;
+    }, 300);
+  };
+
+  const nodeTypes = useMemo(
+    () => ({
+      table: (props: NodeProps<Node<Table>>) => (
+        <TableNode
+          {...props}
+          onOpenTableInfoDialog={(tableNodeId: string) => {
+            if (dialogNodeClearTimeoutRef.current) {
+              clearTimeout(dialogNodeClearTimeoutRef.current);
+              dialogNodeClearTimeoutRef.current = null;
+            }
+            setTidNodeId(tableNodeId);
+            setTableInfoDialogOpen(true);
+          }}
+        />
+      ),
+    }),
+    [],
+  );
+  const tidNode = nodes.find((node) => node.id === tidNodeId);
+  const tableInfoDialogHandlers = tidNode
+    ? createTableInfoDialogHandlers({
+        tidNode,
+        updateTable,
+        setNodes,
+        setEdges,
+        setTableInfoDialogOpen,
+        clearTidNode,
+        scheduleTidNodeClear,
+      })
+    : null;
+
+  useEffect(() => {
+    return () => {
+      if (dialogNodeClearTimeoutRef.current) {
+        clearTimeout(dialogNodeClearTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (tidNodeId && !tidNode) {
+      setTableInfoDialogOpen(false);
+      if (dialogNodeClearTimeoutRef.current) {
+        clearTimeout(dialogNodeClearTimeoutRef.current);
+        dialogNodeClearTimeoutRef.current = null;
+      }
+      setTidNodeId(null);
+    }
+  }, [tidNode, tidNodeId]);
 
   useEffect(() => {
     setNodes(createNodes(useDiagramStore.getState().tables));
@@ -65,7 +147,7 @@ export const Internal = () => {
 
   const handlePaneClick = (event: MouseEvent) => {
     if (isReadOnly) {
-      return () => {};
+      return;
     }
     switch (diagramMode) {
       case DiagramMode.Table:
@@ -83,9 +165,7 @@ export const Internal = () => {
         style={{ width: "100%", height: "100%" }}
         nodes={nodes}
         edges={edges}
-        nodeTypes={{
-          table: TableNode,
-        }}
+        nodeTypes={nodeTypes}
         edgeTypes={{
           cardinality: CardinalityEdge,
         }}
@@ -100,6 +180,15 @@ export const Internal = () => {
       >
         <Background variant={BackgroundVariant.Lines} gap={16} size={1} />
       </ReactFlow>
+      {tidNode && (
+        <TableInfoDialog
+          data={tidNode.data}
+          open={tableInfoDialogOpen}
+          onOpenChange={tableInfoDialogHandlers?.handleOpenChange}
+          onApply={tableInfoDialogHandlers?.handleApply}
+          onCancel={tableInfoDialogHandlers?.handleCancel}
+        />
+      )}
     </div>
   );
 };
