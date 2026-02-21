@@ -8,6 +8,8 @@ import {
   useEdgesState,
   useNodesState,
   useReactFlow,
+  type Edge,
+  type EdgeProps,
   type Node,
   type NodeProps,
 } from "@xyflow/react";
@@ -16,16 +18,19 @@ import {
   createNodes,
 } from "@/features/dbDiagram/adapters/reactflow/mappers";
 import { modeSettings } from "@/features/dbDiagram/adapters/reactflow/modeSettings";
+import { RelationInfoDialog } from "@/features/dbDiagram/components/relationInfoDialog";
 import { TableInfoDialog } from "@/features/dbDiagram/components/tableInfoDialog";
 import { cn } from "@/lib/utils";
 import { useDiagramStore } from "@/stores/diagramStore";
 import { useViewModeStore } from "@/stores/viewModeStore";
 import { DiagramMode } from "@/types/domain/diagramMode";
+import type { Relationship } from "@/types/domain/relationship";
 import type { Table } from "@/types/domain/table";
 import { CardinalityEdge } from "../cardinalityEdge";
 import { TableNode } from "../tableNode";
 import {
   createClickInTableModeHandler,
+  createRelationInfoDialogHandlers,
   createTableInfoDialogHandlers,
 } from "./handlers";
 
@@ -45,6 +50,7 @@ function getSettings(isReadOnly: boolean, diagramMode: DiagramMode | null) {
 export const Internal = () => {
   const { isReadOnly, diagramMode } = useViewModeStore();
   const updateTable = useDiagramStore((state) => state.updateTable);
+  const updateRelationship = useDiagramStore((state) => state.updateRelationship);
   const tablesVersion = useDiagramStore((state) => state.tablesVersion);
   const relationshipsVersion = useDiagramStore(
     (state) => state.relationshipsVersion,
@@ -59,7 +65,12 @@ export const Internal = () => {
   const { addNodes, screenToFlowPosition } = useReactFlow();
   const [tidNodeId, setTidNodeId] = useState<string | null>(null);
   const [tableInfoDialogOpen, setTableInfoDialogOpen] = useState(false);
+  const [ridEdgeId, setRidEdgeId] = useState<string | null>(null);
+  const [relationInfoDialogOpen, setRelationInfoDialogOpen] = useState(false);
   const dialogNodeClearTimeoutRef = useRef<ReturnType<
+    typeof setTimeout
+  > | null>(null);
+  const dialogEdgeClearTimeoutRef = useRef<ReturnType<
     typeof setTimeout
   > | null>(null);
 
@@ -82,6 +93,25 @@ export const Internal = () => {
     }, 300);
   };
 
+  const clearRidEdge = () => {
+    if (dialogEdgeClearTimeoutRef.current) {
+      clearTimeout(dialogEdgeClearTimeoutRef.current);
+      dialogEdgeClearTimeoutRef.current = null;
+    }
+    setRidEdgeId(null);
+  };
+
+  const scheduleRidEdgeClear = () => {
+    if (dialogEdgeClearTimeoutRef.current) {
+      clearTimeout(dialogEdgeClearTimeoutRef.current);
+    }
+    // RelationInfoDialog defers handlers after close animation, so keep context briefly.
+    dialogEdgeClearTimeoutRef.current = setTimeout(() => {
+      setRidEdgeId(null);
+      dialogEdgeClearTimeoutRef.current = null;
+    }, 300);
+  };
+
   const nodeTypes = useMemo(
     () => ({
       table: (props: NodeProps<Node<Table>>) => (
@@ -100,7 +130,26 @@ export const Internal = () => {
     }),
     [],
   );
+  const edgeTypes = useMemo(
+    () => ({
+      cardinality: (props: EdgeProps<Edge<Relationship>>) => (
+        <CardinalityEdge
+          {...props}
+          onOpenRelationInfoDialog={() => {
+            if (dialogEdgeClearTimeoutRef.current) {
+              clearTimeout(dialogEdgeClearTimeoutRef.current);
+              dialogEdgeClearTimeoutRef.current = null;
+            }
+            setRidEdgeId(props.id);
+            setRelationInfoDialogOpen(true);
+          }}
+        />
+      ),
+    }),
+    [],
+  );
   const tidNode = nodes.find((node) => node.id === tidNodeId);
+  const ridEdge = edges.find((edge) => edge.id === ridEdgeId);
   const tableInfoDialogHandlers = tidNode
     ? createTableInfoDialogHandlers({
         tidNode,
@@ -112,11 +161,24 @@ export const Internal = () => {
         scheduleTidNodeClear,
       })
     : null;
+  const relationInfoDialogHandlers = ridEdgeId && ridEdge?.data
+    ? createRelationInfoDialogHandlers({
+        ridEdgeId,
+        updateRelationship,
+        setEdges,
+        setRelationInfoDialogOpen,
+        clearRidEdge,
+        scheduleRidEdgeClear,
+      })
+    : null;
 
   useEffect(() => {
     return () => {
       if (dialogNodeClearTimeoutRef.current) {
         clearTimeout(dialogNodeClearTimeoutRef.current);
+      }
+      if (dialogEdgeClearTimeoutRef.current) {
+        clearTimeout(dialogEdgeClearTimeoutRef.current);
       }
     };
   }, []);
@@ -131,6 +193,17 @@ export const Internal = () => {
       setTidNodeId(null);
     }
   }, [tidNode, tidNodeId]);
+
+  useEffect(() => {
+    if (ridEdgeId && !ridEdge) {
+      setRelationInfoDialogOpen(false);
+      if (dialogEdgeClearTimeoutRef.current) {
+        clearTimeout(dialogEdgeClearTimeoutRef.current);
+        dialogEdgeClearTimeoutRef.current = null;
+      }
+      setRidEdgeId(null);
+    }
+  }, [ridEdge, ridEdgeId]);
 
   useEffect(() => {
     setNodes(createNodes(useDiagramStore.getState().tables));
@@ -166,9 +239,7 @@ export const Internal = () => {
         nodes={nodes}
         edges={edges}
         nodeTypes={nodeTypes}
-        edgeTypes={{
-          cardinality: CardinalityEdge,
-        }}
+        edgeTypes={edgeTypes}
         onPaneClick={handlePaneClick}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
@@ -187,6 +258,15 @@ export const Internal = () => {
           onOpenChange={tableInfoDialogHandlers?.handleOpenChange}
           onApply={tableInfoDialogHandlers?.handleApply}
           onCancel={tableInfoDialogHandlers?.handleCancel}
+        />
+      )}
+      {ridEdge?.data && (
+        <RelationInfoDialog
+          data={ridEdge.data}
+          open={relationInfoDialogOpen}
+          onOpenChange={relationInfoDialogHandlers?.handleOpenChange}
+          onApply={relationInfoDialogHandlers?.handleApply}
+          onCancel={relationInfoDialogHandlers?.handleCancel}
         />
       )}
     </div>
