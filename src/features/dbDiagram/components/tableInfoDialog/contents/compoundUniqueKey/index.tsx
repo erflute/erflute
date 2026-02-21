@@ -107,7 +107,7 @@ export function CompoundUniqueKeyContent({
   const deleteDisabled = isReadOnly || selectedKeyIndex == null;
 
   return (
-    <section className="flex h-full flex-col gap-5 text-sm text-slate-700">
+    <section className="flex h-full min-h-0 flex-col gap-5 text-sm text-slate-700">
       <label
         className="flex flex-col gap-2"
         htmlFor="compound-unique-key-select"
@@ -151,8 +151,8 @@ export function CompoundUniqueKeyContent({
         />
       </label>
 
-      <div className="rounded-md border border-slate-200">
-        <div className="max-h-64 overflow-y-auto">
+      <div className="flex min-h-0 flex-1 flex-col rounded-md border border-slate-200">
+        <div className="min-h-0 flex-1 overflow-y-auto">
           <table className="min-w-full table-fixed divide-y divide-slate-200 text-sm">
             <colgroup>
               <col className="w-4/5" />
@@ -191,7 +191,7 @@ export function CompoundUniqueKeyContent({
             </tbody>
           </table>
         </div>
-        <div className="border-t border-slate-200 px-3 py-2">
+        <div className="shrink-0 border-t border-slate-200 px-3 py-2">
           <div className="flex flex-wrap gap-2">
             <Button
               type="button"

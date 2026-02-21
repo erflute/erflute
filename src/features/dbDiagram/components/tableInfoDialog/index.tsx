@@ -210,7 +210,7 @@ export function TableInfoDialog({
           </TabsContent>
           <TabsContent
             value="compound-unique-key"
-            className="rounded-md border border-dashed border-slate-300 bg-white p-6 text-sm text-slate-500"
+            className="flex min-h-0 flex-col rounded-md border border-dashed border-slate-300 bg-white p-6 text-sm text-slate-500"
           >
             <CompoundUniqueKeyContent data={tableData} setData={setTableData} />
           </TabsContent>
