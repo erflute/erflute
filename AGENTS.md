@@ -4,6 +4,7 @@
 
 - Write all code in English, including tests.
 - Fix all ESLint syntax errors and warnings before completing any task.
+- Avoid using `useMemo` and `useCallback` by default; use them only when there is a clear, meaningful performance benefit.
 
 ## Component Directory Structure
 
