@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import {
   Handle,
   Position,
@@ -20,29 +21,60 @@ export function TableNode({
   onOpenTableInfoDialog,
 }: TableNodeProps) {
   const { setNodes } = useReactFlow<Node<Table>>();
+  const handleWidthChange = useCallback(
+    (nextWidth: number) => {
+      setNodes((currentNodes) => {
+        let hasChanges = false;
+        const nextNodes = currentNodes.map((node) => {
+          if (node.id !== id) {
+            return node;
+          }
+          if (node.width === nextWidth && node.data.width === nextWidth) {
+            return node;
+          }
+          hasChanges = true;
+          return {
+            ...node,
+            width: nextWidth,
+            data: { ...node.data, width: nextWidth },
+          };
+        });
+        return hasChanges ? nextNodes : currentNodes;
+      });
+    },
+    [id, setNodes],
+  );
+  const handleHeightChange = useCallback(
+    (nextHeight: number) => {
+      setNodes((currentNodes) => {
+        let hasChanges = false;
+        const nextNodes = currentNodes.map((node) => {
+          if (node.id !== id) {
+            return node;
+          }
+          if (node.height === nextHeight && node.data.height === nextHeight) {
+            return node;
+          }
+          hasChanges = true;
+          return {
+            ...node,
+            height: nextHeight,
+            data: { ...node.data, height: nextHeight },
+          };
+        });
+        return hasChanges ? nextNodes : currentNodes;
+      });
+    },
+    [id, setNodes],
+  );
+
   return (
     <>
       <TableCard
         width={width}
         height={height}
-        setWidth={(width) => {
-          setNodes((nds) =>
-            nds.map((node) =>
-              node.id === id
-                ? { ...node, width, data: { ...data, width } }
-                : node,
-            ),
-          );
-        }}
-        setHeight={(height) => {
-          setNodes((nds) =>
-            nds.map((node) =>
-              node.id === id
-                ? { ...node, height, data: { ...data, height } }
-                : node,
-            ),
-          );
-        }}
+        setWidth={handleWidthChange}
+        setHeight={handleHeightChange}
         data={data}
         onHeaderDoubleClick={() => onOpenTableInfoDialog(id)}
       />
