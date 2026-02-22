@@ -42,7 +42,7 @@ export function useTableInfoDialogController({
     if (dialogNodeClearTimeoutRef.current) {
       clearTimeout(dialogNodeClearTimeoutRef.current);
     }
-    // TableInfoDialog defers handlers after close animation, so keep context briefly.
+    // Keep dialog context briefly so close animation can complete before unmount.
     dialogNodeClearTimeoutRef.current = setTimeout(() => {
       setTidNodeId(null);
       dialogNodeClearTimeoutRef.current = null;
@@ -126,7 +126,7 @@ export function useRelationInfoDialogController({
     if (dialogEdgeClearTimeoutRef.current) {
       clearTimeout(dialogEdgeClearTimeoutRef.current);
     }
-    // RelationInfoDialog defers handlers after close animation, so keep context briefly.
+    // Keep dialog context briefly so close animation can complete before unmount.
     dialogEdgeClearTimeoutRef.current = setTimeout(() => {
       setRidEdgeId(null);
       dialogEdgeClearTimeoutRef.current = null;

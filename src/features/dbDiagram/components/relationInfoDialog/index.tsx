@@ -48,8 +48,6 @@ export function RelationInfoDialog({
 }: RelationInfoDialogProps) {
   const { open, onOpenChange, ...dialogProps } = props;
   const { isReadOnly } = useViewModeStore();
-
-  // This timeout ref is used to keep the closing transition animation smooth
   const deferredActionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
     null,
   );
@@ -114,7 +112,7 @@ export function RelationInfoDialog({
     }
     deferredActionTimeoutRef.current = setTimeout(() => {
       onApply?.(preparedRelationship);
-    }, 200);
+    }, 0);
   };
 
   const handleCancel = () => {
@@ -124,7 +122,7 @@ export function RelationInfoDialog({
     }
     deferredActionTimeoutRef.current = setTimeout(() => {
       onCancel?.();
-    }, 200);
+    }, 0);
   };
 
   return (

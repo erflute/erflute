@@ -29,8 +29,6 @@ export function TableInfoDialog({
 }: TableInfoDialogProps) {
   const { open, onOpenChange, ...dialogProps } = props;
   const [tableData, setTableData] = useState<Table>(data);
-
-  // This timeout ref is used to keep the closing transition animation smooth
   const deferredActionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
     null,
   );
@@ -114,7 +112,7 @@ export function TableInfoDialog({
     }
     deferredActionTimeoutRef.current = setTimeout(() => {
       onApply?.(preparedTable);
-    }, 200);
+    }, 0);
   };
 
   const handleCancel = () => {
@@ -124,7 +122,7 @@ export function TableInfoDialog({
     }
     deferredActionTimeoutRef.current = setTimeout(() => {
       onCancel?.();
-    }, 200);
+    }, 0);
   };
 
   return (
