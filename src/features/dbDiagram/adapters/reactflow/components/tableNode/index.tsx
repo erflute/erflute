@@ -1,28 +1,25 @@
-import { useState } from "react";
 import {
   Handle,
   Position,
   useReactFlow,
-  type Edge,
   type Node,
   type NodeProps,
 } from "@xyflow/react";
-import { updateRelationAndRefs } from "@/domain/diagram/updateRelation";
-import { stringifyReference } from "@/domain/parsers/referenceParser";
 import { TableCard } from "@/features/dbDiagram/components/tableCard";
-import { TableInfoDialog } from "@/features/dbDiagram/components/tableInfoDialog";
-import { useDiagramStore } from "@/stores/diagramStore";
-import type { Relationship } from "@/types/domain/relationship";
 import type { Table } from "@/types/domain/table";
 
-export function TableNode({ id, width, height, data }: NodeProps<Node<Table>>) {
-  const { setEdges, setNodes } = useReactFlow<
-    Node<Table>,
-    Edge<Relationship>
-  >();
-  const updateTable = useDiagramStore((state) => state.updateTable);
-  const [tableInfoDialogOpen, setTableInfoDialogOpen] = useState(false);
-  const tablePhysicalName = data.physicalName;
+type TableNodeProps = NodeProps<Node<Table>> & {
+  onOpenTableInfoDialog: (tableNodeId: string) => void;
+};
+
+export function TableNode({
+  id,
+  width,
+  height,
+  data,
+  onOpenTableInfoDialog,
+}: TableNodeProps) {
+  const { setNodes } = useReactFlow<Node<Table>>();
   return (
     <>
       <TableCard
@@ -47,7 +44,7 @@ export function TableNode({ id, width, height, data }: NodeProps<Node<Table>>) {
           );
         }}
         data={data}
-        onHeaderDoubleClick={() => setTableInfoDialogOpen(true)}
+        onHeaderDoubleClick={() => onOpenTableInfoDialog(id)}
       />
       <Handle type="source" position={Position.Top} />
       <Handle type="source" position={Position.Right} />
@@ -57,59 +54,6 @@ export function TableNode({ id, width, height, data }: NodeProps<Node<Table>>) {
       <Handle type="target" position={Position.Right} />
       <Handle type="target" position={Position.Bottom} />
       <Handle type="target" position={Position.Left} />
-      <TableInfoDialog
-        data={data}
-        open={tableInfoDialogOpen}
-        onOpenChange={setTableInfoDialogOpen}
-        onApply={(updatedTable) => {
-          updateTable(updatedTable, tablePhysicalName);
-          const currentNodeId = stringifyReference({
-            tableName: tablePhysicalName,
-          });
-          const nextNodeId = stringifyReference({
-            tableName: updatedTable.physicalName,
-          });
-          setNodes((nodes) =>
-            nodes.map((node) => {
-              if (node.id !== currentNodeId) {
-                return node;
-              }
-              return {
-                ...node,
-                id: nextNodeId,
-                width: updatedTable.width,
-                height: updatedTable.height,
-                data: updatedTable,
-              };
-            }),
-          );
-          if (currentNodeId !== nextNodeId) {
-            setEdges((edges) =>
-              edges.map((edge) => {
-                const source =
-                  edge.source === currentNodeId ? nextNodeId : edge.source;
-                const target =
-                  edge.target === currentNodeId ? nextNodeId : edge.target;
-                const nextData = edge.data
-                  ? updateRelationAndRefs({
-                      nextTableName: updatedTable.physicalName,
-                      relationship: edge.data,
-                      previousTableName: tablePhysicalName,
-                    })
-                  : edge.data;
-                if (
-                  source === edge.source &&
-                  target === edge.target &&
-                  nextData === edge.data
-                ) {
-                  return edge;
-                }
-                return { ...edge, source, target, data: nextData };
-              }),
-            );
-          }
-        }}
-      />
     </>
   );
 }

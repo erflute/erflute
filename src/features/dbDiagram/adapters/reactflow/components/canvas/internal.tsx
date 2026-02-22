@@ -14,12 +14,14 @@ import {
   createNodes,
 } from "@/features/dbDiagram/adapters/reactflow/mappers";
 import { modeSettings } from "@/features/dbDiagram/adapters/reactflow/modeSettings";
+import { RelationInfoDialog } from "@/features/dbDiagram/components/relationInfoDialog";
+import { TableInfoDialog } from "@/features/dbDiagram/components/tableInfoDialog";
 import { cn } from "@/lib/utils";
 import { useDiagramStore } from "@/stores/diagramStore";
 import { useViewModeStore } from "@/stores/viewModeStore";
 import { DiagramMode } from "@/types/domain/diagramMode";
-import { CardinalityEdge } from "../cardinalityEdge";
-import { TableNode } from "../tableNode";
+import { useRelationInfoDialogController, useTableInfoDialogController } from "./dialogControllers";
+import { useCanvasEdgeTypes, useCanvasNodeTypes } from "./flowTypes";
 import { createClickInTableModeHandler } from "./handlers";
 
 function getSettings(isReadOnly: boolean, diagramMode: DiagramMode | null) {
@@ -37,6 +39,8 @@ function getSettings(isReadOnly: boolean, diagramMode: DiagramMode | null) {
 
 export const Internal = () => {
   const { isReadOnly, diagramMode } = useViewModeStore();
+  const updateTable = useDiagramStore((state) => state.updateTable);
+  const updateRelationship = useDiagramStore((state) => state.updateRelationship);
   const tablesVersion = useDiagramStore((state) => state.tablesVersion);
   const relationshipsVersion = useDiagramStore(
     (state) => state.relationshipsVersion,
@@ -49,6 +53,33 @@ export const Internal = () => {
   );
   const settings = getSettings(isReadOnly, diagramMode);
   const { addNodes, screenToFlowPosition } = useReactFlow();
+  const {
+    tidNode,
+    tableInfoDialogOpen,
+    openTableInfoDialog,
+    tableInfoDialogHandlers,
+  } = useTableInfoDialogController({
+    nodes,
+    setNodes,
+    setEdges,
+    updateTable,
+  });
+  const {
+    ridEdge,
+    relationInfoDialogOpen,
+    openRelationInfoDialog,
+    relationInfoDialogHandlers,
+  } = useRelationInfoDialogController({
+    edges,
+    setEdges,
+    updateRelationship,
+  });
+  const nodeTypes = useCanvasNodeTypes({
+    onOpenTableInfoDialog: openTableInfoDialog,
+  });
+  const edgeTypes = useCanvasEdgeTypes({
+    onOpenRelationInfoDialog: openRelationInfoDialog,
+  });
 
   useEffect(() => {
     setNodes(createNodes(useDiagramStore.getState().tables));
@@ -65,7 +96,7 @@ export const Internal = () => {
 
   const handlePaneClick = (event: MouseEvent) => {
     if (isReadOnly) {
-      return () => {};
+      return;
     }
     switch (diagramMode) {
       case DiagramMode.Table:
@@ -83,12 +114,8 @@ export const Internal = () => {
         style={{ width: "100%", height: "100%" }}
         nodes={nodes}
         edges={edges}
-        nodeTypes={{
-          table: TableNode,
-        }}
-        edgeTypes={{
-          cardinality: CardinalityEdge,
-        }}
+        nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         onPaneClick={handlePaneClick}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
@@ -100,6 +127,24 @@ export const Internal = () => {
       >
         <Background variant={BackgroundVariant.Lines} gap={16} size={1} />
       </ReactFlow>
+      {tidNode && (
+        <TableInfoDialog
+          data={tidNode.data}
+          open={tableInfoDialogOpen}
+          onOpenChange={tableInfoDialogHandlers?.handleOpenChange}
+          onApply={tableInfoDialogHandlers?.handleApply}
+          onCancel={tableInfoDialogHandlers?.handleCancel}
+        />
+      )}
+      {ridEdge?.data && (
+        <RelationInfoDialog
+          data={ridEdge.data}
+          open={relationInfoDialogOpen}
+          onOpenChange={relationInfoDialogHandlers?.handleOpenChange}
+          onApply={relationInfoDialogHandlers?.handleApply}
+          onCancel={relationInfoDialogHandlers?.handleCancel}
+        />
+      )}
     </div>
   );
 };
