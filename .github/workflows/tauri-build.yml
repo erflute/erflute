@@ -131,7 +131,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
-          name: ersflute ${{ github.ref_name }}
+          name: erflute ${{ github.ref_name }}
           draft: true
           prerelease: false
           fail_on_unmatched_files: true

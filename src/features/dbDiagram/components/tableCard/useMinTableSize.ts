@@ -1,5 +1,5 @@
 /* istanbul ignore file */
-import { useEffect, type RefObject } from "react";
+import { useCallback, useEffect, type RefObject } from "react";
 
 /**
  * Ensures a minimum TableCard size based on its content.
@@ -15,35 +15,46 @@ export function useMinTableSize(
   setWidth?: (width: number) => void,
   setHeight?: (height: number) => void,
 ) {
-  // TODO: If TableCard becomes resizable in the future,
-  // extend this logic (e.g. using ResizeObserver) to continuously
-  // enforce the same minimum-size constraint while resizing.
-  useEffect(() => {
-    if (contentRef.current) {
-      if (typeof width === "number" && setWidth) {
-        // minWidth = left padding (4px) + right padding (4px)
-        // + left/right border (1px each) + extra breathing room (2px)
-        // + content width (rounded up to avoid sub-pixel overflow)
-        const contentWidth = Math.ceil(
-          contentRef.current.getBoundingClientRect().width,
-        );
-        const minWidth = 4 + 4 + 2 + 2 + contentWidth;
-        if (width < minWidth) {
-          setWidth(minWidth);
-        }
-      }
-      if (typeof height === "number" && setHeight) {
-        // minHeight = header height (20px) + bottom padding (4px)
-        // + top/bottom border (1px each) + extra breathing room (2px)
-        // + content height (rounded up to avoid sub-pixel overflow)
-        const contentHeight = Math.ceil(
-          contentRef.current.getBoundingClientRect().height,
-        );
-        const minHeight = 20 + 4 + 2 + 2 + contentHeight;
-        if (height < minHeight) {
-          setHeight(minHeight);
-        }
+  const clampToMinSize = useCallback(() => {
+    if (!contentRef.current) {
+      return;
+    }
+    if (typeof width === "number" && setWidth) {
+      // minWidth = left padding (4px) + right padding (4px)
+      // + left/right border (1px each) + extra breathing room (2px)
+      // + full content width (including overflow)
+      const contentWidth = contentRef.current.scrollWidth;
+      const minWidth = 4 + 4 + 2 + 2 + contentWidth;
+      if (width < minWidth) {
+        setWidth(minWidth);
       }
     }
-  }, [contentRef, width, height, setHeight, setWidth]);
+    if (typeof height === "number" && setHeight) {
+      // minHeight = header height (20px) + bottom padding (4px)
+      // + top/bottom border (1px each) + extra breathing room (2px)
+      // + full content height (including overflow)
+      const contentHeight = contentRef.current.scrollHeight;
+      const minHeight = 20 + 4 + 2 + 2 + contentHeight;
+      if (height < minHeight) {
+        setHeight(minHeight);
+      }
+    }
+  }, [contentRef, height, setHeight, setWidth, width]);
+
+  useEffect(() => {
+    clampToMinSize();
+  }, [clampToMinSize]);
+
+  useEffect(() => {
+    if (!contentRef.current || typeof ResizeObserver === "undefined") {
+      return;
+    }
+    const observer = new ResizeObserver(() => {
+      clampToMinSize();
+    });
+    observer.observe(contentRef.current);
+    return () => {
+      observer.disconnect();
+    };
+  }, [clampToMinSize, contentRef]);
 }
