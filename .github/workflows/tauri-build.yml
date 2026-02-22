@@ -56,6 +56,14 @@ jobs:
       - name: Install frontend dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Cleanup stale macOS DMG mounts
+        if: matrix.os == 'macos-latest'
+        run: |
+          if mount | grep -q '/Volumes/erflute'; then
+            hdiutil detach '/Volumes/erflute' -force || true
+          fi
+          rm -f src-tauri/target/universal-apple-darwin/release/bundle/dmg/*.dmg
+
       - name: Build (macOS)
         if: (github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/')) && matrix.os == 'macos-latest'
         uses: tauri-apps/tauri-action@v0
