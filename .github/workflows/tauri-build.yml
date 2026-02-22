@@ -56,8 +56,8 @@ jobs:
       - name: Install frontend dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build (manual, macOS)
-        if: github.event_name == 'workflow_dispatch' && matrix.os == 'macos-latest'
+      - name: Build (macOS)
+        if: (github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/')) && matrix.os == 'macos-latest'
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -66,8 +66,8 @@ jobs:
           includeDebug: false
           includeRelease: true
 
-      - name: Build (manual, Windows)
-        if: github.event_name == 'workflow_dispatch' && matrix.os == 'windows-latest'
+      - name: Build (Windows)
+        if: (github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/')) && matrix.os == 'windows-latest'
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -76,8 +76,8 @@ jobs:
           includeDebug: false
           includeRelease: true
 
-      - name: Build (manual, Linux)
-        if: github.event_name == 'workflow_dispatch' && matrix.os == 'ubuntu-22.04'
+      - name: Build (Linux)
+        if: (github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/')) && matrix.os == 'ubuntu-22.04'
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -86,24 +86,24 @@ jobs:
           includeDebug: false
           includeRelease: true
 
-      - name: Upload build artifacts (manual, macOS)
-        if: github.event_name == 'workflow_dispatch' && matrix.os == 'macos-latest'
+      - name: Upload build artifacts (macOS)
+        if: (github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/')) && matrix.os == 'macos-latest'
         uses: actions/upload-artifact@v4
         with:
           name: tauri-bundles-${{ matrix.os }}
           path: src-tauri/target/universal-apple-darwin/release/bundle/dmg/*.dmg
           if-no-files-found: error
 
-      - name: Upload build artifacts (manual, Windows)
-        if: github.event_name == 'workflow_dispatch' && matrix.os == 'windows-latest'
+      - name: Upload build artifacts (Windows)
+        if: (github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/')) && matrix.os == 'windows-latest'
         uses: actions/upload-artifact@v4
         with:
           name: tauri-bundles-${{ matrix.os }}
           path: src-tauri/target/release/bundle/msi/*.msi
           if-no-files-found: error
 
-      - name: Upload build artifacts (manual, Linux)
-        if: github.event_name == 'workflow_dispatch' && matrix.os == 'ubuntu-22.04'
+      - name: Upload build artifacts (Linux)
+        if: (github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/')) && matrix.os == 'ubuntu-22.04'
         uses: actions/upload-artifact@v4
         with:
           name: tauri-bundles-${{ matrix.os }}
@@ -113,38 +113,31 @@ jobs:
             src-tauri/target/release/bundle/appimage/*.AppImage
           if-no-files-found: error
 
-      - name: Build and draft release (tag, macOS)
-        if: startsWith(github.ref, 'refs/tags/') && matrix.os == 'macos-latest'
-        uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tagName: ${{ github.ref_name }}
-          releaseName: ersflute ${{ github.ref_name }}
-          releaseDraft: true
-          prerelease: false
-          args: --verbose --target universal-apple-darwin --bundles dmg
+  release:
+    name: draft release
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-22.04
+    needs: build
 
-      - name: Build and draft release (tag, Windows)
-        if: startsWith(github.ref, 'refs/tags/') && matrix.os == 'windows-latest'
-        uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
         with:
-          tagName: ${{ github.ref_name }}
-          releaseName: ersflute ${{ github.ref_name }}
-          releaseDraft: true
-          prerelease: false
-          args: --verbose --bundles msi
+          pattern: tauri-bundles-*
+          path: dist
+          merge-multiple: true
 
-      - name: Build and draft release (tag, Linux)
-        if: startsWith(github.ref, 'refs/tags/') && matrix.os == 'ubuntu-22.04'
-        uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create draft release
+        uses: softprops/action-gh-release@v2
         with:
-          tagName: ${{ github.ref_name }}
-          releaseName: ersflute ${{ github.ref_name }}
-          releaseDraft: true
+          tag_name: ${{ github.ref_name }}
+          name: ersflute ${{ github.ref_name }}
+          draft: true
           prerelease: false
-          args: --verbose --bundles appimage,deb,rpm
+          fail_on_unmatched_files: true
+          files: |
+            dist/**/*.dmg
+            dist/**/*.msi
+            dist/**/*.deb
+            dist/**/*.rpm
+            dist/**/*.AppImage
