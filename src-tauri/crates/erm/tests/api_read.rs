@@ -552,13 +552,13 @@ fn test_read_erm_file() {
                     vdiagram_name: "sample".to_string(),
                     color: None,
                     vtables: vtables::VTables {
-                        vtables: vec![vtables::VTable {
+                        vtables: Some(vec![vtables::VTable {
                             table_id: "table.MEMBERS".to_string(),
                             x: 264,
                             y: 182,
                             font_name: "Ubuntu".to_string(),
                             font_size: 9,
-                        }],
+                        }]),
                     },
                     walker_notes: vdiagrams::WalkerNotes {},
                     walker_groups: vdiagrams::WalkerGroups {},
