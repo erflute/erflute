@@ -70,13 +70,17 @@ impl From<entities::VDiagram> for VDiagram {
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct VDiagrams {
-    pub vdiagrams: Vec<VDiagram>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub vdiagrams: Option<Vec<VDiagram>>,
 }
 
 impl From<entities::VDiagrams> for VDiagrams {
     fn from(entity: entities::VDiagrams) -> Self {
         Self {
-            vdiagrams: entity.vdiagrams.into_iter().map(Into::into).collect(),
+            vdiagrams: entity
+                .vdiagrams
+                .map(|v| v.into_iter().map(Into::into).collect()),
+            // vdiagrams: entity.vdiagrams.into_iter().map(Into::into).collect(),
         }
     }
 }

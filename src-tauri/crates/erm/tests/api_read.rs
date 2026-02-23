@@ -548,7 +548,7 @@ fn test_read_erm_file() {
                 ]),
             },
             vdiagrams: vdiagrams::VDiagrams {
-                vdiagrams: vec![vdiagrams::VDiagram {
+                vdiagrams: Some(vec![vdiagrams::VDiagram {
                     vdiagram_name: "sample".to_string(),
                     color: None,
                     vtables: vtables::VTables {
@@ -562,7 +562,7 @@ fn test_read_erm_file() {
                     },
                     walker_notes: vdiagrams::WalkerNotes {},
                     walker_groups: vdiagrams::WalkerGroups {},
-                }],
+                }]),
             },
             column_groups: column_groups::ColumnGroups {
                 column_groups: Some(vec![column_groups::ColumnGroup {
