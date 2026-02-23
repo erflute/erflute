@@ -80,7 +80,6 @@ impl From<entities::VDiagrams> for VDiagrams {
             vdiagrams: entity
                 .vdiagrams
                 .map(|v| v.into_iter().map(Into::into).collect()),
-            // vdiagrams: entity.vdiagrams.into_iter().map(Into::into).collect(),
         }
     }
 }

@@ -24,7 +24,7 @@ export async function loadDiagram(filename: string): Promise<{
   const settings = diagram.diagramSettings;
   const tables = diagram.diagramWalkers.tables ?? [];
   const columnGroups = diagram.columnGroups?.columnGroups ?? [];
-  const vdiagrams = diagram.vdiagrams?.vdiagrams ?? [];
+  const vdiagrams = diagram.vdiagrams.vdiagrams ?? [];
   return {
     settings: mapSettingsFrom(settings),
     tables: mapTablesFrom(tables),

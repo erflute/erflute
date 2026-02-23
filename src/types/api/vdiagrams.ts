@@ -21,5 +21,5 @@ export type VDiagramResponse = {
 };
 
 export type VDiagramsResponse = {
-  vdiagrams: VDiagramResponse[];
+  vdiagrams?: VDiagramResponse[];
 };
