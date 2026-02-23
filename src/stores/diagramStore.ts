@@ -5,6 +5,7 @@ import type { ColumnGroup } from "@/types/domain/columnGroup";
 import type { Relationship } from "@/types/domain/relationship";
 import { ViewMode, type Settings } from "@/types/domain/settings";
 import type { Table } from "@/types/domain/table";
+import type { VirtualDiagram } from "@/types/domain/vdiagram";
 
 const initialSettings: Settings = {
   database: "",
@@ -16,6 +17,7 @@ type DiagramStore = {
   tables: Table[];
   relationships: Relationship[];
   columnGroups: ColumnGroup[];
+  vdiagrams: VirtualDiagram[];
   tablesVersion: number;
   relationshipsVersion: number;
   setSettings: (settings: Settings) => void;
@@ -27,6 +29,7 @@ type DiagramStore = {
     previousName: string,
   ) => void;
   setColumnGroups: (columnGroups: ColumnGroup[]) => void;
+  setVDiagrams: (vdiagrams: VirtualDiagram[]) => void;
 };
 
 export const useDiagramStore = create<DiagramStore>((set) => ({
@@ -34,6 +37,7 @@ export const useDiagramStore = create<DiagramStore>((set) => ({
   tables: [],
   relationships: [],
   columnGroups: [],
+  vdiagrams: [],
   // Version counters are reserved for full list replacements (setTables/setRelationships),
   // so incremental updates do not trigger expensive full refreshes.
   tablesVersion: 0,
@@ -75,4 +79,5 @@ export const useDiagramStore = create<DiagramStore>((set) => ({
       return { relationships: nextRelationships };
     }),
   setColumnGroups: (columnGroups: ColumnGroup[]) => set({ columnGroups }),
+  setVDiagrams: (vdiagrams: VirtualDiagram[]) => set({ vdiagrams }),
 }));

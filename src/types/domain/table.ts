@@ -8,7 +8,7 @@ export function isColumnGroupName(
   return typeof value === "string";
 }
 
-type Color = {
+export type Color = {
   r: number;
   g: number;
   b: number;

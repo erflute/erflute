@@ -9,6 +9,8 @@ use erm::dtos::diagram::diagram_walkers::tables::columns;
 use erm::dtos::diagram::diagram_walkers::tables::compound_unique_key_list;
 use erm::dtos::diagram::diagram_walkers::tables::connections;
 use erm::dtos::diagram::diagram_walkers::tables::indexes;
+use erm::dtos::diagram::vdiagrams;
+use erm::dtos::diagram::vdiagrams::vtables;
 use erm::open;
 
 // TODO: Add test cases of detailed condition for each field in https://github.com/s-kai273/erflute/issues/22
@@ -544,6 +546,23 @@ fn test_read_erm_file() {
                         },
                     }
                 ]),
+            },
+            vdiagrams: vdiagrams::VDiagrams {
+                vdiagrams: Some(vec![vdiagrams::VDiagram {
+                    vdiagram_name: "sample".to_string(),
+                    color: None,
+                    vtables: vtables::VTables {
+                        vtables: Some(vec![vtables::VTable {
+                            table_id: "table.MEMBERS".to_string(),
+                            x: 264,
+                            y: 182,
+                            font_name: "Ubuntu".to_string(),
+                            font_size: 9,
+                        }]),
+                    },
+                    walker_notes: vdiagrams::WalkerNotes {},
+                    walker_groups: vdiagrams::WalkerGroups {},
+                }]),
             },
             column_groups: column_groups::ColumnGroups {
                 column_groups: Some(vec![column_groups::ColumnGroup {
