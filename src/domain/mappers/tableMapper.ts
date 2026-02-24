@@ -1,6 +1,6 @@
 import type { NormalColumn, TableResponse } from "@/types/api/diagramWalkers";
 import type { Column } from "@/types/domain/column";
-import { parseColumnType, type ColumnType } from "@/types/domain/columnType";
+import { parseColumnType } from "@/types/domain/columnType";
 import type { Relationship } from "@/types/domain/relationship";
 import type {
   CompoundUniqueKey,
@@ -10,13 +10,10 @@ import type {
 } from "@/types/domain/table";
 import { parseReference } from "../parsers/referenceParser";
 
-function getColumnType(
+function getReferredColumn(
   item: NormalColumn,
   tableResponses: TableResponse[],
-): ColumnType | undefined {
-  if (item.columnType) {
-    return parseColumnType(item.columnType);
-  }
+): NormalColumn | undefined {
   if (item.referredColumn) {
     const { tableName, columnName } = parseReference(item.referredColumn);
     if (!tableName || !columnName) {
@@ -35,7 +32,7 @@ function getColumnType(
     const column = items
       .filter((clm) => typeof clm !== "string")
       .find((clm) => columnName === clm.physicalName);
-    return column?.columnType ? parseColumnType(column.columnType) : undefined;
+    return column;
   }
   return undefined;
 }
@@ -65,15 +62,21 @@ export function mapTablesFrom(tableResponses: TableResponse[]): Table[] {
         if (typeof item === "string") {
           return item;
         }
+        const referredColumn = getReferredColumn(item, tableResponses);
+        const columnType = item.columnType
+          ? parseColumnType(item.columnType)
+          : referredColumn?.columnType
+            ? parseColumnType(referredColumn.columnType)
+            : undefined;
         return {
           physicalName: item.physicalName,
           logicalName: item.logicalName,
           description: item.description,
-          columnType: getColumnType(item, tableResponses),
-          length: item.length,
-          decimal: item.decimal,
-          enumArgs: item.args,
-          unsigned: item.unsigned,
+          columnType: columnType,
+          length: item.length ?? referredColumn?.length,
+          decimal: item.decimal ?? referredColumn?.decimal,
+          enumArgs: item.args ?? referredColumn?.args,
+          unsigned: item.unsigned ?? referredColumn?.unsigned,
           notNull: item.notNull,
           unique: item.uniqueKey,
           defaultValue: item.defaultValue,

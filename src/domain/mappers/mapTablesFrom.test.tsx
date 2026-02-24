@@ -162,6 +162,43 @@ describe("with populated columns", () => {
       ColumnType.Int,
     );
   });
+
+  it("uses referred column attributes when type arguments are omitted", () => {
+    const [, referencingTable] = mapTablesFrom([
+      createTableResponse({
+        physicalName: "users",
+        columns: {
+          items: [
+            {
+              physicalName: "account_code",
+              columnType: "varchar(n)",
+              length: 32,
+              unsigned: true,
+              args: "A,B,C",
+            },
+          ],
+        },
+      }),
+      createTableResponse({
+        physicalName: "orders",
+        columns: {
+          items: [
+            {
+              physicalName: "account_code",
+              referredColumn: "table.users.account_code",
+            },
+          ],
+        },
+      }),
+    ]);
+
+    expect((referencingTable.columns?.[0] as Column)?.columnType).toBe(
+      ColumnType.VarCharN,
+    );
+    expect((referencingTable.columns?.[0] as Column)?.length).toBe(32);
+    expect((referencingTable.columns?.[0] as Column)?.unsigned).toBe(true);
+    expect((referencingTable.columns?.[0] as Column)?.enumArgs).toBe("A,B,C");
+  });
 });
 
 describe("without normal columns", () => {
