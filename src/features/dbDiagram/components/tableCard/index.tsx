@@ -124,8 +124,16 @@ export function TableCard({
   // Ref to the variable table content used to determine the TableCard size.
   // Only the content area is measured to keep the TableCard dimensions
   // in sync with the rendered layout.
-  const contentRef = useRef<HTMLDivElement>(null);
-  useMinTableSize(contentRef, width, height, setWidth, setHeight);
+  const columnContentRef = useRef<HTMLDivElement>(null);
+  const indexContentRef = useRef<HTMLDivElement>(null);
+  useMinTableSize(
+    columnContentRef,
+    indexContentRef,
+    width,
+    height,
+    setWidth,
+    setHeight,
+  );
   return (
     <div
       className={cn(
@@ -148,7 +156,7 @@ export function TableCard({
       </div>
       <div className="nodrag flex-1 w-full h-full px-1 pb-1">
         <div className="w-full h-full bg-white">
-          <div ref={contentRef} className="w-fit h-fit">
+          <div ref={columnContentRef} className="w-fit h-fit">
             {flatColumns.map((column) => (
               <p
                 key={column.physicalName}
@@ -176,8 +184,13 @@ export function TableCard({
                 </span>
               </p>
             ))}
-            {indexes.length > 0 && (
-              <div className="mt-1 border-t border-dashed border-slate-300 pt-1 text-[0.625rem] leading-4 text-slate-700">
+          </div>
+          {indexes.length > 0 && (
+            <div className="w-full border-t border-dashed border-slate-300">
+              <div
+                ref={indexContentRef}
+                className="w-fit h-fit py-1 text-[0.625rem] leading-4 text-slate-700"
+              >
                 <p className="whitespace-nowrap pl-2">
                   &lt;&lt; index &gt;&gt;
                 </p>
@@ -190,8 +203,8 @@ export function TableCard({
                   </p>
                 ))}
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
