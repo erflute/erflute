@@ -82,14 +82,14 @@ export function mapTablesFrom(tableResponses: TableResponse[]): Table[] {
           referredColumn: item.referredColumn,
         } satisfies Column;
       }),
-      indexes: table.indexes.indexes?.map((index) => {
+      indexes: table.indexes?.map((index) => {
         return {
           name: index.name,
           indexType: index.indexType,
           description: index.description,
           fullText: index.fullText,
           nonUnique: index.nonUnique,
-          columns: index.columns.columns.map((column) => {
+          columns: index.columns.map((column) => {
             return {
               columnId: column.columnId,
               desc: column.desc,
@@ -101,7 +101,7 @@ export function mapTablesFrom(tableResponses: TableResponse[]): Table[] {
         (uniqueKey) => {
           return {
             name: uniqueKey.name,
-            columns: uniqueKey.columns.columns.map((column) => column.columnId),
+            columns: uniqueKey.columns.map((column) => column.columnId),
           } satisfies CompoundUniqueKey;
         },
       ),

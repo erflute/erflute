@@ -21,20 +21,6 @@ impl From<entities::Column> for Column {
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Columns {
-    pub columns: Vec<Column>,
-}
-
-impl From<entities::Columns> for Columns {
-    fn from(entity: entities::Columns) -> Self {
-        Self {
-            columns: entity.columns.into_iter().map(Into::into).collect(),
-        }
-    }
-}
-
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct Index {
     pub name: String,
 
@@ -49,7 +35,7 @@ pub struct Index {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub non_unique: Option<bool>,
 
-    pub columns: Columns,
+    pub columns: Vec<Column>,
 }
 
 impl From<entities::Index> for Index {
@@ -60,24 +46,7 @@ impl From<entities::Index> for Index {
             description: entity.description,
             full_text: entity.full_text,
             non_unique: entity.non_unique,
-            columns: entity.columns.into(),
-        }
-    }
-}
-
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Indexes {
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub indexes: Option<Vec<Index>>,
-}
-
-impl From<entities::Indexes> for Indexes {
-    fn from(entity: entities::Indexes) -> Self {
-        Self {
-            indexes: entity
-                .indexes
-                .map(|v| v.into_iter().map(Into::into).collect()),
+            columns: entity.columns.columns.into_iter().map(Into::into).collect(),
         }
     }
 }

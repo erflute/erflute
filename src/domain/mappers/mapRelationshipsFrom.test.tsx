@@ -17,7 +17,7 @@ const createTableResponse = (
   color: { r: 10, g: 20, b: 30 },
   connections: { relationships: [] },
   columns: { items: [] },
-  indexes: { indexes: [] },
+  indexes: [],
   compoundUniqueKeyList: {},
   ...overrides,
 });
@@ -98,9 +98,7 @@ describe("when tables include relationships", () => {
           compoundUniqueKeys: [
             {
               name: "uq_account_tenant",
-              columns: {
-                columns: [{ columnId: "email" }, { columnId: "tenant_id" }],
-              },
+              columns: [{ columnId: "email" }, { columnId: "tenant_id" }],
             },
           ],
         },
@@ -163,9 +161,7 @@ describe("when tables include relationships", () => {
           compoundUniqueKeys: [
             {
               name: "uq_project_tenant",
-              columns: {
-                columns: [{ columnId: "code" }, { columnId: "tenant_id" }],
-              },
+              columns: [{ columnId: "code" }, { columnId: "tenant_id" }],
             },
           ],
         },

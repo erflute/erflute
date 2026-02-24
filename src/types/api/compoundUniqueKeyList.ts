@@ -2,13 +2,9 @@ type Column = {
   columnId: string;
 };
 
-type Columns = {
-  columns: Column[];
-};
-
 type CompoundUniqueKey = {
   name: string;
-  columns: Columns;
+  columns: Column[];
 };
 
 export type CompoundUniqueKeyList = {

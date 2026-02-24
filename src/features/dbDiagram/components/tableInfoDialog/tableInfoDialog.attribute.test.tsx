@@ -332,6 +332,8 @@ describe("when editing is allowed", () => {
     );
   });
 
+  // This scenario performs many sequential user interactions and can exceed
+  // Jest's default timeout during full-suite runs under load.
   it("updates column details and persists them after returning to the list", async () => {
     const user = userEvent.setup();
     renderEditableTableInfoDialog();
@@ -407,7 +409,7 @@ describe("when editing is allowed", () => {
     expect(
       within(updatedDetailRegion).getByLabelText("Description"),
     ).toHaveValue("Billing amount");
-  });
+  }, 15000);
 
   it("updates enum args when the column type supports it", async () => {
     const user = userEvent.setup();

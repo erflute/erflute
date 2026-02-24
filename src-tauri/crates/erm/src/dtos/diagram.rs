@@ -2,7 +2,7 @@ pub mod column_groups;
 pub mod diagram_settings;
 pub mod diagram_walkers;
 
-use column_groups::ColumnGroups;
+use column_groups::ColumnGroup;
 use diagram_settings::DiagramSettings;
 use diagram_walkers::DiagramWalkers;
 use serde::{Deserialize, Serialize};
@@ -12,7 +12,8 @@ use serde::{Deserialize, Serialize};
 pub struct Diagram {
     pub diagram_settings: DiagramSettings,
     pub diagram_walkers: DiagramWalkers,
-    pub column_groups: ColumnGroups,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub column_groups: Option<Vec<ColumnGroup>>,
 }
 
 impl From<crate::entities::diagram::Diagram> for Diagram {
@@ -20,7 +21,10 @@ impl From<crate::entities::diagram::Diagram> for Diagram {
         Self {
             diagram_settings: entity.diagram_settings.into(),
             diagram_walkers: entity.diagram_walkers.into(),
-            column_groups: entity.column_groups.into(),
+            column_groups: entity
+                .column_groups
+                .column_groups
+                .map(|v| v.into_iter().map(Into::into).collect()),
         }
     }
 }

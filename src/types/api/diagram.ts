@@ -5,5 +5,5 @@ import type { DiagramWalkersResponse } from "./diagramWalkers";
 export type DiagramResponse = {
   diagramSettings: DiagramSettingsResponse;
   diagramWalkers: DiagramWalkersResponse;
-  columnGroups: ColumnGroupsResponse;
+  columnGroups?: ColumnGroupsResponse["columnGroups"];
 };

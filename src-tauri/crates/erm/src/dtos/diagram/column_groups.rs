@@ -86,20 +86,3 @@ impl From<entities::ColumnGroup> for ColumnGroup {
         }
     }
 }
-
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ColumnGroups {
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub column_groups: Option<Vec<ColumnGroup>>,
-}
-
-impl From<entities::ColumnGroups> for ColumnGroups {
-    fn from(entity: entities::ColumnGroups) -> Self {
-        Self {
-            column_groups: entity
-                .column_groups
-                .map(|v| v.into_iter().map(Into::into).collect()),
-        }
-    }
-}
