@@ -8,7 +8,6 @@ use erm::dtos::diagram::diagram_walkers::tables;
 use erm::dtos::diagram::diagram_walkers::tables::columns;
 use erm::dtos::diagram::diagram_walkers::tables::compound_unique_key_list;
 use erm::dtos::diagram::diagram_walkers::tables::connections;
-use erm::dtos::diagram::diagram_walkers::tables::indexes;
 use erm::open;
 
 // TODO: Add test cases of detailed condition for each field in https://github.com/s-kai273/erflute/issues/22
@@ -77,7 +76,7 @@ fn test_read_erm_file() {
                                 columns::ColumnItem::Group("COMMON".to_string()),
                             ]),
                         },
-                        indexes: indexes::Indexes { indexes: None },
+                        indexes: None,
                         compound_unique_key_list: compound_unique_key_list::CompoundUniqueKeyList {
                             compound_unique_keys: None
                         },
@@ -183,7 +182,7 @@ fn test_read_erm_file() {
                                 columns::ColumnItem::Group("COMMON".to_string()),
                             ]),
                         },
-                        indexes: indexes::Indexes { indexes: None },
+                        indexes: None,
                         compound_unique_key_list: compound_unique_key_list::CompoundUniqueKeyList {
                             compound_unique_keys: None
                         },
@@ -232,7 +231,7 @@ fn test_read_erm_file() {
                                 }),
                             ]),
                         },
-                        indexes: indexes::Indexes { indexes: None },
+                        indexes: None,
                         compound_unique_key_list: compound_unique_key_list::CompoundUniqueKeyList {
                             compound_unique_keys: None
                         },
@@ -355,7 +354,7 @@ fn test_read_erm_file() {
                                 columns::ColumnItem::Group("COMMON".to_string()),
                             ]),
                         },
-                        indexes: indexes::Indexes { indexes: None },
+                        indexes: None,
                         compound_unique_key_list: compound_unique_key_list::CompoundUniqueKeyList {
                             compound_unique_keys: None
                         },
@@ -472,7 +471,7 @@ fn test_read_erm_file() {
                                 columns::ColumnItem::Group("COMMON".to_string()),
                             ]),
                         },
-                        indexes: indexes::Indexes { indexes: None },
+                        indexes: None,
                         compound_unique_key_list: compound_unique_key_list::CompoundUniqueKeyList {
                             compound_unique_keys: None
                         },
@@ -538,15 +537,14 @@ fn test_read_erm_file() {
                                 columns::ColumnItem::Group("COMMON".to_string()),
                             ]),
                         },
-                        indexes: indexes::Indexes { indexes: None },
+                        indexes: None,
                         compound_unique_key_list: compound_unique_key_list::CompoundUniqueKeyList {
                             compound_unique_keys: None
                         },
                     }
                 ]),
             },
-            column_groups: column_groups::ColumnGroups {
-                column_groups: Some(vec![column_groups::ColumnGroup {
+            column_groups: Some(vec![column_groups::ColumnGroup {
                     column_group_name: "COMMON".to_string(),
                     columns: column_groups::Columns {
                         normal_columns: Some(vec![
@@ -581,7 +579,6 @@ fn test_read_erm_file() {
                         ])
                     }
                 }])
-            }
         }
     )
 }

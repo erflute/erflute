@@ -20,7 +20,7 @@ export async function loadDiagram(filename: string): Promise<{
   const diagram = await invoke<DiagramResponse>("load_diagram", { filename });
   const settings = diagram.diagramSettings;
   const tables = diagram.diagramWalkers.tables ?? [];
-  const columnGroups = diagram.columnGroups?.columnGroups ?? [];
+  const columnGroups = diagram.columnGroups ?? [];
   return {
     settings: mapSettingsFrom(settings),
     tables: mapTablesFrom(tables),

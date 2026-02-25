@@ -1,5 +1,5 @@
 /* istanbul ignore file */
-import { useCallback, useEffect, type RefObject } from "react";
+import { useEffect, type RefObject } from "react";
 
 /**
  * Ensures a minimum TableCard size based on its content.
@@ -9,52 +9,60 @@ import { useCallback, useEffect, type RefObject } from "react";
  * all table content remains fully visible.
  */
 export function useMinTableSize(
-  contentRef: RefObject<HTMLDivElement | null>,
+  columnContentRef: RefObject<HTMLDivElement | null>,
+  indexContentRef: RefObject<HTMLDivElement | null>,
   width?: number,
   height?: number,
   setWidth?: (width: number) => void,
   setHeight?: (height: number) => void,
+  // `ref.current` changes do not trigger effects.
+  // Re-run this effect when index rows are added/removed so a newly mounted
+  // index section is measured and observed immediately.
+  indexCount?: number,
 ) {
-  const clampToMinSize = useCallback(() => {
-    if (!contentRef.current) {
-      return;
-    }
-    if (typeof width === "number" && setWidth) {
-      // minWidth = left padding (4px) + right padding (4px)
-      // + left/right border (1px each) + extra breathing room (2px)
-      // + full content width (including overflow)
-      const contentWidth = contentRef.current.scrollWidth;
-      const minWidth = 4 + 4 + 2 + 2 + contentWidth;
-      if (width < minWidth) {
-        setWidth(minWidth);
-      }
-    }
-    if (typeof height === "number" && setHeight) {
-      // minHeight = header height (20px) + bottom padding (4px)
-      // + top/bottom border (1px each) + extra breathing room (2px)
-      // + full content height (including overflow)
-      const contentHeight = contentRef.current.scrollHeight;
-      const minHeight = 20 + 4 + 2 + 2 + contentHeight;
-      if (height < minHeight) {
-        setHeight(minHeight);
-      }
-    }
-  }, [contentRef, height, setHeight, setWidth, width]);
-
   useEffect(() => {
+    const clampToMinSize = () => {
+      if (!columnContentRef.current) {
+        return;
+      }
+      if (typeof width === "number" && setWidth) {
+        // minWidth = left padding (4px) + right padding (4px)
+        // + left/right border (1px each) + extra breathing room (2px)
+        // + full content width (including overflow)
+        const columnWidth = columnContentRef.current.scrollWidth;
+        const indexWidth = indexContentRef.current?.scrollWidth ?? 0;
+        const minWidth = 4 + 4 + 2 + 2 + Math.max(columnWidth, indexWidth);
+        if (width < minWidth) {
+          setWidth(minWidth);
+        }
+      }
+      if (typeof height === "number" && setHeight) {
+        // minHeight = header height (20px) + bottom padding (4px)
+        // + top/bottom border (1px each) + extra breathing room (2px)
+        // + full content height (including overflow)
+        const columnHeight = columnContentRef.current.scrollHeight;
+        const indexHeight = indexContentRef.current?.scrollHeight ?? 0;
+        const minHeight = 20 + 4 + 2 + 2 + columnHeight + indexHeight;
+        if (height < minHeight) {
+          setHeight(minHeight);
+        }
+      }
+    };
+
     clampToMinSize();
-  }, [clampToMinSize]);
 
-  useEffect(() => {
-    if (!contentRef.current || typeof ResizeObserver === "undefined") {
+    if (!columnContentRef.current || typeof ResizeObserver === "undefined") {
       return;
     }
     const observer = new ResizeObserver(() => {
       clampToMinSize();
     });
-    observer.observe(contentRef.current);
+    observer.observe(columnContentRef.current);
+    if (indexContentRef.current) {
+      observer.observe(indexContentRef.current);
+    }
     return () => {
       observer.disconnect();
     };
-  }, [clampToMinSize, contentRef]);
+  }, [width, height, setHeight, setWidth, indexCount]);
 }

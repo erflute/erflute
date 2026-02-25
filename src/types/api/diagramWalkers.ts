@@ -79,7 +79,7 @@ export type TableResponse = {
   primaryKeyName?: string;
   option?: string;
   columns: Columns;
-  indexes: Indexes;
+  indexes?: Indexes;
   compoundUniqueKeyList: CompoundUniqueKeyList;
 };
 

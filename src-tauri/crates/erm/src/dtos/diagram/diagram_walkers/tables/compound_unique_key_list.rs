@@ -17,30 +17,16 @@ impl From<entities::Column> for Column {
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Columns {
-    pub columns: Vec<Column>,
-}
-
-impl From<entities::Columns> for Columns {
-    fn from(entity: entities::Columns) -> Self {
-        Self {
-            columns: entity.columns.into_iter().map(Into::into).collect(),
-        }
-    }
-}
-
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct CompoundUniqueKey {
     pub name: String,
-    pub columns: Columns,
+    pub columns: Vec<Column>,
 }
 
 impl From<entities::CompoundUniqueKey> for CompoundUniqueKey {
     fn from(entity: entities::CompoundUniqueKey) -> Self {
         Self {
             name: entity.name,
-            columns: entity.columns.into(),
+            columns: entity.columns.columns.into_iter().map(Into::into).collect(),
         }
     }
 }

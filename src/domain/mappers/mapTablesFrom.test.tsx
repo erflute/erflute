@@ -18,7 +18,7 @@ const createTableResponse = (
   color: { r: 10, g: 20, b: 30 },
   connections: { relationships: [] },
   columns: { items: [] },
-  indexes: {},
+  indexes: [],
   compoundUniqueKeyList: {},
   ...overrides,
 });
@@ -33,12 +33,10 @@ describe("with populated columns", () => {
           compoundUniqueKeys: [
             {
               name: "users_unique",
-              columns: {
-                columns: [
-                  { columnId: "table.users.id" },
-                  { columnId: "table.users.email" },
-                ],
-              },
+              columns: [
+                { columnId: "table.users.id" },
+                { columnId: "table.users.email" },
+              ],
             },
           ],
         },
@@ -75,12 +73,16 @@ describe("with populated columns", () => {
         physicalName: "users",
         logicalName: "Users",
         description: "User table",
+        tableConstraint: undefined,
+        primaryKeyName: undefined,
+        option: undefined,
         compoundUniqueKeys: [
           {
             name: "users_unique",
             columns: ["table.users.id", "table.users.email"],
           },
         ],
+        indexes: [],
         columns: [
           {
             physicalName: "id",
@@ -89,6 +91,7 @@ describe("with populated columns", () => {
             columnType: ColumnType.Int,
             length: 11,
             decimal: 2,
+            enumArgs: undefined,
             unsigned: true,
             notNull: true,
             unique: true,
@@ -158,6 +161,43 @@ describe("with populated columns", () => {
     expect((referencingTable.columns?.[0] as Column)?.columnType).toBe(
       ColumnType.Int,
     );
+  });
+
+  it("uses referred column attributes when type arguments are omitted", () => {
+    const [, referencingTable] = mapTablesFrom([
+      createTableResponse({
+        physicalName: "users",
+        columns: {
+          items: [
+            {
+              physicalName: "account_code",
+              columnType: "varchar(n)",
+              length: 32,
+              unsigned: true,
+              args: "A,B,C",
+            },
+          ],
+        },
+      }),
+      createTableResponse({
+        physicalName: "orders",
+        columns: {
+          items: [
+            {
+              physicalName: "account_code",
+              referredColumn: "table.users.account_code",
+            },
+          ],
+        },
+      }),
+    ]);
+
+    expect((referencingTable.columns?.[0] as Column)?.columnType).toBe(
+      ColumnType.VarCharN,
+    );
+    expect((referencingTable.columns?.[0] as Column)?.length).toBe(32);
+    expect((referencingTable.columns?.[0] as Column)?.unsigned).toBe(true);
+    expect((referencingTable.columns?.[0] as Column)?.enumArgs).toBe("A,B,C");
   });
 });
 
