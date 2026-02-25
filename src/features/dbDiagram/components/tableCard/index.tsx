@@ -133,6 +133,7 @@ export function TableCard({
     height,
     setWidth,
     setHeight,
+    indexes.length,
   );
   return (
     <div
