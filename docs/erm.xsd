@@ -3,30 +3,83 @@
            elementFormDefault="unqualified"
            attributeFormDefault="unqualified">
 
+  <xs:annotation>
+    <xs:documentation>
+      ERFlute .erm XML schema.
+      - Canonical tags follow current writer implementation.
+      - Legacy tags are accepted where reader has explicit compatibility handling.
+    </xs:documentation>
+  </xs:annotation>
+
+  <!-- =================================================================== -->
+  <!--                                                                  Root -->
+  <!-- =================================================================== -->
   <xs:element name="diagram" type="DiagramType"/>
 
   <xs:complexType name="DiagramType">
     <xs:sequence>
-      <xs:element name="presenter" type="xs:string"/>
-      <xs:element name="page_settings" type="PageSettingsType"/>
+      <xs:element name="presenter" type="xs:string" minOccurs="0"/>
+
+      <xs:choice minOccurs="0">
+        <xs:element name="db_settings" type="DBSettingsType"/>
+        <xs:element name="dbsetting" type="DBSettingsType"/>
+      </xs:choice>
+
+      <xs:choice minOccurs="0">
+        <xs:element name="page_settings" type="PageSettingsType"/>
+        <xs:element name="page_setting" type="PageSettingsType"/>
+      </xs:choice>
+
+      <!-- legacy viewer-private values (no longer written by current ERFlute writer) -->
+      <xs:element name="category_index" type="xs:integer" minOccurs="0"/>
+      <xs:element name="current_ermodel" type="xs:string" minOccurs="0"/>
+      <xs:element name="zoom" type="xs:decimal" minOccurs="0"/>
+      <xs:element name="x" type="xs:integer" minOccurs="0"/>
+      <xs:element name="y" type="xs:integer" minOccurs="0"/>
+      <xs:element name="default_color" type="ColorType" minOccurs="0"/>
+
       <xs:element name="color" type="ColorType" minOccurs="0"/>
       <xs:element name="font_name" type="xs:string" minOccurs="0"/>
       <xs:element name="font_size" type="xs:integer" minOccurs="0"/>
-      <xs:element name="diagram_settings" type="DiagramSettingsType"/>
-      <xs:element name="tablespace_set" minOccurs="0">
-        <xs:complexType><xs:sequence/></xs:complexType>
-      </xs:element>
-      <xs:element name="diagram_walkers" type="DiagramWalkersType"/>
-      <xs:element name="vdiagrams" minOccurs="0">
-        <xs:complexType><xs:sequence/></xs:complexType>
-      </xs:element>
+
+      <xs:choice>
+        <xs:element name="diagram_settings" type="DiagramSettingsType"/>
+        <xs:element name="settings" type="DiagramSettingsType"/>
+      </xs:choice>
+
+      <xs:element name="dictionary" type="DictionaryType" minOccurs="0"/>
+      <xs:element name="tablespace_set" type="TablespaceSetType" minOccurs="0"/>
+
+      <xs:choice minOccurs="0">
+        <xs:element name="diagram_walkers" type="DiagramWalkersType"/>
+        <xs:element name="contents" type="DiagramWalkersType"/>
+      </xs:choice>
+
+      <xs:choice minOccurs="0">
+        <xs:element name="vdiagrams" type="VirtualDiagramsType"/>
+        <xs:element name="ermodels" type="VirtualDiagramsType"/>
+      </xs:choice>
+
       <xs:element name="column_groups" type="ColumnGroupsType" minOccurs="0"/>
-      <xs:element name="sequence_set" minOccurs="0">
-        <xs:complexType><xs:sequence/></xs:complexType>
-      </xs:element>
-      <xs:element name="trigger_set" minOccurs="0">
-        <xs:complexType><xs:sequence/></xs:complexType>
-      </xs:element>
+      <xs:element name="sequence_set" type="SequenceSetType" minOccurs="0"/>
+      <xs:element name="trigger_set" type="TriggerSetType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- =================================================================== -->
+  <!--                                                              Settings -->
+  <!-- =================================================================== -->
+  <xs:complexType name="DBSettingsType">
+    <xs:sequence>
+      <xs:element name="dbsystem" type="xs:string"/>
+      <xs:element name="server" type="xs:string"/>
+      <xs:element name="port" type="xs:integer"/>
+      <xs:element name="database" type="xs:string"/>
+      <xs:element name="user" type="xs:string"/>
+      <xs:element name="password" type="xs:string"/>
+      <xs:element name="use_default_driver" type="xs:boolean"/>
+      <xs:element name="url" type="xs:string"/>
+      <xs:element name="driver_class_name" type="xs:string"/>
     </xs:sequence>
   </xs:complexType>
 
@@ -46,8 +99,8 @@
     <xs:sequence>
       <xs:element name="database" type="xs:string"/>
       <xs:element name="capital" type="xs:boolean"/>
-      <xs:element name="table_style" type="xs:string" minOccurs="0"/>
-      <xs:element name="notation" type="xs:string" minOccurs="0"/>
+      <xs:element name="table_style" type="xs:string"/>
+      <xs:element name="notation" type="xs:string"/>
       <xs:element name="notation_level" type="xs:integer"/>
       <xs:element name="notation_expand_group" type="xs:boolean"/>
       <xs:element name="view_mode" type="xs:integer"/>
@@ -60,13 +113,22 @@
       <xs:element name="titleFontEm" type="xs:decimal" minOccurs="0"/>
       <xs:element name="masterDataBasePath" type="xs:string" minOccurs="0"/>
       <xs:element name="use_view_object" type="xs:boolean"/>
-      <xs:element name="export_settings" type="ExportSettingsType"/>
+
+      <xs:choice>
+        <xs:element name="export_settings" type="ExportSettingsType"/>
+        <xs:element name="export_setting" type="ExportSettingsType"/>
+      </xs:choice>
+
       <xs:element name="category_settings" type="CategorySettingsType"/>
       <xs:element name="model_properties" type="ModelPropertiesType"/>
-      <xs:element name="table_properties" minOccurs="0">
-        <xs:complexType><xs:sequence/></xs:complexType>
-      </xs:element>
-      <xs:element name="environment_settings" type="EnvironmentSettingsType"/>
+      <xs:element name="table_properties" type="TablePropertiesType"/>
+
+      <xs:choice minOccurs="0">
+        <xs:element name="environment_settings" type="EnvironmentSettingsType"/>
+        <xs:element name="environment_setting" type="EnvironmentSettingsType"/>
+      </xs:choice>
+
+      <xs:element name="design_settings" type="DesignSettingsType" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
 
@@ -74,9 +136,9 @@
     <xs:sequence>
       <xs:element name="category_name_to_export" type="xs:string"/>
       <xs:element name="ddl_output" type="xs:string"/>
-      <xs:element name="excel_output" type="xs:string" minOccurs="0"/>
-      <xs:element name="excel_template" type="xs:string" minOccurs="0"/>
-      <xs:element name="image_output" type="xs:string" minOccurs="0"/>
+      <xs:element name="excel_output" type="xs:string"/>
+      <xs:element name="excel_template" type="xs:string"/>
+      <xs:element name="image_output" type="xs:string"/>
       <xs:element name="put_diagram_on_excel" type="xs:boolean"/>
       <xs:element name="use_logical_name_as_sheet" type="xs:boolean"/>
       <xs:element name="open_after_saved" type="xs:boolean"/>
@@ -108,22 +170,31 @@
     <xs:sequence>
       <xs:element name="free_layout" type="xs:boolean"/>
       <xs:element name="show_referred_tables" type="xs:boolean"/>
-      <xs:element name="categories" minOccurs="0">
-        <xs:complexType><xs:sequence/></xs:complexType>
-      </xs:element>
+      <xs:element name="categories" type="CategoriesType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="CategoriesType">
+    <xs:sequence>
+      <xs:element name="category" type="CategoryType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="CategoryType">
+    <xs:sequence>
+      <xs:group ref="WalkerElementGroup"/>
+      <xs:element name="name" type="xs:string" minOccurs="0"/>
+      <xs:element name="selected" type="xs:boolean" minOccurs="0"/>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="category_contents" type="xs:string"/>
+        <xs:element name="node_element" type="xs:string"/>
+      </xs:choice>
     </xs:sequence>
   </xs:complexType>
 
   <xs:complexType name="ModelPropertiesType">
     <xs:sequence>
-      <xs:element name="font_name" type="xs:string" minOccurs="0"/>
-      <xs:element name="font_size" type="xs:integer" minOccurs="0"/>
-      <xs:element name="x" type="xs:integer" minOccurs="0"/>
-      <xs:element name="y" type="xs:integer" minOccurs="0"/>
-      <xs:element name="color" type="ColorType" minOccurs="0"/>
-      <xs:element name="connections" minOccurs="0">
-        <xs:complexType><xs:sequence/></xs:complexType>
-      </xs:element>
+      <xs:group ref="WalkerElementGroup"/>
       <xs:element name="display" type="xs:boolean" minOccurs="0"/>
       <xs:element name="model_property" type="KeyValueType" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
@@ -134,7 +205,7 @@
       <xs:element name="environment" minOccurs="0" maxOccurs="unbounded">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="id" type="xs:integer"/>
+            <xs:element name="id" type="xs:string"/>
             <xs:element name="name" type="xs:string"/>
           </xs:sequence>
         </xs:complexType>
@@ -142,80 +213,104 @@
     </xs:sequence>
   </xs:complexType>
 
-  <xs:complexType name="DiagramWalkersType">
+  <xs:complexType name="DesignSettingsType">
     <xs:sequence>
-      <xs:element name="table" type="TableType" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="foreign_key" type="ConstraintPrefixType" minOccurs="0"/>
+      <xs:element name="unique" type="ConstraintPrefixType" minOccurs="0"/>
+      <xs:element name="index" type="ConstraintPrefixType" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
 
-  <xs:complexType name="TableType">
+  <xs:complexType name="ConstraintPrefixType">
     <xs:sequence>
-      <xs:element name="physical_name" type="xs:string"/>
-      <xs:element name="logical_name" type="xs:string" minOccurs="0"/>
-      <xs:element name="description" type="xs:string" minOccurs="0"/>
+      <xs:element name="default_prefix" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- =================================================================== -->
+  <!--                                                                 Walkers -->
+  <!-- =================================================================== -->
+  <xs:group name="WalkerElementGroup">
+    <xs:sequence>
+      <xs:element name="id" type="xs:string" minOccurs="0"/>
+      <xs:element name="height" type="xs:integer" minOccurs="0"/>
+      <xs:element name="width" type="xs:integer" minOccurs="0"/>
       <xs:element name="font_name" type="xs:string" minOccurs="0"/>
       <xs:element name="font_size" type="xs:integer" minOccurs="0"/>
       <xs:element name="x" type="xs:integer" minOccurs="0"/>
       <xs:element name="y" type="xs:integer" minOccurs="0"/>
       <xs:element name="color" type="ColorType" minOccurs="0"/>
-      <xs:element name="connections" type="RelationshipsType" minOccurs="0"/>
-      <xs:element name="columns" type="ColumnsType"/>
-      <xs:element name="indexes" type="IndexesType" minOccurs="0"/>
-      <xs:element name="compound_unique_key_list" type="CompoundUniqueKeysType" minOccurs="0"/>
-      <xs:element name="table_properties" minOccurs="0">
-        <xs:complexType><xs:sequence/></xs:complexType>
-      </xs:element>
-      <xs:attribute name="height" type="xs:integer" use="optional"/>
-      <xs:attribute name="width" type="xs:integer" use="optional"/>
+      <xs:element name="connections" type="ConnectionsType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:complexType name="DiagramWalkersType">
+    <xs:sequence>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="table" type="TableType"/>
+        <xs:element name="view" type="ViewType"/>
+        <xs:element name="walker_note" type="WalkerNoteType"/>
+        <xs:element name="note" type="WalkerNoteType"/>
+        <xs:element name="walker_group" type="WalkerGroupType"/>
+        <xs:element name="group" type="WalkerGroupType"/>
+        <xs:element name="image" type="ImageType"/>
+        <xs:element name="inserted_image" type="ImageType"/>
+      </xs:choice>
     </xs:sequence>
   </xs:complexType>
 
-  <xs:complexType name="ColumnsType">
+  <xs:complexType name="ConnectionsType">
     <xs:sequence>
-      <xs:element name="normal_column" type="ColumnType" minOccurs="0" maxOccurs="unbounded"/>
-      <xs:element name="column_group" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-    </xs:sequence>
-  </xs:complexType>
-
-  <xs:complexType name="ColumnType">
-    <xs:sequence>
-      <xs:element name="physical_name" type="xs:string"/>
-      <xs:element name="logical_name" type="xs:string" minOccurs="0"/>
-      <xs:element name="type" type="xs:string" minOccurs="0"/>
-      <xs:element name="length" type="xs:integer" minOccurs="0"/>
-      <xs:element name="decimal" type="xs:integer" minOccurs="0"/>
-      <xs:element name="description" type="xs:string" minOccurs="0"/>
-      <xs:element name="referred_column" type="xs:string" minOccurs="0"/>
-      <xs:element name="relationship" type="xs:string" minOccurs="0"/>
-      <xs:element name="not_null" type="xs:boolean" minOccurs="0"/>
-      <xs:element name="primary_key" type="xs:boolean" minOccurs="0"/>
-      <xs:element name="auto_increment" type="xs:boolean" minOccurs="0"/>
-      <xs:element name="unique_key" type="xs:boolean" minOccurs="0"/>
-    </xs:sequence>
-  </xs:complexType>
-
-  <xs:complexType name="RelationshipsType">
-    <xs:sequence>
-      <xs:element name="relationship" type="RelationshipType" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="relationship" type="RelationshipType"/>
+        <xs:element name="relation" type="RelationshipType"/>
+        <xs:element name="comment_connection" type="CommentConnectionType"/>
+      </xs:choice>
     </xs:sequence>
   </xs:complexType>
 
   <xs:complexType name="RelationshipType">
     <xs:sequence>
-      <xs:element name="name" type="xs:string"/>
-      <xs:element name="source" type="xs:string"/>
-      <xs:element name="target" type="xs:string"/>
+      <xs:element name="id" type="xs:string" minOccurs="0"/>
+      <xs:element name="name" type="xs:string" minOccurs="0"/>
+      <xs:element name="source" type="xs:string" minOccurs="0"/>
+      <xs:element name="target" type="xs:string" minOccurs="0"/>
       <xs:element name="bendpoint" type="BendpointType" minOccurs="0" maxOccurs="unbounded"/>
-      <xs:element name="fk_columns" type="FkColumnsType"/>
-      <xs:element name="parent_cardinality" type="xs:string"/>
-      <xs:element name="child_cardinality" type="xs:string"/>
-      <xs:element name="reference_for_pk" type="xs:boolean"/>
-      <xs:element name="on_delete_action" type="xs:string" minOccurs="0"/>
-      <xs:element name="on_update_action" type="xs:string" minOccurs="0"/>
+      <xs:element name="fk_columns" type="FkColumnsType" minOccurs="0"/>
+      <xs:element name="parent_cardinality" type="ParentCardinalityType" minOccurs="0"/>
+      <xs:element name="child_cardinality" type="ChildCardinalityType" minOccurs="0"/>
+      <xs:element name="reference_for_pk" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="on_delete_action" type="OnActionType" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+            Semantics: empty string or omitted element means NO ACTION.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="on_update_action" type="OnActionType" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+            Semantics: empty string or omitted element means NO ACTION.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
       <xs:element name="source_xp" type="xs:integer" minOccurs="0"/>
       <xs:element name="source_yp" type="xs:integer" minOccurs="0"/>
       <xs:element name="target_xp" type="xs:integer" minOccurs="0"/>
       <xs:element name="target_yp" type="xs:integer" minOccurs="0"/>
+      <xs:element name="referred_compound_unique_key" type="xs:string" minOccurs="0"/>
+      <xs:element name="referred_simple_unique_column" type="xs:string" minOccurs="0"/>
+      <xs:element name="referenced_complex_unique_key" type="xs:string" minOccurs="0"/>
+      <xs:element name="referenced_column" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="CommentConnectionType">
+    <xs:sequence>
+      <xs:element name="id" type="xs:string" minOccurs="0"/>
+      <xs:element name="source" type="xs:string" minOccurs="0"/>
+      <xs:element name="target" type="xs:string" minOccurs="0"/>
+      <xs:element name="bendpoint" type="BendpointType" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
 
@@ -239,9 +334,92 @@
     </xs:sequence>
   </xs:complexType>
 
+  <!-- =================================================================== -->
+  <!--                                                              Table/View -->
+  <!-- =================================================================== -->
+  <xs:complexType name="TableType">
+    <xs:sequence>
+      <xs:element name="physical_name" type="xs:string"/>
+      <xs:element name="logical_name" type="xs:string"/>
+      <xs:element name="description" type="xs:string"/>
+      <xs:group ref="WalkerElementGroup"/>
+      <xs:choice minOccurs="0">
+        <xs:element name="table_constraint" type="xs:string"/>
+        <xs:element name="constraint" type="xs:string"/>
+      </xs:choice>
+      <xs:element name="primary_key_name" type="xs:string" minOccurs="0"/>
+      <xs:element name="option" type="xs:string" minOccurs="0"/>
+      <xs:element name="columns" type="ColumnsType"/>
+      <xs:element name="indexes" type="IndexesType"/>
+      <xs:choice minOccurs="0">
+        <xs:element name="compound_unique_key_list" type="CompoundUniqueKeysType"/>
+        <xs:element name="complex_unique_key_list" type="CompoundUniqueKeysType"/>
+      </xs:choice>
+      <xs:element name="table_properties" type="TablePropertiesType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ViewType">
+    <xs:sequence>
+      <xs:element name="physical_name" type="xs:string"/>
+      <xs:element name="logical_name" type="xs:string"/>
+      <xs:element name="description" type="xs:string"/>
+      <xs:group ref="WalkerElementGroup"/>
+      <xs:element name="sql" type="xs:string"/>
+      <xs:element name="columns" type="ColumnsType"/>
+      <xs:element name="view_properties" type="ViewPropertiesType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ColumnsType">
+    <xs:sequence>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="normal_column" type="ColumnType"/>
+        <xs:element name="column_group" type="xs:string"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ColumnType">
+    <xs:sequence>
+      <xs:element name="word_id" type="xs:string" minOccurs="0"/>
+      <xs:element name="id" type="xs:string" minOccurs="0"/>
+      <xs:element name="physical_name" type="xs:string"/>
+      <xs:element name="logical_name" type="xs:string" minOccurs="0"/>
+      <xs:element name="type" type="xs:string" minOccurs="0"/>
+      <xs:element name="length" type="xs:integer" minOccurs="0"/>
+      <xs:element name="decimal" type="xs:integer" minOccurs="0"/>
+      <xs:element name="array" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="array_dimension" type="xs:integer" minOccurs="0"/>
+      <xs:element name="unsigned" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="args" type="xs:string" minOccurs="0"/>
+      <xs:element name="char_semantics" type="xs:boolean" minOccurs="0"/>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="referred_column" type="xs:string"/>
+        <xs:element name="referenced_column" type="xs:string"/>
+        <xs:element name="relationship" type="xs:string"/>
+        <xs:element name="relation" type="xs:string"/>
+      </xs:choice>
+      <xs:element name="description" type="xs:string" minOccurs="0"/>
+      <xs:choice minOccurs="0">
+        <xs:element name="column_constraint" type="xs:string"/>
+        <xs:element name="constraint" type="xs:string"/>
+      </xs:choice>
+      <xs:element name="not_null" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="primary_key" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="unique_key" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="auto_increment" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="default_value" type="xs:string" minOccurs="0"/>
+      <xs:element name="unique_key_name" type="xs:string" minOccurs="0"/>
+      <xs:element name="character_set" type="xs:string" minOccurs="0"/>
+      <xs:element name="collation" type="xs:string" minOccurs="0"/>
+      <xs:element name="sequence" type="SequenceType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
   <xs:complexType name="IndexesType">
     <xs:sequence>
-      <xs:element name="index" minOccurs="0" maxOccurs="unbounded" type="IndexType"/>
+      <xs:element name="index" type="IndexType" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
 
@@ -249,7 +427,9 @@
     <xs:sequence>
       <xs:element name="name" type="xs:string"/>
       <xs:element name="type" type="xs:string" minOccurs="0"/>
-      <xs:element name="non_unique" type="xs:boolean"/>
+      <xs:element name="description" type="xs:string" minOccurs="0"/>
+      <xs:element name="full_text" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="non_unique" type="xs:boolean" minOccurs="0"/>
       <xs:element name="columns" type="IndexColumnsType"/>
     </xs:sequence>
   </xs:complexType>
@@ -259,7 +439,11 @@
       <xs:element name="column" minOccurs="0" maxOccurs="unbounded">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="column_id" type="xs:string"/>
+            <xs:choice>
+              <xs:element name="column_id" type="xs:string"/>
+              <xs:element name="id" type="xs:string"/>
+            </xs:choice>
+            <xs:element name="desc" type="xs:boolean" minOccurs="0"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -271,6 +455,7 @@
       <xs:element name="compound_unique_key" minOccurs="0" maxOccurs="unbounded">
         <xs:complexType>
           <xs:sequence>
+            <xs:element name="id" type="xs:string" minOccurs="0"/>
             <xs:element name="name" type="xs:string"/>
             <xs:element name="columns" type="IndexColumnsType"/>
           </xs:sequence>
@@ -279,16 +464,42 @@
     </xs:sequence>
   </xs:complexType>
 
+  <xs:complexType name="TablePropertiesType">
+    <xs:sequence>
+      <xs:element name="tablespace_id" type="xs:string" minOccurs="0"/>
+      <xs:element name="schema" type="xs:string" minOccurs="0"/>
+      <xs:element name="character_set" type="xs:string" minOccurs="0"/>
+      <xs:element name="collation" type="xs:string" minOccurs="0"/>
+      <xs:element name="storage_engine" type="xs:string" minOccurs="0"/>
+      <xs:element name="primary_key_length_of_text" type="xs:integer" minOccurs="0"/>
+      <xs:element name="without_oids" type="xs:boolean" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ViewPropertiesType">
+    <xs:sequence>
+      <xs:element name="tablespace_id" type="xs:string" minOccurs="0"/>
+      <xs:element name="schema" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- =================================================================== -->
+  <!--                                                           Column Group -->
+  <!-- =================================================================== -->
   <xs:complexType name="ColumnGroupsType">
     <xs:sequence>
-      <xs:element name="column_group" minOccurs="0" maxOccurs="unbounded">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element name="column_group_name" type="xs:string"/>
-            <xs:element name="columns" type="ColumnGroupColumnsType"/>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
+      <xs:element name="column_group" minOccurs="0" maxOccurs="unbounded" type="ColumnGroupType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ColumnGroupType">
+    <xs:sequence>
+      <xs:element name="id" type="xs:string" minOccurs="0"/>
+      <xs:choice>
+        <xs:element name="column_group_name" type="xs:string"/>
+        <xs:element name="group_name" type="xs:string"/>
+      </xs:choice>
+      <xs:element name="columns" type="ColumnGroupColumnsType"/>
     </xs:sequence>
   </xs:complexType>
 
@@ -298,6 +509,230 @@
     </xs:sequence>
   </xs:complexType>
 
+  <!-- =================================================================== -->
+  <!--                                                              Virtual -->
+  <!-- =================================================================== -->
+  <xs:complexType name="VirtualDiagramsType">
+    <xs:sequence>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="vdiagram" type="VirtualDiagramType"/>
+        <xs:element name="ermodel" type="VirtualDiagramType"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="VirtualDiagramType">
+    <xs:sequence>
+      <xs:element name="vdiagram_id" type="xs:string" minOccurs="0"/>
+      <xs:choice minOccurs="0">
+        <xs:element name="vdiagram_name" type="xs:string"/>
+        <xs:element name="name" type="xs:string"/>
+      </xs:choice>
+      <xs:element name="color" type="ColorType" minOccurs="0"/>
+      <xs:element name="vtables" type="VirtualTablesType" minOccurs="0"/>
+      <xs:choice minOccurs="0">
+        <xs:element name="walker_notes" type="WalkerNotesType"/>
+        <xs:element name="notes" type="WalkerNotesType"/>
+      </xs:choice>
+      <xs:choice minOccurs="0">
+        <xs:element name="walker_groups" type="WalkerGroupsType"/>
+        <xs:element name="groups" type="WalkerGroupsType"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="VirtualTablesType">
+    <xs:sequence>
+      <xs:element name="vtable" type="VirtualTableType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="VirtualTableType">
+    <xs:sequence>
+      <xs:choice>
+        <xs:element name="table_id" type="xs:string"/>
+        <xs:element name="id" type="xs:string"/>
+      </xs:choice>
+      <xs:element name="x" type="xs:integer" minOccurs="0"/>
+      <xs:element name="y" type="xs:integer" minOccurs="0"/>
+      <xs:element name="width" type="xs:integer" minOccurs="0"/>
+      <xs:element name="height" type="xs:integer" minOccurs="0"/>
+      <xs:element name="font_name" type="xs:string" minOccurs="0"/>
+      <xs:element name="font_size" type="xs:integer" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="WalkerNotesType">
+    <xs:sequence>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="walker_note" type="WalkerNoteType"/>
+        <xs:element name="note" type="WalkerNoteType"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="WalkerNoteType">
+    <xs:sequence>
+      <xs:group ref="WalkerElementGroup"/>
+      <xs:choice minOccurs="0">
+        <xs:element name="note_text" type="xs:string"/>
+        <xs:element name="text" type="xs:string"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="WalkerGroupsType">
+    <xs:sequence>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="walker_group" type="WalkerGroupType"/>
+        <xs:element name="group" type="WalkerGroupType"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="WalkerGroupType">
+    <xs:sequence>
+      <xs:group ref="WalkerElementGroup"/>
+      <xs:choice minOccurs="0">
+        <xs:element name="walker_group_name" type="xs:string"/>
+        <xs:element name="name" type="xs:string"/>
+      </xs:choice>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="diagram_walker" type="xs:string"/>
+        <xs:element name="node_element" type="xs:string"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ImageType">
+    <xs:sequence>
+      <xs:group ref="WalkerElementGroup"/>
+      <xs:element name="data" type="xs:string"/>
+      <xs:element name="hue" type="xs:integer"/>
+      <xs:element name="saturation" type="xs:integer"/>
+      <xs:element name="brightness" type="xs:integer"/>
+      <xs:element name="alpha" type="xs:integer" minOccurs="0"/>
+      <xs:element name="fix_aspect_ratio" type="xs:boolean" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- =================================================================== -->
+  <!--                                                         Tablespace etc -->
+  <!-- =================================================================== -->
+  <xs:complexType name="TablespaceSetType">
+    <xs:sequence>
+      <xs:element name="tablespace" type="TablespaceType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="TablespaceType">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="id" type="xs:string" minOccurs="0"/>
+      <xs:element name="properties" type="TablespacePropertiesType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="TablespacePropertiesType">
+    <xs:sequence>
+      <xs:element name="environment_id" type="xs:string"/>
+      <xs:element name="buffer_pool_name" type="xs:string" minOccurs="0"/>
+      <xs:element name="container" type="xs:string" minOccurs="0"/>
+      <xs:element name="extent_size" type="xs:string" minOccurs="0"/>
+      <xs:element name="managed_by" type="xs:string" minOccurs="0"/>
+      <xs:element name="page_size" type="xs:string" minOccurs="0"/>
+      <xs:element name="prefetch_size" type="xs:string" minOccurs="0"/>
+      <xs:element name="type" type="xs:string" minOccurs="0"/>
+      <xs:element name="data_file" type="xs:string" minOccurs="0"/>
+      <xs:element name="engine" type="xs:string" minOccurs="0"/>
+      <xs:element name="initial_size" type="xs:string" minOccurs="0"/>
+      <xs:element name="log_file_group" type="xs:string" minOccurs="0"/>
+      <xs:element name="auto_extend" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="auto_segment_space_management" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="logging" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="offline" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="temporary" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="auto_extend_max_size" type="xs:string" minOccurs="0"/>
+      <xs:element name="auto_extend_size" type="xs:string" minOccurs="0"/>
+      <xs:element name="file_size" type="xs:string" minOccurs="0"/>
+      <xs:element name="initial" type="xs:string" minOccurs="0"/>
+      <xs:element name="max_extents" type="xs:string" minOccurs="0"/>
+      <xs:element name="min_extents" type="xs:string" minOccurs="0"/>
+      <xs:element name="minimum_extent_size" type="xs:string" minOccurs="0"/>
+      <xs:element name="next" type="xs:string" minOccurs="0"/>
+      <xs:element name="pct_increase" type="xs:string" minOccurs="0"/>
+      <xs:element name="location" type="xs:string" minOccurs="0"/>
+      <xs:element name="owner" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="SequenceSetType">
+    <xs:sequence>
+      <xs:element name="sequence" type="SequenceType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="SequenceType">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="schema" type="xs:string"/>
+      <xs:element name="increment" type="NullableIntegerType"/>
+      <xs:element name="min_value" type="NullableLongType"/>
+      <xs:element name="max_value" type="NullableDecimalType"/>
+      <xs:element name="start" type="NullableLongType"/>
+      <xs:element name="cache" type="NullableIntegerType"/>
+      <xs:element name="cycle" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="order" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="description" type="xs:string" minOccurs="0"/>
+      <xs:element name="data_type" type="xs:string" minOccurs="0"/>
+      <xs:element name="decimal_size" type="NullableIntegerType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="TriggerSetType">
+    <xs:sequence>
+      <xs:element name="trigger" type="TriggerType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="TriggerType">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="schema" type="xs:string"/>
+      <xs:element name="sql" type="xs:string"/>
+      <xs:element name="description" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- =================================================================== -->
+  <!--                                                         Legacy Dictionary -->
+  <!-- =================================================================== -->
+  <xs:complexType name="DictionaryType">
+    <xs:sequence>
+      <xs:element name="word" type="WordType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="WordType">
+    <xs:sequence>
+      <xs:element name="id" type="xs:string" minOccurs="0"/>
+      <xs:element name="type" type="xs:string" minOccurs="0"/>
+      <xs:element name="length" type="xs:integer" minOccurs="0"/>
+      <xs:element name="decimal" type="xs:integer" minOccurs="0"/>
+      <xs:element name="array" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="array_dimension" type="xs:integer" minOccurs="0"/>
+      <xs:element name="unsigned" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="args" type="xs:string" minOccurs="0"/>
+      <xs:element name="char_semantics" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="description" type="xs:string" minOccurs="0"/>
+      <xs:element name="logical_name" type="xs:string" minOccurs="0"/>
+      <xs:element name="physical_name" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- =================================================================== -->
+  <!--                                                            Shared Type -->
+  <!-- =================================================================== -->
   <xs:complexType name="KeyValueType">
     <xs:sequence>
       <xs:element name="name" type="xs:string"/>
@@ -312,5 +747,54 @@
       <xs:element name="b" type="xs:integer"/>
     </xs:sequence>
   </xs:complexType>
+
+  <xs:simpleType name="EmptyStringType">
+    <xs:restriction base="xs:string">
+      <xs:length value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="NullableIntegerType">
+    <xs:union memberTypes="xs:integer EmptyStringType"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="NullableLongType">
+    <xs:union memberTypes="xs:long EmptyStringType"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="NullableDecimalType">
+    <xs:union memberTypes="xs:decimal EmptyStringType"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="OnActionType">
+    <xs:annotation>
+      <xs:documentation>
+        Explicitly stored actions. NO ACTION is represented by empty string or omitted element.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="RESTRICT"/>
+      <xs:enumeration value="CASCADE"/>
+      <xs:enumeration value="SET NULL"/>
+      <xs:enumeration value="SET DEFAULT"/>
+      <xs:enumeration value=""/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ParentCardinalityType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="1"/>
+      <xs:enumeration value="0..1"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ChildCardinalityType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="1..n"/>
+      <xs:enumeration value="0..n"/>
+      <xs:enumeration value="1"/>
+      <xs:enumeration value="0..1"/>
+    </xs:restriction>
+  </xs:simpleType>
 
 </xs:schema>
