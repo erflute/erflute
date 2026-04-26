@@ -8,6 +8,7 @@ use erm::dtos::diagram::diagram_walkers::tables;
 use erm::dtos::diagram::diagram_walkers::tables::columns;
 use erm::dtos::diagram::diagram_walkers::tables::compound_unique_key_list;
 use erm::dtos::diagram::diagram_walkers::tables::connections;
+use erm::dtos::diagram::page_settings;
 use erm::open;
 
 // TODO: Add test cases of detailed condition for each field in https://github.com/s-kai273/erflute/issues/22
@@ -19,6 +20,15 @@ fn test_read_snapshot() {
         diagram,
         diagram::Diagram {
             presenter: Some("ERFlute".to_string()),
+            page_settings: Some(page_settings::PageSettings {
+                direction_horizontal: true,
+                scale: 100,
+                paper_size: "A4 210 x 297 mm".to_string(),
+                top_margin: 30,
+                left_margin: 30,
+                bottom_margin: 30,
+                right_margin: 30,
+            }),
             category_index: None,
             current_ermodel: None,
             zoom: None,

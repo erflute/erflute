@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <diagram>
   <presenter>ERFlute</presenter>
+  <page_settings>
+    <direction_horizontal>true</direction_horizontal>
+    <scale>100</scale>
+    <paper_size>A4 210 x 297 mm</paper_size>
+    <top_margin>30</top_margin>
+    <left_margin>31</left_margin>
+    <bottom_margin>32</bottom_margin>
+    <right_margin>33</right_margin>
+  </page_settings>
   <category_index>2</category_index>
   <current_ermodel>main</current_ermodel>
   <zoom>1.25</zoom>

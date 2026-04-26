@@ -1,10 +1,12 @@
 pub mod column_groups;
 pub mod diagram_settings;
 pub mod diagram_walkers;
+pub mod page_settings;
 
 use column_groups::ColumnGroup;
 use diagram_settings::DiagramSettings;
 use diagram_walkers::DiagramWalkers;
+use page_settings::PageSettings;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
@@ -30,6 +32,9 @@ impl From<crate::entities::diagram::Color> for Color {
 pub struct Diagram {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub presenter: Option<String>,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub page_settings: Option<PageSettings>,
 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub category_index: Option<i64>,
@@ -71,6 +76,7 @@ impl From<crate::entities::diagram::Diagram> for Diagram {
     fn from(entity: crate::entities::diagram::Diagram) -> Self {
         Self {
             presenter: entity.presenter,
+            page_settings: entity.page_settings.map(Into::into),
             category_index: entity.category_index,
             current_ermodel: entity.current_ermodel,
             zoom: entity.zoom,

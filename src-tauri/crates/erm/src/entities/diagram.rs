@@ -1,10 +1,12 @@
 pub mod column_groups;
 pub mod diagram_settings;
 pub mod diagram_walkers;
+pub mod page_settings;
 
 use column_groups::ColumnGroups;
 use diagram_settings::DiagramSettings;
 use diagram_walkers::DiagramWalkers;
+use page_settings::PageSettings;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
@@ -18,6 +20,9 @@ pub struct Color {
 pub struct Diagram {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub presenter: Option<String>,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub page_settings: Option<PageSettings>,
 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub category_index: Option<i64>,

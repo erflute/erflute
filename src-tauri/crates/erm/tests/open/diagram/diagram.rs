@@ -3,18 +3,28 @@ use std::fs;
 
 use erm::dtos::diagram;
 use erm::dtos::diagram::diagram_settings;
+use erm::dtos::diagram::page_settings;
 use erm::open;
 
-const VALID_VALUES_FIXTURE: &str = "./tests/open/fixtures/diagram/valid_values.erm";
+const DEFAULT_DIAGRAM_FIXTURE: &str = "./tests/open/fixtures/default_diagram.erm";
 
 #[test]
 fn diagram_tags_keep_valid_values() {
-    let diagram = open(VALID_VALUES_FIXTURE).expect("failed to parse");
+    let diagram = open(DEFAULT_DIAGRAM_FIXTURE).expect("failed to parse");
 
     assert_eq!(
         diagram,
         diagram::Diagram {
             presenter: Some("ERFlute".to_string()),
+            page_settings: Some(page_settings::PageSettings {
+                direction_horizontal: true,
+                scale: 100,
+                paper_size: "A4 210 x 297 mm".to_string(),
+                top_margin: 30,
+                left_margin: 31,
+                bottom_margin: 32,
+                right_margin: 33,
+            }),
             category_index: Some(2),
             current_ermodel: Some("main".to_string()),
             zoom: Some(1.25),
@@ -95,7 +105,7 @@ fn missing_required_diagram_settings_is_rejected() {
 }
 
 fn assert_replaced_fixture_parse_error(target: &str, replacement: &str, test_name: &str) {
-    let fixture = fs::read_to_string(VALID_VALUES_FIXTURE).expect("failed to read fixture");
+    let fixture = fs::read_to_string(DEFAULT_DIAGRAM_FIXTURE).expect("failed to read fixture");
     let content = fixture.replace(target, replacement);
     assert_ne!(fixture, content);
 
