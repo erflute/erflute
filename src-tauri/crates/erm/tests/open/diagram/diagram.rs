@@ -36,7 +36,27 @@ fn diagram_tags_keep_valid_values() {
             font_size: Some(9),
             diagram_settings: diagram_settings::DiagramSettings {
                 database: "MySQL".to_string(),
+                capital: true,
+                table_style: "standard".to_string(),
+                notation: "IE".to_string(),
+                notation_level: 1,
+                notation_expand_group: false,
                 view_mode: 1,
+                outline_view_mode: 2,
+                view_order_by: 3,
+                auto_ime_change: false,
+                validate_physical_name: true,
+                use_bezier_curve: false,
+                suspend_validator: false,
+                title_font_em: Some(1.5),
+                master_data_base_path: Some("master.db".to_string()),
+                use_view_object: true,
+                export_settings: diagram_settings::ExportSettings {},
+                category_settings: diagram_settings::CategorySettings {},
+                model_properties: diagram_settings::ModelProperties {},
+                table_properties: diagram_settings::TableProperties {},
+                environment_settings: Some(diagram_settings::EnvironmentSettings {}),
+                design_settings: Some(diagram_settings::DesignSettings {}),
             },
             diagram_walkers: None,
             column_groups: None,
@@ -97,11 +117,24 @@ fn font_size_rejects_invalid_value_type() {
 
 #[test]
 fn missing_required_diagram_settings_is_rejected() {
-    assert_replaced_fixture_parse_error(
-        "  <diagram_settings>\n    <database>MySQL</database>\n    <view_mode>1</view_mode>\n  </diagram_settings>",
-        "",
-        "missing_diagram_settings",
-    );
+    assert_removed_element_parse_error("diagram_settings", "missing_diagram_settings");
+}
+
+fn assert_removed_element_parse_error(tag_name: &str, test_name: &str) {
+    let fixture = fs::read_to_string(DEFAULT_DIAGRAM_FIXTURE).expect("failed to read fixture");
+    let start = fixture
+        .find(&format!("  <{tag_name}"))
+        .expect("failed to find fixture element");
+    let closing = format!("  </{tag_name}>\n");
+    let end = fixture[start..]
+        .find(&closing)
+        .map(|index| start + index + closing.len())
+        .expect("failed to find fixture closing element");
+    let mut content = fixture.clone();
+    content.replace_range(start..end, "");
+
+    assert_ne!(fixture, content);
+    assert_parse_error(content, test_name);
 }
 
 fn assert_replaced_fixture_parse_error(target: &str, replacement: &str, test_name: &str) {
@@ -109,6 +142,10 @@ fn assert_replaced_fixture_parse_error(target: &str, replacement: &str, test_nam
     let content = fixture.replace(target, replacement);
     assert_ne!(fixture, content);
 
+    assert_parse_error(content, test_name);
+}
+
+fn assert_parse_error(content: String, test_name: &str) {
     let path = std::env::temp_dir().join(format!(
         "erm_diagram_{}_{}.erm",
         std::process::id(),
