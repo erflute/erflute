@@ -1,32 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <diagram>
-  <presenter>ERFlute</presenter>
-  <page_settings>
-    <direction_horizontal>true</direction_horizontal>
-    <scale>100</scale>
-    <paper_size>A4 210 x 297 mm</paper_size>
-    <top_margin>30</top_margin>
-    <left_margin>31</left_margin>
-    <bottom_margin>32</bottom_margin>
-    <right_margin>33</right_margin>
-  </page_settings>
-  <category_index>2</category_index>
-  <current_ermodel>main</current_ermodel>
-  <zoom>1.25</zoom>
-  <x>-10</x>
-  <y>20</y>
-  <default_color>
-    <r>1</r>
-    <g>2</g>
-    <b>3</b>
-  </default_color>
-  <color>
-    <r>4</r>
-    <g>5</g>
-    <b>6</b>
-  </color>
-  <font_name>Ubuntu</font_name>
-  <font_size>9</font_size>
   <diagram_settings>
     <database>MySQL</database>
     <capital>true</capital>

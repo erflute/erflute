@@ -4,11 +4,11 @@ use std::fs;
 use erm::dtos::diagram::page_settings;
 use erm::open;
 
-const DEFAULT_DIAGRAM_FIXTURE: &str = "./tests/open/fixtures/default_diagram.erm";
+const PAGE_SETTINGS_FIXTURE: &str = "./tests/open/fixtures/diagram/page_settings.erm";
 
 #[test]
 fn page_settings_tags_keep_valid_values() {
-    let diagram = open(DEFAULT_DIAGRAM_FIXTURE).expect("failed to parse");
+    let diagram = open(PAGE_SETTINGS_FIXTURE).expect("failed to parse");
 
     assert_eq!(
         diagram.page_settings,
@@ -134,7 +134,7 @@ fn missing_right_margin_is_rejected() {
 }
 
 fn assert_replaced_fixture_parse_error(target: &str, replacement: &str, test_name: &str) {
-    let fixture = fs::read_to_string(DEFAULT_DIAGRAM_FIXTURE).expect("failed to read fixture");
+    let fixture = fs::read_to_string(PAGE_SETTINGS_FIXTURE).expect("failed to read fixture");
     let content = fixture.replace(target, replacement);
     assert_ne!(fixture, content);
 

@@ -4,11 +4,11 @@ use std::fs;
 use erm::dtos::diagram::diagram_settings;
 use erm::open;
 
-const DEFAULT_DIAGRAM_FIXTURE: &str = "./tests/open/fixtures/default_diagram.erm";
+const DIAGRAM_SETTINGS_FIXTURE: &str = "./tests/open/fixtures/diagram/diagram_settings.erm";
 
 #[test]
 fn diagram_settings_tags_keep_valid_values() {
-    let diagram = open(DEFAULT_DIAGRAM_FIXTURE).expect("failed to parse");
+    let diagram = open(DIAGRAM_SETTINGS_FIXTURE).expect("failed to parse");
 
     assert_eq!(
         diagram.diagram_settings,
@@ -238,7 +238,7 @@ fn missing_table_properties_is_rejected() {
 }
 
 fn assert_removed_line_parse_error(tag_name: &str, test_name: &str) {
-    let fixture = fs::read_to_string(DEFAULT_DIAGRAM_FIXTURE).expect("failed to read fixture");
+    let fixture = fs::read_to_string(DIAGRAM_SETTINGS_FIXTURE).expect("failed to read fixture");
     let line = fixture
         .lines()
         .find(|line| line.trim_start().starts_with(&format!("<{tag_name}>")))
@@ -250,7 +250,7 @@ fn assert_removed_line_parse_error(tag_name: &str, test_name: &str) {
 }
 
 fn assert_removed_element_parse_error(tag_name: &str, test_name: &str) {
-    let fixture = fs::read_to_string(DEFAULT_DIAGRAM_FIXTURE).expect("failed to read fixture");
+    let fixture = fs::read_to_string(DIAGRAM_SETTINGS_FIXTURE).expect("failed to read fixture");
     let start = fixture
         .find(&format!("    <{tag_name}"))
         .expect("failed to find fixture element");
@@ -276,7 +276,7 @@ fn assert_removed_element_parse_error(tag_name: &str, test_name: &str) {
 }
 
 fn assert_replaced_fixture_parse_error(target: &str, replacement: &str, test_name: &str) {
-    let fixture = fs::read_to_string(DEFAULT_DIAGRAM_FIXTURE).expect("failed to read fixture");
+    let fixture = fs::read_to_string(DIAGRAM_SETTINGS_FIXTURE).expect("failed to read fixture");
     let content = fixture.replace(target, replacement);
     assert_ne!(fixture, content);
 

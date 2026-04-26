@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<diagram>
+  <presenter>ERFlute</presenter>
+  <category_index>2</category_index>
+  <current_ermodel>main</current_ermodel>
+  <zoom>1.25</zoom>
+  <x>-10</x>
+  <y>20</y>
+  <default_color>
+    <r>1</r>
+    <g>2</g>
+    <b>3</b>
+  </default_color>
+  <color>
+    <r>4</r>
+    <g>5</g>
+    <b>6</b>
+  </color>
+  <font_name>Ubuntu</font_name>
+  <font_size>9</font_size>
+  <diagram_settings>
+    <database>MySQL</database>
+    <capital>true</capital>
+    <table_style>standard</table_style>
+    <notation>IE</notation>
+    <notation_level>1</notation_level>
+    <notation_expand_group>false</notation_expand_group>
+    <view_mode>1</view_mode>
+    <outline_view_mode>2</outline_view_mode>
+    <view_order_by>3</view_order_by>
+    <auto_ime_change>false</auto_ime_change>
+    <validate_physical_name>true</validate_physical_name>
+    <use_bezier_curve>false</use_bezier_curve>
+    <suspend_validator>false</suspend_validator>
+    <use_view_object>true</use_view_object>
+    <export_settings />
+    <category_settings />
+    <model_properties />
+    <table_properties />
+  </diagram_settings>
+</diagram>
