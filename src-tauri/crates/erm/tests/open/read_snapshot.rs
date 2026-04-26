@@ -18,11 +18,25 @@ fn test_read_snapshot() {
     assert_eq!(
         diagram,
         diagram::Diagram {
+            presenter: Some("ERFlute".to_string()),
+            category_index: None,
+            current_ermodel: None,
+            zoom: None,
+            x: None,
+            y: None,
+            default_color: None,
+            color: Some(diagram::Color {
+                r: 255,
+                g: 255,
+                b: 255,
+            }),
+            font_name: Some("".to_string()),
+            font_size: Some(9),
             diagram_settings: diagram_settings::DiagramSettings {
                 database: "MySQL".to_string(),
                 view_mode: 1,
             },
-            diagram_walkers: diagram_walkers::DiagramWalkers {
+            diagram_walkers: Some(diagram_walkers::DiagramWalkers {
                 tables: Some(vec![
                     tables::Table {
                         physical_name: "MEMBERS".to_string(),
@@ -543,7 +557,7 @@ fn test_read_snapshot() {
                         },
                     }
                 ]),
-            },
+            }),
             column_groups: Some(vec![column_groups::ColumnGroup {
                 column_group_name: "COMMON".to_string(),
                 columns: column_groups::Columns {

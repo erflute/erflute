@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<diagram>
+  <presenter>ERFlute</presenter>
+  <category_index>2</category_index>
+  <current_ermodel>main</current_ermodel>
+  <zoom>1.25</zoom>
+  <x>-10</x>
+  <y>20</y>
+  <default_color>
+    <r>1</r>
+    <g>2</g>
+    <b>3</b>
+  </default_color>
+  <color>
+    <r>4</r>
+    <g>5</g>
+    <b>6</b>
+  </color>
+  <font_name>Ubuntu</font_name>
+  <font_size>9</font_size>
+  <diagram_settings>
+    <database>MySQL</database>
+    <view_mode>1</view_mode>
+  </diagram_settings>
+</diagram>
