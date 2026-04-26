@@ -13,8 +13,8 @@ use erm::open;
 // TODO: Add test cases of detailed condition for each field in https://github.com/s-kai273/erflute/issues/22
 
 #[test]
-fn test_read_erm_file() {
-    let diagram = open("./tests/fixtures/testerd.erm").expect("failed to parse");
+fn test_read_snapshot() {
+    let diagram = open("./tests/open/fixtures/read_snapshot.erm").expect("failed to parse");
     assert_eq!(
         diagram,
         diagram::Diagram {
@@ -545,40 +545,40 @@ fn test_read_erm_file() {
                 ]),
             },
             column_groups: Some(vec![column_groups::ColumnGroup {
-                    column_group_name: "COMMON".to_string(),
-                    columns: column_groups::Columns {
-                        normal_columns: Some(vec![
-                            column_groups::NormalColumn {
-                                physical_name: "CREATED_AT".to_string(),
-                                logical_name: Some("作成時間".to_string()),
-                                column_type: "datetime".to_string(),
-                                not_null: Some(true),
-                                ..Default::default()
-                            },
-                            column_groups::NormalColumn {
-                                physical_name: "CREATED_BY".to_string(),
-                                logical_name: Some("作成会員ID".to_string()),
-                                column_type: "bigint".to_string(),
-                                not_null: Some(true),
-                                ..Default::default()
-                            },
-                            column_groups::NormalColumn {
-                                physical_name: "UPDATED_AT".to_string(),
-                                logical_name: Some("更新時間".to_string()),
-                                column_type: "datetime".to_string(),
-                                not_null: Some(true),
-                                ..Default::default()
-                            },
-                            column_groups::NormalColumn {
-                                physical_name: "UPDATED_BY".to_string(),
-                                logical_name: Some("更新会員ID".to_string()),
-                                column_type: "bigint".to_string(),
-                                not_null: Some(true),
-                                ..Default::default()
-                            }
-                        ])
-                    }
-                }])
+                column_group_name: "COMMON".to_string(),
+                columns: column_groups::Columns {
+                    normal_columns: Some(vec![
+                        column_groups::NormalColumn {
+                            physical_name: "CREATED_AT".to_string(),
+                            logical_name: Some("作成時間".to_string()),
+                            column_type: "datetime".to_string(),
+                            not_null: Some(true),
+                            ..Default::default()
+                        },
+                        column_groups::NormalColumn {
+                            physical_name: "CREATED_BY".to_string(),
+                            logical_name: Some("作成会員ID".to_string()),
+                            column_type: "bigint".to_string(),
+                            not_null: Some(true),
+                            ..Default::default()
+                        },
+                        column_groups::NormalColumn {
+                            physical_name: "UPDATED_AT".to_string(),
+                            logical_name: Some("更新時間".to_string()),
+                            column_type: "datetime".to_string(),
+                            not_null: Some(true),
+                            ..Default::default()
+                        },
+                        column_groups::NormalColumn {
+                            physical_name: "UPDATED_BY".to_string(),
+                            logical_name: Some("更新会員ID".to_string()),
+                            column_type: "bigint".to_string(),
+                            not_null: Some(true),
+                            ..Default::default()
+                        }
+                    ])
+                }
+            }])
         }
     )
 }
