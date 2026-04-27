@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<diagram>
+  <presenter>ERFlute</presenter>
+  <diagram_settings>
+    <database>MySQL</database>
+    <capital>true</capital>
+    <table_style>standard</table_style>
+    <notation>IE</notation>
+    <notation_level>1</notation_level>
+    <notation_expand_group>false</notation_expand_group>
+    <view_mode>1</view_mode>
+    <outline_view_mode>2</outline_view_mode>
+    <view_order_by>3</view_order_by>
+    <auto_ime_change>false</auto_ime_change>
+    <validate_physical_name>true</validate_physical_name>
+    <use_bezier_curve>false</use_bezier_curve>
+    <suspend_validator>false</suspend_validator>
+    <use_view_object>true</use_view_object>
+    <export_settings />
+    <category_settings />
+    <model_properties />
+    <table_properties />
+  </diagram_settings>
+  <diagram_walkers>
+    <table>
+      <physical_name>MEMBERS</physical_name>
+      <logical_name>Members</logical_name>
+      <description>Member master table</description>
+      <height>108</height>
+      <width>194</width>
+      <font_name>Ubuntu</font_name>
+      <font_size>9</font_size>
+      <x>160</x>
+      <y>106</y>
+      <color>
+        <r>128</r>
+        <g>129</g>
+        <b>130</b>
+      </color>
+      <connections>
+        <relationship>
+          <name>FK_MEMBERS_PARENT</name>
+          <source>table.PARENT_MEMBERS</source>
+          <target>table.MEMBERS</target>
+          <bendpoint>
+            <relative>true</relative>
+            <x>11</x>
+            <y>12</y>
+          </bendpoint>
+          <fk_columns>
+            <fk_column>
+              <fk_column_name>PARENT_MEMBER_ID</fk_column_name>
+            </fk_column>
+          </fk_columns>
+          <parent_cardinality>0..1</parent_cardinality>
+          <child_cardinality>0..n</child_cardinality>
+          <reference_for_pk>false</reference_for_pk>
+          <on_delete_action>CASCADE</on_delete_action>
+          <on_update_action>RESTRICT</on_update_action>
+          <referred_compound_unique_key>UK_PARENT_MEMBERS_CODE</referred_compound_unique_key>
+          <referred_simple_unique_column>PARENT_MEMBER_CODE</referred_simple_unique_column>
+        </relationship>
+      </connections>
+      <table_constraint>ENGINE=InnoDB</table_constraint>
+      <primary_key_name>PK_MEMBERS</primary_key_name>
+      <option>member option</option>
+      <columns>
+        <normal_column>
+          <physical_name>MEMBER_ID</physical_name>
+          <logical_name>Member ID</logical_name>
+          <description>Surrogate key</description>
+          <type>bigint</type>
+          <length>18</length>
+          <decimal>0</decimal>
+          <args>UNSIGNED</args>
+          <unsigned>true</unsigned>
+          <not_null>true</not_null>
+          <unique_key>true</unique_key>
+          <default_value>0</default_value>
+          <primary_key>true</primary_key>
+          <auto_increment>true</auto_increment>
+          <referred_column>table.PARENT_MEMBERS.PARENT_MEMBER_ID</referred_column>
+          <relationship>FK_MEMBERS_PARENT</relationship>
+        </normal_column>
+        <normal_column>
+          <physical_name>MEMBER_NAME</physical_name>
+        </normal_column>
+        <column_group>COMMON_COLUMNS</column_group>
+      </columns>
+      <indexes>
+        <index>
+          <name>IDX_MEMBERS_NAME</name>
+          <type>BTREE</type>
+          <description>Name lookup</description>
+          <full_text>false</full_text>
+          <non_unique>true</non_unique>
+          <columns>
+            <column>
+              <column_id>MEMBER_NAME</column_id>
+              <desc>true</desc>
+            </column>
+            <column>
+              <column_id>MEMBER_ID</column_id>
+            </column>
+          </columns>
+        </index>
+      </indexes>
+      <compound_unique_key_list>
+        <compound_unique_key>
+          <name>UK_MEMBERS_NAME</name>
+          <columns>
+            <column>
+              <column_id>MEMBER_NAME</column_id>
+            </column>
+            <column>
+              <column_id>MEMBER_ID</column_id>
+            </column>
+          </columns>
+        </compound_unique_key>
+      </compound_unique_key_list>
+      <table_properties>
+        <tablespace_id>main_tablespace</tablespace_id>
+        <schema>public</schema>
+        <character_set>utf8mb4</character_set>
+        <collation>utf8mb4_bin</collation>
+        <storage_engine>InnoDB</storage_engine>
+        <primary_key_length_of_text>191</primary_key_length_of_text>
+        <without_oids>true</without_oids>
+      </table_properties>
+    </table>
+  </diagram_walkers>
+</diagram>
