@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<diagram>
+  <presenter>ERFlute</presenter>
+  <diagram_settings>
+    <database>MySQL</database>
+    <capital>true</capital>
+    <table_style>standard</table_style>
+    <notation>IE</notation>
+    <notation_level>1</notation_level>
+    <notation_expand_group>false</notation_expand_group>
+    <view_mode>1</view_mode>
+    <outline_view_mode>2</outline_view_mode>
+    <view_order_by>3</view_order_by>
+    <auto_ime_change>false</auto_ime_change>
+    <validate_physical_name>true</validate_physical_name>
+    <use_bezier_curve>false</use_bezier_curve>
+    <suspend_validator>false</suspend_validator>
+    <use_view_object>true</use_view_object>
+    <export_settings />
+    <category_settings />
+    <model_properties />
+    <table_properties />
+  </diagram_settings>
+  <column_groups>
+    <column_group>
+      <column_group_name>COMMON</column_group_name>
+      <columns>
+        <normal_column>
+          <physical_name>CREATED_AT</physical_name>
+          <logical_name>Created At</logical_name>
+          <description>Created timestamp</description>
+          <type>datetime</type>
+          <length>6</length>
+          <decimal>0</decimal>
+          <args>fsp</args>
+          <not_null>true</not_null>
+          <unique_key>false</unique_key>
+          <unsigned>false</unsigned>
+          <default_value>CURRENT_TIMESTAMP</default_value>
+        </normal_column>
+        <normal_column>
+          <physical_name>UPDATED_BY</physical_name>
+          <type>bigint</type>
+        </normal_column>
+      </columns>
+    </column_group>
+    <column_group>
+      <column_group_name>AUDIT</column_group_name>
+      <columns />
+    </column_group>
+  </column_groups>
+</diagram>
