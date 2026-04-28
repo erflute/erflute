@@ -59,16 +59,22 @@ mod validation {
 }
 
 #[derive(Validate)]
-#[validate(rule = "validate_child")]
+#[validate(rule = validate_child)]
 struct Child {
     name: String,
 }
 
 #[derive(Validate)]
-#[validate(rule = "validate_parent")]
+#[validate(rule = validate_parent)]
 struct Parent {
     #[validate(path = "child")]
     children: Option<Vec<Child>>,
+}
+
+#[derive(Validate)]
+#[validate(rules(validate_first_rule, validate_second_rule))]
+struct MultipleRules {
+    name: String,
 }
 
 fn validate_parent(value: &Parent) -> Result<(), validation::ValidationError> {
@@ -87,6 +93,28 @@ fn validate_child(value: &Child) -> Result<(), validation::ValidationError> {
         return Err(validation::ValidationError::new(
             "name".to_string(),
             "invalid child".to_string(),
+        ));
+    }
+
+    Ok(())
+}
+
+fn validate_first_rule(value: &MultipleRules) -> Result<(), validation::ValidationError> {
+    if value.name == "first" {
+        return Err(validation::ValidationError::new(
+            "name".to_string(),
+            "first rule".to_string(),
+        ));
+    }
+
+    Ok(())
+}
+
+fn validate_second_rule(value: &MultipleRules) -> Result<(), validation::ValidationError> {
+    if value.name == "second" {
+        return Err(validation::ValidationError::new(
+            "name".to_string(),
+            "second rule".to_string(),
         ));
     }
 
@@ -120,4 +148,19 @@ fn option_vec_child_path_uses_field_override_and_index() {
 
     assert_eq!(error.path, "child[0].name");
     assert_eq!(error.message, "invalid child");
+}
+
+#[test]
+fn multiple_struct_level_rules_are_called_in_order() {
+    let result = MultipleRules {
+        name: "second".to_string(),
+    }
+    .validate();
+
+    let Err(error) = result else {
+        panic!("expected validation error");
+    };
+
+    assert_eq!(error.path, "name");
+    assert_eq!(error.message, "second rule");
 }

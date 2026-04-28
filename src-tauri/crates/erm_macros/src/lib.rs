@@ -112,9 +112,13 @@ fn collect_rule_paths(attrs: &[syn::Attribute]) -> Result<Vec<syn::Path>> {
         attr.parse_nested_meta(|meta| {
             if meta.path.is_ident("rule") {
                 let value = meta.value()?;
-                let rule = value.parse::<LitStr>()?;
-                rule_paths.push(rule.parse()?);
+                rule_paths.push(value.parse()?);
                 Ok(())
+            } else if meta.path.is_ident("rules") {
+                meta.parse_nested_meta(|rule| {
+                    rule_paths.push(rule.path);
+                    Ok(())
+                })
             } else {
                 Err(meta.error("unsupported validate attribute"))
             }

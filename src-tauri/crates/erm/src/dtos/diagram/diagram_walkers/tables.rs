@@ -11,6 +11,10 @@ use indexes::Index;
 use serde::{Deserialize, Serialize};
 
 use crate::validation::Validate;
+use crate::validation::diagram::diagram_walkers::tables::{
+    validate_compound_unique_key_column_references, validate_duplicate_column_physical_names,
+    validate_index_column_references,
+};
 
 #[derive(Debug, PartialEq, Serialize, Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
@@ -31,15 +35,11 @@ impl From<entities::Color> for Color {
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize, Validate)]
-#[validate(
-    rule = "crate::validation::diagram::diagram_walkers::tables::validate_duplicate_column_physical_names"
-)]
-#[validate(
-    rule = "crate::validation::diagram::diagram_walkers::tables::validate_index_column_references"
-)]
-#[validate(
-    rule = "crate::validation::diagram::diagram_walkers::tables::validate_compound_unique_key_column_references"
-)]
+#[validate(rules(
+    validate_duplicate_column_physical_names,
+    validate_index_column_references,
+    validate_compound_unique_key_column_references
+))]
 #[serde(rename_all = "camelCase")]
 pub struct Table {
     pub physical_name: String,

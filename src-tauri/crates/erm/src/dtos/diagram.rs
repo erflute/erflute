@@ -10,6 +10,7 @@ use page_settings::PageSettings;
 use serde::{Deserialize, Serialize};
 
 use crate::validation::Validate;
+use crate::validation::diagram::validate_column_group_references;
 
 #[derive(Debug, PartialEq, Serialize, Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
@@ -30,7 +31,7 @@ impl From<crate::entities::diagram::Color> for Color {
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize, Validate)]
-#[validate(rule = "crate::validation::diagram::validate_column_group_references")]
+#[validate(rule = validate_column_group_references)]
 #[serde(rename_all = "camelCase")]
 pub struct Diagram {
     #[serde(default, skip_serializing_if = "Option::is_none")]
