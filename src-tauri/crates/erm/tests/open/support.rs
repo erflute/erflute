@@ -1,15 +1,17 @@
 use std::fs;
 
+use erm::dtos::diagram::Diagram;
+use erm::errors::Error;
 use erm::open;
 
-pub(super) struct FixtureAssertions {
+pub(crate) struct FixtureAssertions {
     fixture_path: &'static str,
     temp_prefix: &'static str,
     element_indent: &'static str,
 }
 
 impl FixtureAssertions {
-    pub(super) const fn new(
+    pub(crate) const fn new(
         fixture_path: &'static str,
         temp_prefix: &'static str,
         element_indent: &'static str,
@@ -21,7 +23,7 @@ impl FixtureAssertions {
         }
     }
 
-    pub(super) fn assert_replaced_fixture_parse_error(
+    pub(crate) fn assert_replaced_fixture_parse_error(
         &self,
         target: &str,
         replacement: &str,
@@ -36,11 +38,39 @@ impl FixtureAssertions {
         );
     }
 
-    pub(super) fn assert_removed_line_parse_error(&self, tag_name: &str, test_name: &str) {
+    pub(crate) fn assert_replaced_fixture_parse_success(
+        &self,
+        target: &str,
+        replacement: &str,
+        test_name: &str,
+    ) {
+        assert_replaced_fixture_parse_success(
+            self.fixture_path,
+            self.temp_prefix,
+            target,
+            replacement,
+            test_name,
+        );
+    }
+
+    pub(crate) fn open_replaced_fixture(
+        &self,
+        target: &str,
+        replacement: &str,
+        test_name: &str,
+    ) -> Result<Diagram, Error> {
+        let fixture = fs::read_to_string(self.fixture_path).expect("failed to read fixture");
+        let content = fixture.replace(target, replacement);
+        assert_ne!(fixture, content);
+
+        open_content(content, self.temp_prefix, test_name)
+    }
+
+    pub(crate) fn assert_removed_line_parse_error(&self, tag_name: &str, test_name: &str) {
         assert_removed_line_parse_error(self.fixture_path, self.temp_prefix, tag_name, test_name);
     }
 
-    pub(super) fn assert_removed_element_parse_error(&self, tag_name: &str, test_name: &str) {
+    pub(crate) fn assert_removed_element_parse_error(&self, tag_name: &str, test_name: &str) {
         assert_removed_element_parse_error(
             self.fixture_path,
             self.temp_prefix,
@@ -51,7 +81,7 @@ impl FixtureAssertions {
     }
 }
 
-pub(super) fn assert_replaced_fixture_parse_error(
+pub(crate) fn assert_replaced_fixture_parse_error(
     fixture_path: &str,
     temp_prefix: &str,
     target: &str,
@@ -65,7 +95,7 @@ pub(super) fn assert_replaced_fixture_parse_error(
     assert_parse_error(content, temp_prefix, test_name);
 }
 
-pub(super) fn assert_replaced_fixture_parse_success(
+pub(crate) fn assert_replaced_fixture_parse_success(
     fixture_path: &str,
     temp_prefix: &str,
     target: &str,
@@ -79,7 +109,7 @@ pub(super) fn assert_replaced_fixture_parse_success(
     assert_parse_success(content, temp_prefix, test_name);
 }
 
-pub(super) fn assert_removed_line_parse_error(
+pub(crate) fn assert_removed_line_parse_error(
     fixture_path: &str,
     temp_prefix: &str,
     tag_name: &str,
@@ -96,7 +126,7 @@ pub(super) fn assert_removed_line_parse_error(
     assert_parse_error(content, temp_prefix, test_name);
 }
 
-pub(super) fn assert_removed_element_parse_error(
+pub(crate) fn assert_removed_element_parse_error(
     fixture_path: &str,
     temp_prefix: &str,
     element_indent: &str,
@@ -128,7 +158,7 @@ pub(super) fn assert_removed_element_parse_error(
     assert_parse_error(content, temp_prefix, test_name);
 }
 
-pub(super) fn assert_parse_error(content: String, temp_prefix: &str, test_name: &str) {
+pub(crate) fn assert_parse_error(content: String, temp_prefix: &str, test_name: &str) {
     let path = temp_file_path(temp_prefix, test_name);
 
     fs::write(&path, content).expect("failed to write fixture");
@@ -140,6 +170,10 @@ pub(super) fn assert_parse_error(content: String, temp_prefix: &str, test_name: 
 }
 
 fn assert_parse_success(content: String, temp_prefix: &str, test_name: &str) {
+    open_content(content, temp_prefix, test_name).expect("failed to parse");
+}
+
+fn open_content(content: String, temp_prefix: &str, test_name: &str) -> Result<Diagram, Error> {
     let path = temp_file_path(temp_prefix, test_name);
 
     fs::write(&path, content).expect("failed to write fixture");
@@ -147,7 +181,7 @@ fn assert_parse_success(content: String, temp_prefix: &str, test_name: &str) {
     let result = open(path.to_str().expect("invalid fixture path"));
 
     fs::remove_file(&path).expect("failed to remove fixture");
-    result.expect("failed to parse");
+    result
 }
 
 fn temp_file_path(temp_prefix: &str, test_name: &str) -> std::path::PathBuf {

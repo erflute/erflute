@@ -1,0 +1,16 @@
+[package]
+name = "erm_macros"
+version = "0.1.0"
+license = "MIT"
+edition = "2024"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+proc-macro2 = "1"
+quote = "1"
+syn = { version = "2", features = ["full"] }
+
+[dev-dependencies]
+thiserror = "1.0"

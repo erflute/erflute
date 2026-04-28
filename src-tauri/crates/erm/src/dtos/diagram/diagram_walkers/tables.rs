@@ -10,7 +10,9 @@ use connections::Connections;
 use indexes::Index;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+use crate::validation::Validate;
+
+#[derive(Debug, PartialEq, Serialize, Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct Color {
     pub r: u8,
@@ -28,7 +30,10 @@ impl From<entities::Color> for Color {
     }
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, Deserialize, Validate)]
+#[validate(
+    rule = "crate::validation::diagram::diagram_walkers::tables::validate_duplicate_column_physical_names"
+)]
 #[serde(rename_all = "camelCase")]
 pub struct Table {
     pub physical_name: String,

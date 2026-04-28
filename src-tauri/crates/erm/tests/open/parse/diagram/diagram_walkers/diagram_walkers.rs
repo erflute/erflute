@@ -4,7 +4,7 @@ use erm::dtos::diagram::diagram_walkers;
 use erm::dtos::diagram::diagram_walkers::tables;
 use erm::open;
 
-use super::super::support;
+use crate::open::support;
 
 const DIAGRAM_WALKERS_FIXTURE: &str = "./tests/open/fixtures/diagram/diagram_walkers.erm";
 const TEMP_PREFIX: &str = "erm_diagram_walkers";

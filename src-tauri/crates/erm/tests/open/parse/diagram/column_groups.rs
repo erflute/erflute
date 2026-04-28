@@ -3,7 +3,7 @@ use pretty_assertions::assert_eq;
 use erm::dtos::diagram::column_groups;
 use erm::open;
 
-use super::support;
+use crate::open::support;
 
 const COLUMN_GROUPS_FIXTURE: &str = "./tests/open/fixtures/diagram/column_groups.erm";
 const TEMP_PREFIX: &str = "erm_column_groups";

@@ -1,13 +1,18 @@
 pub mod tables;
 
 use crate::entities::diagram::diagram_walkers as entities;
+use crate::validation::Validate;
 use serde::{Deserialize, Serialize};
 use tables::Table;
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, Deserialize, Validate)]
+#[validate(
+    rule = "crate::validation::diagram::diagram_walkers::validate_duplicate_table_physical_names"
+)]
 #[serde(rename_all = "camelCase")]
 pub struct DiagramWalkers {
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[validate(path = "table")]
     pub tables: Option<Vec<Table>>,
 }
 

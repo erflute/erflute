@@ -1,7 +1,8 @@
 use crate::entities::diagram::diagram_settings as entities;
+use crate::validation::Validate;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct ExportSettings {}
 
@@ -11,7 +12,7 @@ impl From<entities::ExportSettings> for ExportSettings {
     }
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct CategorySettings {}
 
@@ -21,7 +22,7 @@ impl From<entities::CategorySettings> for CategorySettings {
     }
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct ModelProperties {}
 
@@ -31,7 +32,7 @@ impl From<entities::ModelProperties> for ModelProperties {
     }
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct TableProperties {}
 
@@ -41,7 +42,7 @@ impl From<entities::TableProperties> for TableProperties {
     }
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct EnvironmentSettings {}
 
@@ -51,7 +52,7 @@ impl From<entities::EnvironmentSettings> for EnvironmentSettings {
     }
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct DesignSettings {}
 
@@ -61,7 +62,7 @@ impl From<entities::DesignSettings> for DesignSettings {
     }
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct DiagramSettings {
     pub database: String,

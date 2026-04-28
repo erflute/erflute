@@ -5,6 +5,7 @@ license = "MIT"
 edition = "2024"
 
 [dependencies]
+erm_macros = { path = "../erm_macros" }
 serde = { version = "1", features = ["derive"]}
 quick-xml = { version = "0.38", features = ["serialize"]}
 thiserror = "1.0"

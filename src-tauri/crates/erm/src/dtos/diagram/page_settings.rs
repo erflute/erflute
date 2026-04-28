@@ -1,7 +1,8 @@
 use crate::entities::diagram::page_settings as entities;
+use crate::validation::Validate;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct PageSettings {
     pub direction_horizontal: bool,

@@ -1,7 +1,7 @@
 use erm::dtos::diagram::diagram_walkers::tables;
 use erm::open;
 
-use super::super::support as diagram_support;
+use crate::open::support as diagram_support;
 
 pub(super) const DIAGRAM_WALKERS_DETAILS_FIXTURE: &str =
     "./tests/open/fixtures/diagram/diagram_walkers_details.erm";

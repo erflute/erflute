@@ -9,7 +9,9 @@ use diagram_walkers::DiagramWalkers;
 use page_settings::PageSettings;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+use crate::validation::Validate;
+
+#[derive(Debug, PartialEq, Serialize, Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct Color {
     pub r: u8,
@@ -27,7 +29,7 @@ impl From<crate::entities::diagram::Color> for Color {
     }
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct Diagram {
     #[serde(default, skip_serializing_if = "Option::is_none")]

@@ -1,7 +1,8 @@
 use crate::entities::diagram::diagram_walkers::tables::indexes as entities;
+use crate::validation::Validate;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct Column {
     pub column_id: String,
@@ -19,7 +20,7 @@ impl From<entities::Column> for Column {
     }
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct Index {
     pub name: String,

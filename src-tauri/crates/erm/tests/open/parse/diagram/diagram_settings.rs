@@ -3,7 +3,7 @@ use pretty_assertions::assert_eq;
 use erm::dtos::diagram::diagram_settings;
 use erm::open;
 
-use super::support;
+use crate::open::support;
 
 const DIAGRAM_SETTINGS_FIXTURE: &str = "./tests/open/fixtures/diagram/diagram_settings.erm";
 const TEMP_PREFIX: &str = "erm_diagram_settings";

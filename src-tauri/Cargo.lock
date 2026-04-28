@@ -937,9 +937,20 @@ dependencies = [
 name = "erm"
 version = "0.1.0"
 dependencies = [
+ "erm_macros",
  "pretty_assertions",
  "quick-xml 0.38.3",
  "serde",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "erm_macros"
+version = "0.1.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.106",
  "thiserror 1.0.69",
 ]
 
