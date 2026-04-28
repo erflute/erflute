@@ -1,13 +1,14 @@
-use pretty_assertions::assert_eq;
-
-use erm::errors::Error;
-
 use crate::open::support;
+use crate::open::validation::support::assert_validation_error;
 
 const DIAGRAM_WALKERS_FIXTURE: &str = "./tests/open/fixtures/diagram/diagram_walkers.erm";
+const DIAGRAM_WALKERS_DETAILS_FIXTURE: &str =
+    "./tests/open/fixtures/diagram/diagram_walkers_details.erm";
 const TEMP_PREFIX: &str = "erm_diagram_walkers_validation";
 const ASSERTIONS: support::FixtureAssertions =
     support::FixtureAssertions::new(DIAGRAM_WALKERS_FIXTURE, TEMP_PREFIX, "      ");
+const DETAILS_ASSERTIONS: support::FixtureAssertions =
+    support::FixtureAssertions::new(DIAGRAM_WALKERS_DETAILS_FIXTURE, TEMP_PREFIX, "      ");
 
 #[test]
 fn duplicate_table_physical_name_is_rejected() {
@@ -24,15 +25,92 @@ fn duplicate_table_physical_name_is_rejected() {
     );
 }
 
-fn assert_validation_error(
-    result: Result<erm::dtos::diagram::Diagram, Error>,
-    path: &str,
-    message: &str,
-) {
-    let Err(Error::Validation(error)) = result else {
-        panic!("expected validation error");
-    };
+#[test]
+fn unknown_relationship_source_table_is_rejected() {
+    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
+        "<source>table.PARENT_MEMBERS</source>",
+        "<source>table.UNKNOWN_MEMBERS</source>",
+        "unknown_relationship_source_table",
+    );
 
-    assert_eq!(error.path, path);
-    assert_eq!(error.message, message);
+    assert_validation_error(
+        result,
+        "diagram_walkers.table[0].connections.relationship[0].source",
+        "unknown relationship source table: table.UNKNOWN_MEMBERS",
+    );
+}
+
+#[test]
+fn unknown_relationship_target_table_is_rejected() {
+    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
+        "<target>table.MEMBERS</target>",
+        "<target>table.UNKNOWN_MEMBERS</target>",
+        "unknown_relationship_target_table",
+    );
+
+    assert_validation_error(
+        result,
+        "diagram_walkers.table[0].connections.relationship[0].target",
+        "unknown relationship target table: table.UNKNOWN_MEMBERS",
+    );
+}
+
+#[test]
+fn unknown_relationship_fk_column_is_rejected() {
+    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
+        "<fk_column_name>PARENT_MEMBER_ID</fk_column_name>",
+        "<fk_column_name>UNKNOWN_MEMBER_ID</fk_column_name>",
+        "unknown_relationship_fk_column",
+    );
+
+    assert_validation_error(
+        result,
+        "diagram_walkers.table[0].connections.relationship[0].fk_columns.fk_column[0].fk_column_name",
+        "unknown relationship fk_column_name: UNKNOWN_MEMBER_ID",
+    );
+}
+
+#[test]
+fn unknown_referred_simple_unique_column_is_rejected() {
+    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
+        "<referred_simple_unique_column>PARENT_MEMBER_CODE</referred_simple_unique_column>",
+        "<referred_simple_unique_column>UNKNOWN_MEMBER_CODE</referred_simple_unique_column>",
+        "unknown_referred_simple_unique_column",
+    );
+
+    assert_validation_error(
+        result,
+        "diagram_walkers.table[0].connections.relationship[0].referred_simple_unique_column",
+        "unknown referred simple unique column: UNKNOWN_MEMBER_CODE",
+    );
+}
+
+#[test]
+fn unknown_referred_compound_unique_key_is_rejected() {
+    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
+        "<referred_compound_unique_key>UK_PARENT_MEMBERS_CODE</referred_compound_unique_key>",
+        "<referred_compound_unique_key>UK_UNKNOWN_MEMBERS_CODE</referred_compound_unique_key>",
+        "unknown_referred_compound_unique_key",
+    );
+
+    assert_validation_error(
+        result,
+        "diagram_walkers.table[0].connections.relationship[0].referred_compound_unique_key",
+        "unknown referred compound unique key: UK_UNKNOWN_MEMBERS_CODE",
+    );
+}
+
+#[test]
+fn unknown_column_group_reference_is_rejected() {
+    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
+        "<column_group>COMMON_COLUMNS</column_group>",
+        "<column_group>UNKNOWN_COLUMNS</column_group>",
+        "unknown_column_group_reference",
+    );
+
+    assert_validation_error(
+        result,
+        "diagram_walkers.table[0].columns.column_group[2]",
+        "unknown column group: UNKNOWN_COLUMNS",
+    );
 }

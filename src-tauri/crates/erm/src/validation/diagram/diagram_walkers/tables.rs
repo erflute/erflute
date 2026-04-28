@@ -26,3 +26,66 @@ pub fn validate_duplicate_column_physical_names(table: &Table) -> Result<(), Val
 
     Ok(())
 }
+
+pub fn validate_index_column_references(table: &Table) -> Result<(), ValidationError> {
+    let Some(indexes) = &table.indexes else {
+        return Ok(());
+    };
+
+    let column_names = normal_column_names(table);
+
+    for (index_index, index) in indexes.iter().enumerate() {
+        for (column_index, column) in index.columns.iter().enumerate() {
+            if !column_names.contains(column.column_id.as_str()) {
+                return Err(ValidationError::new(
+                    format!("indexes[{index_index}].columns[{column_index}].column_id"),
+                    format!("unknown index column_id: {}", column.column_id),
+                ));
+            }
+        }
+    }
+
+    Ok(())
+}
+
+pub fn validate_compound_unique_key_column_references(
+    table: &Table,
+) -> Result<(), ValidationError> {
+    let Some(compound_unique_keys) = &table.compound_unique_key_list.compound_unique_keys else {
+        return Ok(());
+    };
+
+    let column_names = normal_column_names(table);
+
+    for (key_index, key) in compound_unique_keys.iter().enumerate() {
+        for (column_index, column) in key.columns.iter().enumerate() {
+            if !column_names.contains(column.column_id.as_str()) {
+                return Err(ValidationError::new(
+                    format!(
+                        "compound_unique_key_list.compound_unique_key[{key_index}].columns[{column_index}].column_id"
+                    ),
+                    format!(
+                        "unknown compound unique key column_id: {}",
+                        column.column_id
+                    ),
+                ));
+            }
+        }
+    }
+
+    Ok(())
+}
+
+pub(super) fn normal_column_names(table: &Table) -> HashSet<&str> {
+    let Some(items) = &table.columns.items else {
+        return HashSet::new();
+    };
+
+    items
+        .iter()
+        .filter_map(|item| match item {
+            ColumnItem::Normal(column) => Some(column.physical_name.as_str()),
+            ColumnItem::Group(_) => None,
+        })
+        .collect()
+}

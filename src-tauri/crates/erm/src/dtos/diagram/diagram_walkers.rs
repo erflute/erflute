@@ -9,6 +9,7 @@ use tables::Table;
 #[validate(
     rule = "crate::validation::diagram::diagram_walkers::validate_duplicate_table_physical_names"
 )]
+#[validate(rule = "crate::validation::diagram::diagram_walkers::validate_relationship_references")]
 #[serde(rename_all = "camelCase")]
 pub struct DiagramWalkers {
     #[serde(default, skip_serializing_if = "Option::is_none")]

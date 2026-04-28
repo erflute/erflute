@@ -128,5 +128,52 @@
         <without_oids>true</without_oids>
       </table_properties>
     </table>
+    <table>
+      <physical_name>PARENT_MEMBERS</physical_name>
+      <logical_name>Parent Members</logical_name>
+      <description>Parent member table</description>
+      <font_name>Ubuntu</font_name>
+      <font_size>9</font_size>
+      <x>420</x>
+      <y>106</y>
+      <color>
+        <r>128</r>
+        <g>129</g>
+        <b>130</b>
+      </color>
+      <connections />
+      <columns>
+        <normal_column>
+          <physical_name>PARENT_MEMBER_ID</physical_name>
+        </normal_column>
+        <normal_column>
+          <physical_name>PARENT_MEMBER_CODE</physical_name>
+          <unique_key>true</unique_key>
+        </normal_column>
+      </columns>
+      <indexes />
+      <compound_unique_key_list>
+        <compound_unique_key>
+          <name>UK_PARENT_MEMBERS_CODE</name>
+          <columns>
+            <column>
+              <column_id>PARENT_MEMBER_CODE</column_id>
+            </column>
+          </columns>
+        </compound_unique_key>
+      </compound_unique_key_list>
+      <table_properties />
+    </table>
   </diagram_walkers>
+  <column_groups>
+    <column_group>
+      <column_group_name>COMMON_COLUMNS</column_group_name>
+      <columns>
+        <normal_column>
+          <physical_name>CREATED_AT</physical_name>
+          <type>datetime</type>
+        </normal_column>
+      </columns>
+    </column_group>
+  </column_groups>
 </diagram>

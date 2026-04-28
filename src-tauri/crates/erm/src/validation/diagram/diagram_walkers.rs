@@ -3,7 +3,11 @@ pub mod tables;
 use std::collections::HashSet;
 
 use crate::dtos::diagram::diagram_walkers::DiagramWalkers;
+use crate::dtos::diagram::diagram_walkers::tables::Table;
+use crate::dtos::diagram::diagram_walkers::tables::columns::ColumnItem;
 use crate::validation::ValidationError;
+
+use tables::normal_column_names;
 
 pub fn validate_duplicate_table_physical_names(
     diagram_walkers: &DiagramWalkers,
@@ -24,4 +28,143 @@ pub fn validate_duplicate_table_physical_names(
     }
 
     Ok(())
+}
+
+pub fn validate_relationship_references(
+    diagram_walkers: &DiagramWalkers,
+) -> Result<(), ValidationError> {
+    let Some(tables) = &diagram_walkers.tables else {
+        return Ok(());
+    };
+
+    let table_names = tables
+        .iter()
+        .map(|table| table.physical_name.as_str())
+        .collect::<HashSet<_>>();
+
+    for (table_index, table) in tables.iter().enumerate() {
+        let Some(relationships) = &table.connections.relationships else {
+            continue;
+        };
+
+        for (relationship_index, relationship) in relationships.iter().enumerate() {
+            let Some(source_table_name) = table_reference_name(&relationship.source) else {
+                return Err(ValidationError::new(
+                    format!(
+                        "table[{table_index}].connections.relationship[{relationship_index}].source"
+                    ),
+                    format!("invalid relationship source: {}", relationship.source),
+                ));
+            };
+
+            let Some(target_table_name) = table_reference_name(&relationship.target) else {
+                return Err(ValidationError::new(
+                    format!(
+                        "table[{table_index}].connections.relationship[{relationship_index}].target"
+                    ),
+                    format!("invalid relationship target: {}", relationship.target),
+                ));
+            };
+
+            if !table_names.contains(source_table_name) {
+                return Err(ValidationError::new(
+                    format!(
+                        "table[{table_index}].connections.relationship[{relationship_index}].source"
+                    ),
+                    format!("unknown relationship source table: {}", relationship.source),
+                ));
+            }
+
+            if !table_names.contains(target_table_name) {
+                return Err(ValidationError::new(
+                    format!(
+                        "table[{table_index}].connections.relationship[{relationship_index}].target"
+                    ),
+                    format!("unknown relationship target table: {}", relationship.target),
+                ));
+            }
+
+            let Some(source_table) = tables
+                .iter()
+                .find(|table| table.physical_name == source_table_name)
+            else {
+                continue;
+            };
+
+            let source_column_names = normal_column_names(source_table);
+
+            for (column_index, column) in relationship.fk_columns.fk_column.iter().enumerate() {
+                if !source_column_names.contains(column.fk_column_name.as_str()) {
+                    return Err(ValidationError::new(
+                        format!(
+                            "table[{table_index}].connections.relationship[{relationship_index}].fk_columns.fk_column[{column_index}].fk_column_name"
+                        ),
+                        format!(
+                            "unknown relationship fk_column_name: {}",
+                            column.fk_column_name
+                        ),
+                    ));
+                }
+            }
+
+            if let Some(column_name) = &relationship.referred_simple_unique_column {
+                let unique_column_names = unique_column_names(source_table);
+
+                if !unique_column_names.contains(column_name.as_str()) {
+                    return Err(ValidationError::new(
+                        format!(
+                            "table[{table_index}].connections.relationship[{relationship_index}].referred_simple_unique_column"
+                        ),
+                        format!("unknown referred simple unique column: {column_name}"),
+                    ));
+                }
+            }
+
+            if let Some(key_name) = &relationship.referred_compound_unique_key {
+                let compound_unique_key_names = compound_unique_key_names(source_table);
+
+                if !compound_unique_key_names.contains(key_name.as_str()) {
+                    return Err(ValidationError::new(
+                        format!(
+                            "table[{table_index}].connections.relationship[{relationship_index}].referred_compound_unique_key"
+                        ),
+                        format!("unknown referred compound unique key: {key_name}"),
+                    ));
+                }
+            }
+        }
+    }
+
+    Ok(())
+}
+
+fn table_reference_name(reference: &str) -> Option<&str> {
+    reference.strip_prefix("table.")
+}
+
+fn unique_column_names(table: &Table) -> HashSet<&str> {
+    let Some(items) = &table.columns.items else {
+        return HashSet::new();
+    };
+
+    items
+        .iter()
+        .filter_map(|item| match item {
+            ColumnItem::Normal(column) if column.unique_key == Some(true) => {
+                Some(column.physical_name.as_str())
+            }
+            _ => None,
+        })
+        .collect()
+}
+
+fn compound_unique_key_names(table: &Table) -> HashSet<&str> {
+    let Some(compound_unique_keys) = &table.compound_unique_key_list.compound_unique_keys else {
+        return HashSet::new();
+    };
+
+    compound_unique_keys
+        .iter()
+        .map(|key| key.name.as_str())
+        .collect()
 }
