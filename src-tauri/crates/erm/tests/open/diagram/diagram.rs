@@ -1,10 +1,14 @@
 use pretty_assertions::assert_eq;
-use std::fs;
 
 use erm::dtos::diagram;
 use erm::open;
 
+use super::support;
+
 const DIAGRAM_FIXTURE: &str = "./tests/open/fixtures/diagram/diagram.erm";
+const TEMP_PREFIX: &str = "erm_diagram";
+const ASSERTIONS: support::FixtureAssertions =
+    support::FixtureAssertions::new(DIAGRAM_FIXTURE, TEMP_PREFIX, "  ");
 
 #[test]
 fn diagram_tags_keep_valid_values() {
@@ -27,7 +31,7 @@ fn diagram_tags_keep_valid_values() {
 
 #[test]
 fn category_index_rejects_invalid_value_type() {
-    assert_replaced_fixture_parse_error(
+    ASSERTIONS.assert_replaced_fixture_parse_error(
         "<category_index>2</category_index>",
         "<category_index>main</category_index>",
         "category_index",
@@ -36,22 +40,26 @@ fn category_index_rejects_invalid_value_type() {
 
 #[test]
 fn zoom_rejects_invalid_value_type() {
-    assert_replaced_fixture_parse_error("<zoom>1.25</zoom>", "<zoom>large</zoom>", "zoom");
+    ASSERTIONS.assert_replaced_fixture_parse_error(
+        "<zoom>1.25</zoom>",
+        "<zoom>large</zoom>",
+        "zoom",
+    );
 }
 
 #[test]
 fn x_rejects_invalid_value_type() {
-    assert_replaced_fixture_parse_error("<x>-10</x>", "<x>left</x>", "x");
+    ASSERTIONS.assert_replaced_fixture_parse_error("<x>-10</x>", "<x>left</x>", "x");
 }
 
 #[test]
 fn y_rejects_invalid_value_type() {
-    assert_replaced_fixture_parse_error("<y>20</y>", "<y>top</y>", "y");
+    ASSERTIONS.assert_replaced_fixture_parse_error("<y>20</y>", "<y>top</y>", "y");
 }
 
 #[test]
 fn default_color_rejects_invalid_value_type() {
-    assert_replaced_fixture_parse_error(
+    ASSERTIONS.assert_replaced_fixture_parse_error(
         "  <default_color>\n    <r>1</r>\n    <g>2</g>\n    <b>3</b>\n  </default_color>",
         "  <default_color>\n    <r>red</r>\n    <g>2</g>\n    <b>3</b>\n  </default_color>",
         "default_color",
@@ -60,7 +68,7 @@ fn default_color_rejects_invalid_value_type() {
 
 #[test]
 fn color_rejects_invalid_value_type() {
-    assert_replaced_fixture_parse_error(
+    ASSERTIONS.assert_replaced_fixture_parse_error(
         "  <color>\n    <r>4</r>\n    <g>5</g>\n    <b>6</b>\n  </color>",
         "  <color>\n    <r>4</r>\n    <g>green</g>\n    <b>6</b>\n  </color>",
         "color",
@@ -69,7 +77,7 @@ fn color_rejects_invalid_value_type() {
 
 #[test]
 fn font_size_rejects_invalid_value_type() {
-    assert_replaced_fixture_parse_error(
+    ASSERTIONS.assert_replaced_fixture_parse_error(
         "<font_size>9</font_size>",
         "<font_size>large</font_size>",
         "font_size",
@@ -78,45 +86,5 @@ fn font_size_rejects_invalid_value_type() {
 
 #[test]
 fn missing_required_diagram_settings_is_rejected() {
-    assert_removed_element_parse_error("diagram_settings", "missing_diagram_settings");
-}
-
-fn assert_removed_element_parse_error(tag_name: &str, test_name: &str) {
-    let fixture = fs::read_to_string(DIAGRAM_FIXTURE).expect("failed to read fixture");
-    let start = fixture
-        .find(&format!("  <{tag_name}"))
-        .expect("failed to find fixture element");
-    let closing = format!("  </{tag_name}>\n");
-    let end = fixture[start..]
-        .find(&closing)
-        .map(|index| start + index + closing.len())
-        .expect("failed to find fixture closing element");
-    let mut content = fixture.clone();
-    content.replace_range(start..end, "");
-
-    assert_ne!(fixture, content);
-    assert_parse_error(content, test_name);
-}
-
-fn assert_replaced_fixture_parse_error(target: &str, replacement: &str, test_name: &str) {
-    let fixture = fs::read_to_string(DIAGRAM_FIXTURE).expect("failed to read fixture");
-    let content = fixture.replace(target, replacement);
-    assert_ne!(fixture, content);
-
-    assert_parse_error(content, test_name);
-}
-
-fn assert_parse_error(content: String, test_name: &str) {
-    let path = std::env::temp_dir().join(format!(
-        "erm_diagram_{}_{}.erm",
-        std::process::id(),
-        test_name
-    ));
-
-    fs::write(&path, content).expect("failed to write fixture");
-
-    let result = open(path.to_str().expect("invalid fixture path"));
-
-    fs::remove_file(&path).expect("failed to remove fixture");
-    assert!(result.is_err());
+    ASSERTIONS.assert_removed_element_parse_error("diagram_settings", "missing_diagram_settings");
 }

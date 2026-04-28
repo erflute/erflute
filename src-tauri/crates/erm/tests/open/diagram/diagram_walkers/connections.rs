@@ -70,6 +70,7 @@ fn parent_cardinality_accepts_enumerated_values() {
     support::assert_replaced_fixture_parse_success(
         "<parent_cardinality>0..1</parent_cardinality>",
         "<parent_cardinality>1</parent_cardinality>",
+        "parent_cardinality_one",
     );
 }
 
@@ -84,10 +85,15 @@ fn parent_cardinality_rejects_non_enumerated_value() {
 
 #[test]
 fn child_cardinality_accepts_enumerated_values() {
-    for cardinality in ["1..n", "1", "0..1"] {
+    for (cardinality, test_name) in [
+        ("1..n", "child_cardinality_one_or_more"),
+        ("1", "child_cardinality_one"),
+        ("0..1", "child_cardinality_zero_or_one"),
+    ] {
         support::assert_replaced_fixture_parse_success(
             "<child_cardinality>0..n</child_cardinality>",
             &format!("<child_cardinality>{cardinality}</child_cardinality>"),
+            test_name,
         );
     }
 }
@@ -103,10 +109,16 @@ fn child_cardinality_rejects_non_enumerated_value() {
 
 #[test]
 fn on_delete_action_accepts_enumerated_values() {
-    for action in ["RESTRICT", "SET NULL", "SET DEFAULT", ""] {
+    for (action, test_name) in [
+        ("RESTRICT", "on_delete_action_restrict"),
+        ("SET NULL", "on_delete_action_set_null"),
+        ("SET DEFAULT", "on_delete_action_set_default"),
+        ("", "on_delete_action_no_action"),
+    ] {
         support::assert_replaced_fixture_parse_success(
             "<on_delete_action>CASCADE</on_delete_action>",
             &format!("<on_delete_action>{action}</on_delete_action>"),
+            test_name,
         );
     }
 }
@@ -122,10 +134,16 @@ fn on_delete_action_rejects_non_enumerated_value() {
 
 #[test]
 fn on_update_action_accepts_enumerated_values() {
-    for action in ["CASCADE", "SET NULL", "SET DEFAULT", ""] {
+    for (action, test_name) in [
+        ("CASCADE", "on_update_action_cascade"),
+        ("SET NULL", "on_update_action_set_null"),
+        ("SET DEFAULT", "on_update_action_set_default"),
+        ("", "on_update_action_no_action"),
+    ] {
         support::assert_replaced_fixture_parse_success(
             "<on_update_action>RESTRICT</on_update_action>",
             &format!("<on_update_action>{action}</on_update_action>"),
+            test_name,
         );
     }
 }
