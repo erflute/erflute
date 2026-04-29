@@ -3,8 +3,8 @@ pub mod tables;
 use crate::entities::diagram::diagram_walkers as entities;
 use crate::validation::Validate;
 use crate::validation::diagram::diagram_walkers::{
-    validate_duplicate_table_physical_names, validate_normal_column_references,
-    validate_relationship_references,
+    validate_duplicate_relationship_names, validate_duplicate_table_physical_names,
+    validate_normal_column_references, validate_relationship_references,
 };
 use serde::{Deserialize, Serialize};
 use tables::Table;
@@ -12,6 +12,7 @@ use tables::Table;
 #[derive(Debug, PartialEq, Serialize, Deserialize, Validate)]
 #[validate(rules(
     validate_duplicate_table_physical_names,
+    validate_duplicate_relationship_names,
     validate_normal_column_references,
     validate_relationship_references
 ))]

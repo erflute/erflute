@@ -30,6 +30,35 @@ pub fn validate_duplicate_table_physical_names(
     Ok(())
 }
 
+pub fn validate_duplicate_relationship_names(
+    diagram_walkers: &DiagramWalkers,
+) -> Result<(), ValidationError> {
+    let Some(tables) = &diagram_walkers.tables else {
+        return Ok(());
+    };
+
+    let mut relationship_names = HashSet::new();
+
+    for (table_index, table) in tables.iter().enumerate() {
+        let Some(relationships) = &table.connections.relationships else {
+            continue;
+        };
+
+        for (relationship_index, relationship) in relationships.iter().enumerate() {
+            if !relationship_names.insert(relationship.name.as_str()) {
+                return Err(ValidationError::new(
+                    format!(
+                        "table[{table_index}].connections.relationship[{relationship_index}].name"
+                    ),
+                    format!("duplicate relationship name: {}", relationship.name),
+                ));
+            }
+        }
+    }
+
+    Ok(())
+}
+
 pub fn validate_relationship_references(
     diagram_walkers: &DiagramWalkers,
 ) -> Result<(), ValidationError> {

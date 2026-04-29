@@ -26,6 +26,21 @@ fn duplicate_table_physical_name_is_rejected() {
 }
 
 #[test]
+fn duplicate_relationship_name_is_rejected() {
+    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
+        "        </relationship>",
+        "        </relationship>\n        <relationship>\n          <name>FK_MEMBERS_PARENT</name>\n          <source>table.PARENT_MEMBERS</source>\n          <target>table.MEMBERS</target>\n          <fk_columns>\n            <fk_column>\n              <fk_column_name>MEMBER_ID</fk_column_name>\n            </fk_column>\n          </fk_columns>\n          <parent_cardinality>0..1</parent_cardinality>\n          <child_cardinality>0..n</child_cardinality>\n          <reference_for_pk>false</reference_for_pk>\n          <referred_simple_unique_column>table.PARENT_MEMBERS.PARENT_MEMBER_CODE</referred_simple_unique_column>\n        </relationship>",
+        "duplicate_relationship_name",
+    );
+
+    assert_validation_error(
+        result,
+        "diagram_walkers.table[0].connections.relationship[1].name",
+        "duplicate relationship name: FK_MEMBERS_PARENT",
+    );
+}
+
+#[test]
 fn unknown_relationship_source_table_is_rejected() {
     let result = DETAILS_ASSERTIONS.open_replaced_fixture(
         "<source>table.PARENT_MEMBERS</source>",
