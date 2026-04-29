@@ -30,8 +30,10 @@ fn connections_tags_keep_valid_values() {
                 reference_for_pk: false,
                 on_delete_action: Some(connections::OnAction::Cascade),
                 on_update_action: Some(connections::OnAction::Restrict),
-                referred_simple_unique_column: Some("PARENT_MEMBER_CODE".to_string()),
-                referred_compound_unique_key: Some("UK_PARENT_MEMBERS_CODE".to_string()),
+                referred_simple_unique_column: Some(
+                    "table.PARENT_MEMBERS.PARENT_MEMBER_CODE".to_string(),
+                ),
+                referred_compound_unique_key: None,
             }]),
         }
     );

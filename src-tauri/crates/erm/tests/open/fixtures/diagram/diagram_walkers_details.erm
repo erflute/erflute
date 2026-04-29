@@ -57,8 +57,7 @@
           <reference_for_pk>false</reference_for_pk>
           <on_delete_action>CASCADE</on_delete_action>
           <on_update_action>RESTRICT</on_update_action>
-          <referred_compound_unique_key>UK_PARENT_MEMBERS_CODE</referred_compound_unique_key>
-          <referred_simple_unique_column>PARENT_MEMBER_CODE</referred_simple_unique_column>
+          <referred_simple_unique_column>table.PARENT_MEMBERS.PARENT_MEMBER_CODE</referred_simple_unique_column>
         </relationship>
       </connections>
       <table_constraint>ENGINE=InnoDB</table_constraint>

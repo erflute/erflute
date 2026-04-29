@@ -96,6 +96,17 @@ pub fn validate_relationship_references(
                 ));
             }
 
+            if relationship.referred_simple_unique_column.is_some()
+                && relationship.referred_compound_unique_key.is_some()
+            {
+                return Err(ValidationError::new(
+                    format!(
+                        "table[{table_index}].connections.relationship[{relationship_index}].referred_simple_unique_column"
+                    ),
+                    "referred_simple_unique_column and referred_compound_unique_key cannot both be specified".to_string(),
+                ));
+            }
+
             let Some(source_table) = tables
                 .iter()
                 .find(|table| table.physical_name == source_table_name)
@@ -119,15 +130,37 @@ pub fn validate_relationship_references(
                 }
             }
 
-            if let Some(column_name) = &relationship.referred_simple_unique_column {
-                let unique_column_names = unique_column_names(source_table);
-
-                if !unique_column_names.contains(column_name.as_str()) {
+            if let Some(column_reference) = &relationship.referred_simple_unique_column {
+                let Some((referred_table_name, referred_column_name)) =
+                    column_reference_names(column_reference)
+                else {
                     return Err(ValidationError::new(
                         format!(
                             "table[{table_index}].connections.relationship[{relationship_index}].referred_simple_unique_column"
                         ),
-                        format!("unknown referred simple unique column: {column_name}"),
+                        format!("invalid referred simple unique column: {column_reference}"),
+                    ));
+                };
+
+                if referred_table_name != source_table_name {
+                    return Err(ValidationError::new(
+                        format!(
+                            "table[{table_index}].connections.relationship[{relationship_index}].referred_simple_unique_column"
+                        ),
+                        format!(
+                            "referred simple unique column table must match relationship source: {column_reference}"
+                        ),
+                    ));
+                }
+
+                let unique_column_names = unique_column_names(source_table);
+
+                if !unique_column_names.contains(referred_column_name) {
+                    return Err(ValidationError::new(
+                        format!(
+                            "table[{table_index}].connections.relationship[{relationship_index}].referred_simple_unique_column"
+                        ),
+                        format!("unknown referred simple unique column: {column_reference}"),
                     ));
                 }
             }
@@ -161,6 +194,11 @@ pub fn validate_normal_column_references(
         .iter()
         .map(|table| table.physical_name.as_str())
         .collect::<HashSet<_>>();
+    let relationship_names = tables
+        .iter()
+        .flat_map(|table| table.connections.relationships.iter().flatten())
+        .map(|relationship| relationship.name.as_str())
+        .collect::<HashSet<_>>();
 
     for (table_index, table) in tables.iter().enumerate() {
         let Some(items) = &table.columns.items else {
@@ -171,6 +209,17 @@ pub fn validate_normal_column_references(
             let ColumnItem::Normal(column) = item else {
                 continue;
             };
+
+            if let Some(relationship_name) = &column.relationship {
+                if !relationship_names.contains(relationship_name.as_str()) {
+                    return Err(ValidationError::new(
+                        format!(
+                            "table[{table_index}].columns.normal_column[{item_index}].relationship"
+                        ),
+                        format!("unknown relationship: {relationship_name}"),
+                    ));
+                }
+            }
 
             let Some(referred_column) = &column.referred_column else {
                 continue;
