@@ -78,7 +78,8 @@ impl_noop_validate!(
     isize,
     f32,
     f64,
-    crate::column_type::ColumnType
+    crate::column_type::ColumnType,
+    crate::entities::diagram::diagram_walkers::tables::connections::OnAction
 );
 
 pub fn validate<T: Validate>(value: &T) -> Result<(), ValidationError> {

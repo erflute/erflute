@@ -1,3 +1,5 @@
+pub use crate::entities::diagram::diagram_walkers::tables::connections::OnAction;
+
 use crate::entities::diagram::diagram_walkers::tables::connections as entities;
 use crate::validation::Validate;
 use serde::{Deserialize, Serialize};
@@ -70,10 +72,10 @@ pub struct Relationship {
     pub reference_for_pk: bool,
 
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub on_delete_action: Option<String>,
+    pub on_delete_action: Option<OnAction>,
 
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub on_update_action: Option<String>,
+    pub on_update_action: Option<OnAction>,
 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub referred_simple_unique_column: Option<String>,
@@ -95,12 +97,8 @@ impl From<entities::Relationship> for Relationship {
             parent_cardinality: entity.parent_cardinality.as_str().to_string(),
             child_cardinality: entity.child_cardinality.as_str().to_string(),
             reference_for_pk: entity.reference_for_pk,
-            on_delete_action: entity
-                .on_delete_action
-                .map(|action| action.as_str().to_string()),
-            on_update_action: entity
-                .on_update_action
-                .map(|action| action.as_str().to_string()),
+            on_delete_action: entity.on_delete_action,
+            on_update_action: entity.on_update_action,
             referred_simple_unique_column: entity.referred_simple_unique_column,
             referred_compound_unique_key: entity.referred_compound_unique_key,
         }
