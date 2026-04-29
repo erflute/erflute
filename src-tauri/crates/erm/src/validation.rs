@@ -79,6 +79,8 @@ impl_noop_validate!(
     f32,
     f64,
     crate::column_type::ColumnType,
+    crate::entities::diagram::diagram_walkers::tables::connections::ChildCardinality,
+    crate::entities::diagram::diagram_walkers::tables::connections::ParentCardinality,
     crate::entities::diagram::diagram_walkers::tables::connections::OnAction
 );
 

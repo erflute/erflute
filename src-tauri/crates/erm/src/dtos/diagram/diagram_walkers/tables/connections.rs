@@ -1,4 +1,6 @@
-pub use crate::entities::diagram::diagram_walkers::tables::connections::OnAction;
+pub use crate::entities::diagram::diagram_walkers::tables::connections::{
+    ChildCardinality, OnAction, ParentCardinality,
+};
 
 use crate::entities::diagram::diagram_walkers::tables::connections as entities;
 use crate::validation::Validate;
@@ -65,9 +67,9 @@ pub struct Relationship {
 
     pub fk_columns: FkColumns,
 
-    pub parent_cardinality: String,
+    pub parent_cardinality: ParentCardinality,
 
-    pub child_cardinality: String,
+    pub child_cardinality: ChildCardinality,
 
     pub reference_for_pk: bool,
 
@@ -94,8 +96,8 @@ impl From<entities::Relationship> for Relationship {
                 .bendpoints
                 .map(|v| v.into_iter().map(Into::into).collect()),
             fk_columns: entity.fk_columns.into(),
-            parent_cardinality: entity.parent_cardinality.as_str().to_string(),
-            child_cardinality: entity.child_cardinality.as_str().to_string(),
+            parent_cardinality: entity.parent_cardinality,
+            child_cardinality: entity.child_cardinality,
             reference_for_pk: entity.reference_for_pk,
             on_delete_action: entity.on_delete_action,
             on_update_action: entity.on_update_action,
