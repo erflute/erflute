@@ -49,3 +49,54 @@ pub fn validate_column_group_references(diagram: &Diagram) -> Result<(), Validat
 
     Ok(())
 }
+
+pub fn validate_duplicate_column_group_names(diagram: &Diagram) -> Result<(), ValidationError> {
+    let Some(column_groups) = &diagram.column_groups else {
+        return Ok(());
+    };
+
+    let mut group_names = HashSet::new();
+
+    for (group_index, group) in column_groups.iter().enumerate() {
+        if !group_names.insert(group.column_group_name.as_str()) {
+            return Err(ValidationError::new(
+                format!("column_groups[{group_index}].column_group_name"),
+                format!("duplicate column group name: {}", group.column_group_name),
+            ));
+        }
+    }
+
+    Ok(())
+}
+
+pub fn validate_duplicate_column_group_column_physical_names(
+    diagram: &Diagram,
+) -> Result<(), ValidationError> {
+    let Some(column_groups) = &diagram.column_groups else {
+        return Ok(());
+    };
+
+    for (group_index, group) in column_groups.iter().enumerate() {
+        let Some(normal_columns) = &group.columns.normal_columns else {
+            continue;
+        };
+
+        let mut column_names = HashSet::new();
+
+        for (column_index, column) in normal_columns.iter().enumerate() {
+            if !column_names.insert(column.physical_name.as_str()) {
+                return Err(ValidationError::new(
+                    format!(
+                        "column_groups[{group_index}].columns.normal_column[{column_index}].physical_name"
+                    ),
+                    format!(
+                        "duplicate column group column physical_name: {}",
+                        column.physical_name
+                    ),
+                ));
+            }
+        }
+    }
+
+    Ok(())
+}

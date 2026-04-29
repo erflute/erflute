@@ -27,6 +27,44 @@ pub fn validate_duplicate_column_physical_names(table: &Table) -> Result<(), Val
     Ok(())
 }
 
+pub fn validate_duplicate_index_names(table: &Table) -> Result<(), ValidationError> {
+    let Some(indexes) = &table.indexes else {
+        return Ok(());
+    };
+
+    let mut index_names = HashSet::new();
+
+    for (index_index, index) in indexes.iter().enumerate() {
+        if !index_names.insert(index.name.as_str()) {
+            return Err(ValidationError::new(
+                format!("indexes[{index_index}].name"),
+                format!("duplicate index name: {}", index.name),
+            ));
+        }
+    }
+
+    Ok(())
+}
+
+pub fn validate_duplicate_compound_unique_key_names(table: &Table) -> Result<(), ValidationError> {
+    let Some(compound_unique_keys) = &table.compound_unique_key_list.compound_unique_keys else {
+        return Ok(());
+    };
+
+    let mut key_names = HashSet::new();
+
+    for (key_index, key) in compound_unique_keys.iter().enumerate() {
+        if !key_names.insert(key.name.as_str()) {
+            return Err(ValidationError::new(
+                format!("compound_unique_key_list.compound_unique_key[{key_index}].name"),
+                format!("duplicate compound unique key name: {}", key.name),
+            ));
+        }
+    }
+
+    Ok(())
+}
+
 pub fn validate_index_column_references(table: &Table) -> Result<(), ValidationError> {
     let Some(indexes) = &table.indexes else {
         return Ok(());
