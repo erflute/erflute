@@ -64,7 +64,21 @@ macro_rules! impl_noop_validate {
 }
 
 impl_noop_validate!(
-    String, bool, u8, u16, u32, u64, usize, i8, i16, i32, i64, isize, f32, f64
+    String,
+    bool,
+    u8,
+    u16,
+    u32,
+    u64,
+    usize,
+    i8,
+    i16,
+    i32,
+    i64,
+    isize,
+    f32,
+    f64,
+    crate::column_type::ColumnType
 );
 
 pub fn validate<T: Validate>(value: &T) -> Result<(), ValidationError> {

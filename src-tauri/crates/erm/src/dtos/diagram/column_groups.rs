@@ -1,3 +1,5 @@
+pub use crate::column_type::ColumnType;
+
 use crate::entities::diagram::column_groups as entities;
 use crate::validation::Validate;
 use serde::{Deserialize, Serialize};
@@ -13,7 +15,7 @@ pub struct NormalColumn {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
 
-    pub column_type: String,
+    pub column_type: ColumnType,
 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub length: Option<u16>,

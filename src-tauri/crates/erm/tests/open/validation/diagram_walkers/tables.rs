@@ -140,21 +140,6 @@ fn length_for_base_numeric_column_type_is_rejected() {
 }
 
 #[test]
-fn length_for_display_label_column_type_is_rejected() {
-    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
-        "<type>decimal(p,s)</type>",
-        "<type>double(m,d)</type>",
-        "length_for_display_label_column_type",
-    );
-
-    assert_validation_error(
-        result,
-        "diagram_walkers.table[0].columns.normal_column[0].length",
-        "column type does not support length: double(m,d)",
-    );
-}
-
-#[test]
 fn decimal_for_unsupported_column_type_is_rejected() {
     let result = DETAILS_ASSERTIONS.open_replaced_fixture(
         "<physical_name>MEMBER_NAME</physical_name>",

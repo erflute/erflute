@@ -137,14 +137,14 @@ pub fn validate_column_length_and_decimal(table: &Table) -> Result<(), Validatio
             continue;
         };
 
-        if column.length.is_some() && !supports_length(column_type) {
+        if column.length.is_some() && !column_type.supports_length() {
             return Err(ValidationError::new(
                 format!("columns.normal_column[{item_index}].length"),
                 format!("column type does not support length: {column_type}"),
             ));
         }
 
-        if column.decimal.is_some() && !supports_decimal(column_type) {
+        if column.decimal.is_some() && !column_type.supports_decimal() {
             return Err(ValidationError::new(
                 format!("columns.normal_column[{item_index}].decimal"),
                 format!("column type does not support decimal: {column_type}"),
@@ -258,37 +258,4 @@ fn key_column_names(table: &Table) -> HashSet<&str> {
         .chain(index_column_names)
         .chain(compound_unique_key_column_names)
         .collect()
-}
-
-fn supports_length(column_type: &str) -> bool {
-    let column_type = column_type.to_ascii_lowercase();
-    matches!(
-        column_type.as_str(),
-        "character(n)"
-            | "varchar(n)"
-            | "binary(n)"
-            | "varbinary(n)"
-            | "bit(n)"
-            | "int(n)"
-            | "tinyint(n)"
-            | "smallint(n)"
-            | "mediumint(n)"
-            | "bigint(n)"
-            | "decimal(p)"
-            | "decimal(p,s)"
-            | "numeric(p)"
-            | "numeric(p,s)"
-            | "float(p)"
-            | "float(m,d)"
-            | "double precision(m,d)"
-            | "real(m,d)"
-    )
-}
-
-fn supports_decimal(column_type: &str) -> bool {
-    let column_type = column_type.to_ascii_lowercase();
-    matches!(
-        column_type.as_str(),
-        "decimal(p,s)" | "numeric(p,s)" | "float(m,d)" | "double precision(m,d)" | "real(m,d)"
-    )
 }

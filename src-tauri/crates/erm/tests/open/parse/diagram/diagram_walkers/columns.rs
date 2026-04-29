@@ -16,7 +16,7 @@ fn columns_tags_keep_valid_values() {
                     physical_name: "MEMBER_ID".to_string(),
                     logical_name: Some("Member ID".to_string()),
                     description: Some("Surrogate key".to_string()),
-                    column_type: Some("decimal(p,s)".to_string()),
+                    column_type: Some(columns::ColumnType::DecimalPS),
                     length: Some(18),
                     decimal: Some(0),
                     args: Some("UNSIGNED".to_string()),
@@ -81,5 +81,14 @@ fn primary_key_rejects_invalid_value_type() {
         "<primary_key>true</primary_key>",
         "<primary_key>primary</primary_key>",
         "column_primary_key",
+    );
+}
+
+#[test]
+fn display_label_column_type_is_rejected() {
+    support::assert_replaced_fixture_parse_error(
+        "<type>decimal(p,s)</type>",
+        "<type>double(m,d)</type>",
+        "display_label_column_type",
     );
 }

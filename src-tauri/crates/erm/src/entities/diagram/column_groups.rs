@@ -1,3 +1,4 @@
+use crate::column_type::ColumnType;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, PartialEq, Serialize, Deserialize, Default)]
@@ -11,7 +12,7 @@ pub struct NormalColumn {
     pub description: Option<String>,
 
     #[serde(rename = "type")]
-    pub column_type: String,
+    pub column_type: ColumnType,
 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub length: Option<u16>,

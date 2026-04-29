@@ -25,7 +25,7 @@ fn column_groups_tags_keep_valid_values() {
                             physical_name: "CREATED_AT".to_string(),
                             logical_name: Some("Created At".to_string()),
                             description: Some("Created timestamp".to_string()),
-                            column_type: "datetime".to_string(),
+                            column_type: column_groups::ColumnType::Datetime,
                             length: Some(6),
                             decimal: Some(0),
                             args: Some("fsp".to_string()),
@@ -36,7 +36,7 @@ fn column_groups_tags_keep_valid_values() {
                         },
                         column_groups::NormalColumn {
                             physical_name: "UPDATED_BY".to_string(),
-                            column_type: "bigint".to_string(),
+                            column_type: column_groups::ColumnType::BigInt,
                             ..Default::default()
                         },
                     ]),
