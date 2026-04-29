@@ -49,7 +49,7 @@
           </bendpoint>
           <fk_columns>
             <fk_column>
-              <fk_column_name>PARENT_MEMBER_ID</fk_column_name>
+              <fk_column_name>MEMBER_ID</fk_column_name>
             </fk_column>
           </fk_columns>
           <parent_cardinality>0..1</parent_cardinality>

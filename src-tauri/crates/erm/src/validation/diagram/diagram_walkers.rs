@@ -84,6 +84,18 @@ pub fn validate_relationship_references(
                 ));
             }
 
+            if target_table_name != table.physical_name {
+                return Err(ValidationError::new(
+                    format!(
+                        "table[{table_index}].connections.relationship[{relationship_index}].target"
+                    ),
+                    format!(
+                        "relationship target must match containing table: {}",
+                        relationship.target
+                    ),
+                ));
+            }
+
             let Some(source_table) = tables
                 .iter()
                 .find(|table| table.physical_name == source_table_name)
@@ -91,10 +103,10 @@ pub fn validate_relationship_references(
                 continue;
             };
 
-            let source_column_names = normal_column_names(source_table);
+            let target_column_names = normal_column_names(table);
 
             for (column_index, column) in relationship.fk_columns.fk_column.iter().enumerate() {
-                if !source_column_names.contains(column.fk_column_name.as_str()) {
+                if !target_column_names.contains(column.fk_column_name.as_str()) {
                     return Err(ValidationError::new(
                         format!(
                             "table[{table_index}].connections.relationship[{relationship_index}].fk_columns.fk_column[{column_index}].fk_column_name"
@@ -138,8 +150,82 @@ pub fn validate_relationship_references(
     Ok(())
 }
 
+pub fn validate_normal_column_references(
+    diagram_walkers: &DiagramWalkers,
+) -> Result<(), ValidationError> {
+    let Some(tables) = &diagram_walkers.tables else {
+        return Ok(());
+    };
+
+    let table_names = tables
+        .iter()
+        .map(|table| table.physical_name.as_str())
+        .collect::<HashSet<_>>();
+
+    for (table_index, table) in tables.iter().enumerate() {
+        let Some(items) = &table.columns.items else {
+            continue;
+        };
+
+        for (item_index, item) in items.iter().enumerate() {
+            let ColumnItem::Normal(column) = item else {
+                continue;
+            };
+
+            let Some(referred_column) = &column.referred_column else {
+                continue;
+            };
+
+            let Some((referred_table_name, referred_column_name)) =
+                column_reference_names(referred_column)
+            else {
+                return Err(ValidationError::new(
+                    format!(
+                        "table[{table_index}].columns.normal_column[{item_index}].referred_column"
+                    ),
+                    format!("invalid referred_column: {referred_column}"),
+                ));
+            };
+
+            if !table_names.contains(referred_table_name) {
+                return Err(ValidationError::new(
+                    format!(
+                        "table[{table_index}].columns.normal_column[{item_index}].referred_column"
+                    ),
+                    format!("unknown referred column table: {referred_column}"),
+                ));
+            }
+
+            let Some(referred_table) = tables
+                .iter()
+                .find(|table| table.physical_name == referred_table_name)
+            else {
+                continue;
+            };
+
+            let referred_column_names = normal_column_names(referred_table);
+
+            if !referred_column_names.contains(referred_column_name) {
+                return Err(ValidationError::new(
+                    format!(
+                        "table[{table_index}].columns.normal_column[{item_index}].referred_column"
+                    ),
+                    format!("unknown referred column: {referred_column}"),
+                ));
+            }
+        }
+    }
+
+    Ok(())
+}
+
 fn table_reference_name(reference: &str) -> Option<&str> {
     reference.strip_prefix("table.")
+}
+
+fn column_reference_names(reference: &str) -> Option<(&str, &str)> {
+    let reference = reference.strip_prefix("table.")?;
+    reference.split_once('.')
 }
 
 fn unique_column_names(table: &Table) -> HashSet<&str> {

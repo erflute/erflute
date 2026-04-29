@@ -56,9 +56,24 @@ fn unknown_relationship_target_table_is_rejected() {
 }
 
 #[test]
+fn relationship_target_different_from_containing_table_is_rejected() {
+    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
+        "<target>table.MEMBERS</target>",
+        "<target>table.PARENT_MEMBERS</target>",
+        "relationship_target_different_from_containing_table",
+    );
+
+    assert_validation_error(
+        result,
+        "diagram_walkers.table[0].connections.relationship[0].target",
+        "relationship target must match containing table: table.PARENT_MEMBERS",
+    );
+}
+
+#[test]
 fn unknown_relationship_fk_column_is_rejected() {
     let result = DETAILS_ASSERTIONS.open_replaced_fixture(
-        "<fk_column_name>PARENT_MEMBER_ID</fk_column_name>",
+        "<fk_column_name>MEMBER_ID</fk_column_name>",
         "<fk_column_name>UNKNOWN_MEMBER_ID</fk_column_name>",
         "unknown_relationship_fk_column",
     );
@@ -67,6 +82,36 @@ fn unknown_relationship_fk_column_is_rejected() {
         result,
         "diagram_walkers.table[0].connections.relationship[0].fk_columns.fk_column[0].fk_column_name",
         "unknown relationship fk_column_name: UNKNOWN_MEMBER_ID",
+    );
+}
+
+#[test]
+fn unknown_referred_column_table_is_rejected() {
+    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
+        "<referred_column>table.PARENT_MEMBERS.PARENT_MEMBER_ID</referred_column>",
+        "<referred_column>table.UNKNOWN_MEMBERS.PARENT_MEMBER_ID</referred_column>",
+        "unknown_referred_column_table",
+    );
+
+    assert_validation_error(
+        result,
+        "diagram_walkers.table[0].columns.normal_column[0].referred_column",
+        "unknown referred column table: table.UNKNOWN_MEMBERS.PARENT_MEMBER_ID",
+    );
+}
+
+#[test]
+fn unknown_referred_column_is_rejected() {
+    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
+        "<referred_column>table.PARENT_MEMBERS.PARENT_MEMBER_ID</referred_column>",
+        "<referred_column>table.PARENT_MEMBERS.UNKNOWN_MEMBER_ID</referred_column>",
+        "unknown_referred_column",
+    );
+
+    assert_validation_error(
+        result,
+        "diagram_walkers.table[0].columns.normal_column[0].referred_column",
+        "unknown referred column: table.PARENT_MEMBERS.UNKNOWN_MEMBER_ID",
     );
 }
 

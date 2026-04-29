@@ -22,7 +22,7 @@ fn connections_tags_keep_valid_values() {
                 }]),
                 fk_columns: connections::FkColumns {
                     fk_column: vec![connections::FkColumn {
-                        fk_column_name: "PARENT_MEMBER_ID".to_string(),
+                        fk_column_name: "MEMBER_ID".to_string(),
                     }],
                 },
                 parent_cardinality: connections::ParentCardinality::ZeroOrOne,
