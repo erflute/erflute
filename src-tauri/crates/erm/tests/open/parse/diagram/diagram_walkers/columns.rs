@@ -16,7 +16,7 @@ fn columns_tags_keep_valid_values() {
                     physical_name: "MEMBER_ID".to_string(),
                     logical_name: Some("Member ID".to_string()),
                     description: Some("Surrogate key".to_string()),
-                    column_type: Some("bigint".to_string()),
+                    column_type: Some("decimal(p,s)".to_string()),
                     length: Some(18),
                     decimal: Some(0),
                     args: Some("UNSIGNED".to_string()),

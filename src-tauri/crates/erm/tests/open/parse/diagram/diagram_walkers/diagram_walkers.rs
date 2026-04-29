@@ -41,7 +41,15 @@ fn diagram_walkers_table_tags_keep_valid_values() {
             table_constraint: Some("ENGINE=InnoDB".to_string()),
             primary_key_name: Some("PK_MEMBERS".to_string()),
             option: Some("member option".to_string()),
-            columns: tables::columns::Columns { items: None },
+            columns: tables::columns::Columns {
+                items: Some(vec![tables::columns::ColumnItem::Normal(
+                    tables::columns::NormalColumn {
+                        physical_name: "MEMBER_ID".to_string(),
+                        primary_key: Some(true),
+                        ..Default::default()
+                    },
+                )]),
+            },
             indexes: None,
             compound_unique_key_list: tables::compound_unique_key_list::CompoundUniqueKeyList {
                 compound_unique_keys: None,

@@ -12,9 +12,9 @@ const DETAILS_ASSERTIONS: support::FixtureAssertions =
 
 #[test]
 fn duplicate_column_physical_name_in_same_table_is_rejected() {
-    let result = ASSERTIONS.open_replaced_fixture(
-        "<columns />",
-        "      <columns>\n        <normal_column>\n          <physical_name>MEMBER_ID</physical_name>\n        </normal_column>\n        <normal_column>\n          <physical_name>MEMBER_ID</physical_name>\n        </normal_column>\n      </columns>",
+    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
+        "<physical_name>MEMBER_NAME</physical_name>",
+        "<physical_name>MEMBER_ID</physical_name>",
         "duplicate_column_physical_name_in_same_table",
     );
 
@@ -61,6 +61,111 @@ fn duplicate_compound_unique_key_name_in_same_table_is_rejected() {
         result,
         "diagram_walkers.table[0].compound_unique_key_list.compound_unique_key[1].name",
         "duplicate compound unique key name: UK_MEMBERS_NAME",
+    );
+}
+
+#[test]
+fn primary_key_name_without_primary_key_column_is_rejected() {
+    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
+        "<primary_key>true</primary_key>",
+        "<primary_key>false</primary_key>",
+        "primary_key_name_without_primary_key_column",
+    );
+
+    assert_validation_error(
+        result,
+        "diagram_walkers.table[0].primary_key_name",
+        "primary_key_name requires at least one primary key column",
+    );
+}
+
+#[test]
+fn auto_increment_without_key_column_is_rejected() {
+    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
+        "<physical_name>PARENT_MEMBER_ID</physical_name>",
+        "<physical_name>PARENT_MEMBER_ID</physical_name>\n          <auto_increment>true</auto_increment>",
+        "auto_increment_without_key_column",
+    );
+
+    assert_validation_error(
+        result,
+        "diagram_walkers.table[1].columns.normal_column[0].auto_increment",
+        "auto_increment column must be a key column: PARENT_MEMBER_ID",
+    );
+}
+
+#[test]
+fn decimal_greater_than_length_is_rejected() {
+    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
+        "<decimal>0</decimal>",
+        "<decimal>19</decimal>",
+        "decimal_greater_than_length",
+    );
+
+    assert_validation_error(
+        result,
+        "diagram_walkers.table[0].columns.normal_column[0].decimal",
+        "decimal must be less than or equal to length: 19 > 18",
+    );
+}
+
+#[test]
+fn length_for_unsupported_column_type_is_rejected() {
+    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
+        "<type>decimal(p,s)</type>",
+        "<type>datetime</type>",
+        "length_for_unsupported_column_type",
+    );
+
+    assert_validation_error(
+        result,
+        "diagram_walkers.table[0].columns.normal_column[0].length",
+        "column type does not support length: datetime",
+    );
+}
+
+#[test]
+fn length_for_base_numeric_column_type_is_rejected() {
+    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
+        "<type>decimal(p,s)</type>",
+        "<type>bigint</type>",
+        "length_for_base_numeric_column_type",
+    );
+
+    assert_validation_error(
+        result,
+        "diagram_walkers.table[0].columns.normal_column[0].length",
+        "column type does not support length: bigint",
+    );
+}
+
+#[test]
+fn length_for_display_label_column_type_is_rejected() {
+    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
+        "<type>decimal(p,s)</type>",
+        "<type>double(m,d)</type>",
+        "length_for_display_label_column_type",
+    );
+
+    assert_validation_error(
+        result,
+        "diagram_walkers.table[0].columns.normal_column[0].length",
+        "column type does not support length: double(m,d)",
+    );
+}
+
+#[test]
+fn decimal_for_unsupported_column_type_is_rejected() {
+    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
+        "<physical_name>MEMBER_NAME</physical_name>",
+        "<physical_name>MEMBER_NAME</physical_name>\n          <type>varchar(n)</type>\n          <decimal>1</decimal>",
+        "decimal_for_unsupported_column_type",
+    );
+
+    assert_validation_error(
+        result,
+        "diagram_walkers.table[0].columns.normal_column[1].decimal",
+        "column type does not support decimal: varchar(n)",
     );
 }
 

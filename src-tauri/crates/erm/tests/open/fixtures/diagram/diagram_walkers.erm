@@ -41,7 +41,12 @@
       <table_constraint>ENGINE=InnoDB</table_constraint>
       <primary_key_name>PK_MEMBERS</primary_key_name>
       <option>member option</option>
-      <columns />
+      <columns>
+        <normal_column>
+          <physical_name>MEMBER_ID</physical_name>
+          <primary_key>true</primary_key>
+        </normal_column>
+      </columns>
       <indexes />
       <compound_unique_key_list />
       <table_properties />
