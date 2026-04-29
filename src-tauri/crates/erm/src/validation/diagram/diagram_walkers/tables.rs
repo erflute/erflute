@@ -164,7 +164,7 @@ pub fn validate_index_column_references(table: &Table) -> Result<(), ValidationE
 
     for (index_index, index) in indexes.iter().enumerate() {
         for (column_index, column) in index.columns.iter().enumerate() {
-            if !column_names.contains(column.column_id.as_str()) {
+            if !column_reference_exists(table, &column_names, &column.column_id) {
                 return Err(ValidationError::new(
                     format!("indexes[{index_index}].columns[{column_index}].column_id"),
                     format!("unknown index column_id: {}", column.column_id),
@@ -187,7 +187,7 @@ pub fn validate_compound_unique_key_column_references(
 
     for (key_index, key) in compound_unique_keys.iter().enumerate() {
         for (column_index, column) in key.columns.iter().enumerate() {
-            if !column_names.contains(column.column_id.as_str()) {
+            if !column_reference_exists(table, &column_names, &column.column_id) {
                 return Err(ValidationError::new(
                     format!(
                         "compound_unique_key_list.compound_unique_key[{key_index}].columns[{column_index}].column_id"
@@ -218,6 +218,28 @@ pub(super) fn normal_column_names(table: &Table) -> HashSet<&str> {
         .collect()
 }
 
+fn column_reference_exists(table: &Table, column_names: &HashSet<&str>, column_id: &str) -> bool {
+    let Some(column_name) = column_reference_column_name(table, column_id) else {
+        return false;
+    };
+
+    column_names.contains(column_name)
+}
+
+fn column_reference_column_name<'a>(table: &Table, column_id: &'a str) -> Option<&'a str> {
+    if let Some(reference) = column_id.strip_prefix("table.") {
+        let (table_name, column_name) = reference.split_once('.')?;
+
+        if table_name == table.physical_name {
+            return Some(column_name);
+        }
+
+        return None;
+    }
+
+    Some(column_id)
+}
+
 fn normal_columns(table: &Table) -> impl Iterator<Item = (usize, &NormalColumn)> {
     table
         .columns
@@ -230,19 +252,21 @@ fn normal_columns(table: &Table) -> impl Iterator<Item = (usize, &NormalColumn)>
         })
 }
 
-fn key_column_names(table: &Table) -> HashSet<&str> {
+fn key_column_names(table: &Table) -> HashSet<String> {
     let simple_key_names = normal_columns(table).filter_map(|(_, column)| {
         if column.unique_key == Some(true) {
-            Some(column.physical_name.as_str())
+            Some(column.physical_name.to_string())
         } else {
             None
         }
     });
 
     let index_column_names = table.indexes.iter().flat_map(|indexes| {
-        indexes
-            .iter()
-            .flat_map(|index| index.columns.iter().map(|column| column.column_id.as_str()))
+        indexes.iter().flat_map(|index| {
+            index.columns.iter().filter_map(|column| {
+                column_reference_column_name(table, &column.column_id).map(str::to_string)
+            })
+        })
     });
 
     let compound_unique_key_column_names = table
@@ -250,8 +274,11 @@ fn key_column_names(table: &Table) -> HashSet<&str> {
         .compound_unique_keys
         .iter()
         .flat_map(|keys| {
-            keys.iter()
-                .flat_map(|key| key.columns.iter().map(|column| column.column_id.as_str()))
+            keys.iter().flat_map(|key| {
+                key.columns.iter().filter_map(|column| {
+                    column_reference_column_name(table, &column.column_id).map(str::to_string)
+                })
+            })
         });
 
     simple_key_names

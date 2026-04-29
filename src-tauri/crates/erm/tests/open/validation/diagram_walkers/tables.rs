@@ -155,6 +155,15 @@ fn decimal_for_unsupported_column_type_is_rejected() {
 }
 
 #[test]
+fn qualified_index_column_id_for_current_table_is_accepted() {
+    DETAILS_ASSERTIONS.assert_replaced_fixture_parse_success(
+        "            <column>\n              <column_id>MEMBER_NAME</column_id>\n              <desc>true</desc>\n            </column>",
+        "            <column>\n              <column_id>table.MEMBERS.MEMBER_NAME</column_id>\n              <desc>true</desc>\n            </column>",
+        "qualified_index_column_id_for_current_table",
+    );
+}
+
+#[test]
 fn unknown_index_column_id_is_rejected() {
     let result = DETAILS_ASSERTIONS.open_replaced_fixture(
         "<column_id>MEMBER_NAME</column_id>",
@@ -166,6 +175,15 @@ fn unknown_index_column_id_is_rejected() {
         result,
         "diagram_walkers.table[0].indexes[0].columns[0].column_id",
         "unknown index column_id: UNKNOWN_MEMBER_NAME",
+    );
+}
+
+#[test]
+fn qualified_compound_unique_key_column_id_for_current_table_is_accepted() {
+    DETAILS_ASSERTIONS.assert_replaced_fixture_parse_success(
+        "            <column>\n              <column_id>MEMBER_NAME</column_id>\n            </column>\n            <column>\n              <column_id>MEMBER_ID</column_id>\n            </column>",
+        "            <column>\n              <column_id>table.MEMBERS.MEMBER_NAME</column_id>\n            </column>\n            <column>\n              <column_id>table.MEMBERS.MEMBER_ID</column_id>\n            </column>",
+        "qualified_compound_unique_key_column_id_for_current_table",
     );
 }
 
