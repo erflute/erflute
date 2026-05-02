@@ -84,6 +84,46 @@ fn unknown_relationship_target_table_is_rejected() {
 }
 
 #[test]
+fn reference_for_pk_without_source_primary_key_is_rejected() {
+    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
+        "<reference_for_pk>false</reference_for_pk>",
+        "<reference_for_pk>true</reference_for_pk>",
+        "reference_for_pk_without_source_primary_key",
+    );
+
+    assert_validation_error_with_targets(
+        result,
+        "diagram_walkers.table[0].connections.relationship[0].reference_for_pk",
+        "relationship source table requires a primary key: table.PARENT_MEMBERS",
+        &[
+            ("table name", "MEMBERS"),
+            ("relationship name", "FK_MEMBERS_PARENT"),
+            ("source table name", "PARENT_MEMBERS"),
+        ],
+    );
+}
+
+#[test]
+fn relationship_without_primary_key_or_unique_reference_is_rejected() {
+    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
+        "          <referred_simple_unique_column>table.PARENT_MEMBERS.PARENT_MEMBER_CODE</referred_simple_unique_column>\n",
+        "",
+        "relationship_without_primary_key_or_unique_reference",
+    );
+
+    assert_validation_error_with_targets(
+        result,
+        "diagram_walkers.table[0].connections.relationship[0].reference_for_pk",
+        "relationship must reference a simple unique column or compound unique key",
+        &[
+            ("table name", "MEMBERS"),
+            ("relationship name", "FK_MEMBERS_PARENT"),
+            ("source table name", "PARENT_MEMBERS"),
+        ],
+    );
+}
+
+#[test]
 fn relationship_target_different_from_containing_table_is_rejected() {
     let result = DETAILS_ASSERTIONS.open_replaced_fixture(
         "<target>table.MEMBERS</target>",

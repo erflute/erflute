@@ -208,6 +208,38 @@ pub fn validate_cross_table_references(
                 .with_target("relationship name", relationship.name.as_str()));
             };
 
+            if relationship.reference_for_pk {
+                let primary_key_names = primary_key_names(source_table);
+
+                if primary_key_names.is_empty() {
+                    return Err(ValidationError::new(
+                        format!(
+                            "table[{table_index}].connections.relationship[{relationship_index}].reference_for_pk"
+                        ),
+                        format!(
+                            "relationship source table requires a primary key: {}",
+                            relationship.source
+                        ),
+                    )
+                    .with_target("table name", table.physical_name.as_str())
+                    .with_target("relationship name", relationship.name.as_str())
+                    .with_target("source table name", source_table.physical_name.as_str()));
+                }
+            } else if relationship.referred_simple_unique_column.is_none()
+                && relationship.referred_compound_unique_key.is_none()
+            {
+                return Err(ValidationError::new(
+                    format!(
+                        "table[{table_index}].connections.relationship[{relationship_index}].reference_for_pk"
+                    ),
+                    "relationship must reference a simple unique column or compound unique key"
+                        .to_string(),
+                )
+                .with_target("table name", table.physical_name.as_str())
+                .with_target("relationship name", relationship.name.as_str())
+                .with_target("source table name", source_table.physical_name.as_str()));
+            }
+
             if find_table(tables, target_table_name).is_none() {
                 return Err(ValidationError::new(
                     format!(
@@ -290,6 +322,22 @@ fn unique_column_names(table: &Table) -> HashSet<&str> {
         .iter()
         .filter_map(|item| match item {
             ColumnItem::Normal(column) if column.unique_key == Some(true) => {
+                Some(column.physical_name.as_str())
+            }
+            _ => None,
+        })
+        .collect()
+}
+
+fn primary_key_names(table: &Table) -> HashSet<&str> {
+    let Some(items) = &table.columns.items else {
+        return HashSet::new();
+    };
+
+    items
+        .iter()
+        .filter_map(|item| match item {
+            ColumnItem::Normal(column) if column.primary_key == Some(true) => {
                 Some(column.physical_name.as_str())
             }
             _ => None,
