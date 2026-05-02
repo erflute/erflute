@@ -25,7 +25,7 @@ fn column_groups_tags_keep_valid_values() {
                             physical_name: "CREATED_AT".to_string(),
                             logical_name: Some("Created At".to_string()),
                             description: Some("Created timestamp".to_string()),
-                            column_type: column_groups::ColumnType::Datetime,
+                            column_type: column_groups::ColumnType::DecimalPS,
                             length: Some(6),
                             decimal: Some(0),
                             args: Some("fsp".to_string()),

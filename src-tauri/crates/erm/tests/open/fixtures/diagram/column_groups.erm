@@ -29,7 +29,7 @@
           <physical_name>CREATED_AT</physical_name>
           <logical_name>Created At</logical_name>
           <description>Created timestamp</description>
-          <type>datetime</type>
+          <type>decimal(p,s)</type>
           <length>6</length>
           <decimal>0</decimal>
           <args>fsp</args>

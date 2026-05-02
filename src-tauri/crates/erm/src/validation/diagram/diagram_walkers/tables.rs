@@ -3,6 +3,7 @@ use std::collections::{HashMap, HashSet};
 use crate::dtos::diagram::diagram_walkers::tables::Table;
 use crate::dtos::diagram::diagram_walkers::tables::columns::{ColumnItem, NormalColumn};
 use crate::validation::ValidationError;
+use crate::validation::diagram::validate_column_length_and_decimal_values;
 
 pub fn validate_duplicate_column_physical_names(table: &Table) -> Result<(), ValidationError> {
     let Some(items) = &table.columns.items else {
@@ -106,54 +107,17 @@ pub fn validate_auto_increment_columns_are_key_columns(
 
 pub fn validate_column_length_and_decimal(table: &Table) -> Result<(), ValidationError> {
     for (item_index, column) in normal_columns(table) {
-        if let (Some(length), Some(decimal)) = (column.length, column.decimal) {
-            if decimal > length {
-                return Err(ValidationError::new(
-                    format!("columns.normal_column[{item_index}].decimal"),
-                    format!("decimal must be less than or equal to length: {decimal} > {length}"),
-                )
-                .with_target("table name", table.physical_name.as_str())
-                .with_target("column name", column.physical_name.as_str()));
-            }
-        }
-
-        let Some(column_type) = &column.column_type else {
-            if column.length.is_some() {
-                return Err(ValidationError::new(
-                    format!("columns.normal_column[{item_index}].length"),
-                    "length requires a column type that supports length".to_string(),
-                )
-                .with_target("table name", table.physical_name.as_str())
-                .with_target("column name", column.physical_name.as_str()));
-            }
-            if column.decimal.is_some() {
-                return Err(ValidationError::new(
-                    format!("columns.normal_column[{item_index}].decimal"),
-                    "decimal requires a column type that supports decimal".to_string(),
-                )
-                .with_target("table name", table.physical_name.as_str())
-                .with_target("column name", column.physical_name.as_str()));
-            }
-            continue;
-        };
-
-        if column.length.is_some() && !column_type.supports_length() {
-            return Err(ValidationError::new(
-                format!("columns.normal_column[{item_index}].length"),
-                format!("column type does not support length: {column_type}"),
-            )
-            .with_target("table name", table.physical_name.as_str())
-            .with_target("column name", column.physical_name.as_str()));
-        }
-
-        if column.decimal.is_some() && !column_type.supports_decimal() {
-            return Err(ValidationError::new(
-                format!("columns.normal_column[{item_index}].decimal"),
-                format!("column type does not support decimal: {column_type}"),
-            )
-            .with_target("table name", table.physical_name.as_str())
-            .with_target("column name", column.physical_name.as_str()));
-        }
+        validate_column_length_and_decimal_values(
+            column.column_type,
+            column.length,
+            column.decimal,
+            format!("columns.normal_column[{item_index}].length"),
+            format!("columns.normal_column[{item_index}].decimal"),
+            &[
+                ("table name", table.physical_name.as_str()),
+                ("column name", column.physical_name.as_str()),
+            ],
+        )?;
     }
 
     Ok(())
