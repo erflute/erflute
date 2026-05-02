@@ -40,6 +40,23 @@ fn connections_tags_keep_valid_values() {
 }
 
 #[test]
+fn relationship_actions_serialize_as_erm_values() {
+    let table = support::first_table();
+    let relationship = table
+        .connections
+        .relationships
+        .expect("missing relationships")
+        .into_iter()
+        .next()
+        .expect("missing relationship");
+
+    let value = quick_xml::se::to_string(&relationship).expect("failed to serialize relationship");
+
+    assert!(value.contains("<onDeleteAction>CASCADE</onDeleteAction>"));
+    assert!(value.contains("<onUpdateAction>RESTRICT</onUpdateAction>"));
+}
+
+#[test]
 fn bendpoint_relative_rejects_invalid_value_type() {
     support::assert_replaced_fixture_parse_error(
         "<relative>true</relative>",

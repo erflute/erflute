@@ -1,6 +1,6 @@
-use serde::{Deserialize, Deserializer, Serialize};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
-#[derive(Debug, PartialEq, Serialize)]
+#[derive(Debug, PartialEq)]
 pub enum OnAction {
     Restrict,
     Cascade,
@@ -18,6 +18,15 @@ impl OnAction {
             Self::SetDefault => "SET DEFAULT",
             Self::NoAction => "",
         }
+    }
+}
+
+impl Serialize for OnAction {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.serialize_str(self.as_str())
     }
 }
 
