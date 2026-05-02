@@ -74,22 +74,6 @@ fn duplicate_compound_unique_key_name_in_same_table_is_rejected() {
 }
 
 #[test]
-fn primary_key_name_without_primary_key_column_is_rejected() {
-    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
-        "<primary_key>true</primary_key>",
-        "<primary_key>false</primary_key>",
-        "primary_key_name_without_primary_key_column",
-    );
-
-    assert_validation_error_with_targets(
-        result,
-        "diagram_walkers.table[0].primary_key_name",
-        "primary_key_name requires at least one primary key column",
-        &[("table name", "MEMBERS")],
-    );
-}
-
-#[test]
 fn auto_increment_without_key_column_is_rejected() {
     let result = DETAILS_ASSERTIONS.open_replaced_fixture(
         "<physical_name>PARENT_MEMBER_ID</physical_name>",

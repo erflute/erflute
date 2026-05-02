@@ -74,24 +74,6 @@ pub fn validate_duplicate_compound_unique_key_names(table: &Table) -> Result<(),
     Ok(())
 }
 
-pub fn validate_primary_key_name_has_primary_key_column(
-    table: &Table,
-) -> Result<(), ValidationError> {
-    if table.primary_key_name.is_none() {
-        return Ok(());
-    }
-
-    if normal_columns(table).any(|(_, column)| column.primary_key == Some(true)) {
-        return Ok(());
-    }
-
-    Err(ValidationError::new(
-        "primary_key_name".to_string(),
-        "primary_key_name requires at least one primary key column".to_string(),
-    )
-    .with_target("table name", table.physical_name.as_str()))
-}
-
 pub fn validate_auto_increment_columns_are_key_columns(
     table: &Table,
 ) -> Result<(), ValidationError> {
