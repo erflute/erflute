@@ -1,4 +1,6 @@
+use erm::dtos::diagram::Diagram;
 use erm::dtos::diagram::diagram_walkers::tables;
+use erm::errors::Error;
 use erm::open;
 
 use crate::open::support as diagram_support;
@@ -45,4 +47,13 @@ pub(super) fn assert_replaced_fixture_parse_success(
         replacement,
         test_name,
     );
+}
+
+pub(super) fn open_replaced_fixture(
+    target: &str,
+    replacement: &str,
+    test_name: &str,
+) -> Result<Diagram, Error> {
+    diagram_support::FixtureAssertions::new(DIAGRAM_WALKERS_DETAILS_FIXTURE, TEMP_PREFIX, "")
+        .open_replaced_fixture(target, replacement, test_name)
 }

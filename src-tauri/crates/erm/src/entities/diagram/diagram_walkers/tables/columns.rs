@@ -1,4 +1,5 @@
 use crate::column_type::ColumnType;
+use serde::de::IntoDeserializer;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, PartialEq, Serialize, Deserialize, Default)]
@@ -12,6 +13,7 @@ pub struct NormalColumn {
     pub description: Option<String>,
 
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "deserialize_optional_column_type")]
     #[serde(rename = "type")]
     pub column_type: Option<ColumnType>,
 
@@ -63,4 +65,16 @@ pub struct Columns {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "$value")]
     pub items: Option<Vec<ColumnItem>>,
+}
+
+fn deserialize_optional_column_type<'de, D>(deserializer: D) -> Result<Option<ColumnType>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    let value = Option::<String>::deserialize(deserializer)?;
+
+    match value.as_deref().map(str::trim) {
+        None | Some("") => Ok(None),
+        Some(value) => ColumnType::deserialize(value.into_deserializer()).map(Some),
+    }
 }

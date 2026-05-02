@@ -40,6 +40,39 @@ fn columns_tags_keep_valid_values() {
 }
 
 #[test]
+fn empty_column_type_is_accepted_as_no_type() {
+    let diagram = support::open_replaced_fixture(
+        "<physical_name>MEMBER_NAME</physical_name>",
+        "<physical_name>MEMBER_NAME</physical_name>\n          <type></type>",
+        "empty_column_type",
+    )
+    .expect("failed to parse");
+    let table = diagram
+        .diagram_walkers
+        .expect("missing diagram walkers")
+        .tables
+        .expect("missing tables")
+        .into_iter()
+        .next()
+        .expect("missing table");
+    let column = table
+        .columns
+        .items
+        .expect("missing columns")
+        .into_iter()
+        .find_map(|item| match item {
+            columns::ColumnItem::Normal(column) if column.physical_name == "MEMBER_NAME" => {
+                Some(column)
+            }
+            columns::ColumnItem::Normal(_) => None,
+            columns::ColumnItem::Group(_) => None,
+        })
+        .expect("missing normal column");
+
+    assert_eq!(column.column_type, None);
+}
+
+#[test]
 fn length_rejects_invalid_value_type() {
     support::assert_replaced_fixture_parse_error(
         "<length>18</length>",
