@@ -15,7 +15,8 @@ use crate::validation::diagram::diagram_walkers::tables::{
     validate_auto_increment_columns_are_key_columns, validate_column_length_and_decimal,
     validate_compound_unique_key_column_references, validate_duplicate_column_physical_names,
     validate_duplicate_compound_unique_key_names, validate_duplicate_index_names,
-    validate_index_column_references, validate_primary_key_name_has_primary_key_column,
+    validate_index_column_references, validate_local_relationship_consistency,
+    validate_primary_key_name_has_primary_key_column,
 };
 
 #[derive(Debug, PartialEq, Serialize, Deserialize, Validate)]
@@ -45,7 +46,8 @@ impl From<entities::Color> for Color {
     validate_auto_increment_columns_are_key_columns,
     validate_column_length_and_decimal,
     validate_index_column_references,
-    validate_compound_unique_key_column_references
+    validate_compound_unique_key_column_references,
+    validate_local_relationship_consistency
 ))]
 #[serde(rename_all = "camelCase")]
 pub struct Table {

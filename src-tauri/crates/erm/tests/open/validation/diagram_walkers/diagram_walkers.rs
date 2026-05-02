@@ -101,6 +101,51 @@ fn unknown_relationship_fk_column_is_rejected() {
 }
 
 #[test]
+fn relationship_missing_column_fk_mapping_is_rejected() {
+    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
+        "<fk_column_name>MEMBER_ID</fk_column_name>",
+        "<fk_column_name>MEMBER_NAME</fk_column_name>",
+        "relationship_missing_column_fk_mapping",
+    );
+
+    assert_validation_error(
+        result,
+        "diagram_walkers.table[0].connections.relationship[0].fk_columns.fk_column[0].fk_column_name",
+        "fk column must reference relationship: MEMBER_NAME -> FK_MEMBERS_PARENT",
+    );
+}
+
+#[test]
+fn relationship_fk_column_without_column_relationship_is_rejected() {
+    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
+        "          <relationship>FK_MEMBERS_PARENT</relationship>\n",
+        "",
+        "relationship_fk_column_without_column_relationship",
+    );
+
+    assert_validation_error(
+        result,
+        "diagram_walkers.table[0].connections.relationship[0].fk_columns.fk_column[0].fk_column_name",
+        "fk column must reference relationship: MEMBER_ID -> FK_MEMBERS_PARENT",
+    );
+}
+
+#[test]
+fn relationship_column_referred_table_mismatch_is_rejected() {
+    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
+        "<referred_column>table.PARENT_MEMBERS.PARENT_MEMBER_ID</referred_column>",
+        "<referred_column>table.MEMBERS.MEMBER_ID</referred_column>",
+        "relationship_column_referred_table_mismatch",
+    );
+
+    assert_validation_error(
+        result,
+        "diagram_walkers.table[0].columns.normal_column[0].referred_column",
+        "referred_column table must match relationship source: table.MEMBERS.MEMBER_ID",
+    );
+}
+
+#[test]
 fn unknown_referred_column_table_is_rejected() {
     let result = DETAILS_ASSERTIONS.open_replaced_fixture(
         "<referred_column>table.PARENT_MEMBERS.PARENT_MEMBER_ID</referred_column>",
@@ -161,17 +206,11 @@ fn invalid_referred_simple_unique_column_is_rejected() {
 }
 
 #[test]
-fn referred_simple_unique_column_for_non_source_table_is_rejected() {
-    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
+fn referred_simple_unique_column_with_target_table_name_is_accepted() {
+    DETAILS_ASSERTIONS.assert_replaced_fixture_parse_success(
         "<referred_simple_unique_column>table.PARENT_MEMBERS.PARENT_MEMBER_CODE</referred_simple_unique_column>",
-        "<referred_simple_unique_column>table.MEMBERS.MEMBER_ID</referred_simple_unique_column>",
-        "referred_simple_unique_column_for_non_source_table",
-    );
-
-    assert_validation_error(
-        result,
-        "diagram_walkers.table[0].connections.relationship[0].referred_simple_unique_column",
-        "referred simple unique column table must match relationship source: table.MEMBERS.MEMBER_ID",
+        "<referred_simple_unique_column>table.MEMBERS.PARENT_MEMBER_CODE</referred_simple_unique_column>",
+        "referred_simple_unique_column_with_target_table_name",
     );
 }
 

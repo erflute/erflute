@@ -204,6 +204,91 @@ pub fn validate_compound_unique_key_column_references(
     Ok(())
 }
 
+pub fn validate_local_relationship_consistency(table: &Table) -> Result<(), ValidationError> {
+    let Some(relationships) = &table.connections.relationships else {
+        return Ok(());
+    };
+
+    for (relationship_index, relationship) in relationships.iter().enumerate() {
+        if table_reference_name(&relationship.target)
+            .is_some_and(|target_table_name| target_table_name != table.physical_name)
+        {
+            return Err(ValidationError::new(
+                format!("connections.relationship[{relationship_index}].target"),
+                format!(
+                    "relationship target must match containing table: {}",
+                    relationship.target
+                ),
+            ));
+        }
+
+        if relationship.referred_simple_unique_column.is_some()
+            && relationship.referred_compound_unique_key.is_some()
+        {
+            return Err(ValidationError::new(
+                format!(
+                    "connections.relationship[{relationship_index}].referred_simple_unique_column"
+                ),
+                "referred_simple_unique_column and referred_compound_unique_key cannot both be specified"
+                    .to_string(),
+            ));
+        }
+
+        for (column_index, fk_column) in relationship.fk_columns.fk_column.iter().enumerate() {
+            let Some((_, column)) = normal_column_by_name(table, &fk_column.fk_column_name) else {
+                return Err(ValidationError::new(
+                    format!(
+                        "connections.relationship[{relationship_index}].fk_columns.fk_column[{column_index}].fk_column_name"
+                    ),
+                    format!(
+                        "unknown relationship fk_column_name: {}",
+                        fk_column.fk_column_name
+                    ),
+                ));
+            };
+
+            if column.relationship.as_deref() != Some(relationship.name.as_str()) {
+                return Err(ValidationError::new(
+                    format!(
+                        "connections.relationship[{relationship_index}].fk_columns.fk_column[{column_index}].fk_column_name"
+                    ),
+                    format!(
+                        "fk column must reference relationship: {} -> {}",
+                        fk_column.fk_column_name, relationship.name
+                    ),
+                ));
+            }
+        }
+    }
+
+    for (item_index, column) in normal_columns(table) {
+        let Some(relationship_name) = &column.relationship else {
+            continue;
+        };
+
+        let Some(relationship) = find_relationship(table, relationship_name) else {
+            continue;
+        };
+
+        if !relationship
+            .fk_columns
+            .fk_column
+            .iter()
+            .any(|fk_column| fk_column.fk_column_name == column.physical_name)
+        {
+            return Err(ValidationError::new(
+                format!("columns.normal_column[{item_index}].relationship"),
+                format!(
+                    "relationship does not contain fk column: {} -> {}",
+                    relationship_name, column.physical_name
+                ),
+            ));
+        }
+    }
+
+    Ok(())
+}
+
 pub(super) fn normal_column_names(table: &Table) -> HashSet<&str> {
     let Some(items) = &table.columns.items else {
         return HashSet::new();
@@ -250,6 +335,29 @@ fn normal_columns(table: &Table) -> impl Iterator<Item = (usize, &NormalColumn)>
             ColumnItem::Normal(column) => Some((index, column)),
             ColumnItem::Group(_) => None,
         })
+}
+
+fn normal_column_by_name<'a>(
+    table: &'a Table,
+    column_name: &str,
+) -> Option<(usize, &'a NormalColumn)> {
+    normal_columns(table).find(|(_, column)| column.physical_name == column_name)
+}
+
+fn find_relationship<'a>(
+    table: &'a Table,
+    relationship_name: &str,
+) -> Option<&'a crate::dtos::diagram::diagram_walkers::tables::connections::Relationship> {
+    table
+        .connections
+        .relationships
+        .iter()
+        .flatten()
+        .find(|relationship| relationship.name == relationship_name)
+}
+
+fn table_reference_name(reference: &str) -> Option<&str> {
+    reference.strip_prefix("table.")
 }
 
 fn key_column_names(table: &Table) -> HashSet<String> {
