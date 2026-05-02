@@ -1,5 +1,5 @@
 use crate::open::support;
-use crate::open::validation::support::assert_validation_error;
+use crate::open::validation::support::assert_validation_error_with_targets;
 
 const DIAGRAM_WALKERS_FIXTURE: &str = "./tests/open/fixtures/diagram/diagram_walkers.erm";
 const DIAGRAM_WALKERS_DETAILS_FIXTURE: &str =
@@ -18,10 +18,11 @@ fn duplicate_table_physical_name_is_rejected() {
         "duplicate_table_physical_name",
     );
 
-    assert_validation_error(
+    assert_validation_error_with_targets(
         result,
         "diagram_walkers.table[1].physical_name",
         "duplicate table physical_name: MEMBERS",
+        &[("table name", "MEMBERS")],
     );
 }
 
@@ -33,10 +34,14 @@ fn duplicate_relationship_name_is_rejected() {
         "duplicate_relationship_name",
     );
 
-    assert_validation_error(
+    assert_validation_error_with_targets(
         result,
         "diagram_walkers.table[0].connections.relationship[1].name",
         "duplicate relationship name: FK_MEMBERS_PARENT",
+        &[
+            ("table name", "MEMBERS"),
+            ("relationship name", "FK_MEMBERS_PARENT"),
+        ],
     );
 }
 
@@ -48,10 +53,14 @@ fn unknown_relationship_source_table_is_rejected() {
         "unknown_relationship_source_table",
     );
 
-    assert_validation_error(
+    assert_validation_error_with_targets(
         result,
         "diagram_walkers.table[0].connections.relationship[0].source",
         "unknown relationship source table: table.UNKNOWN_MEMBERS",
+        &[
+            ("table name", "MEMBERS"),
+            ("relationship name", "FK_MEMBERS_PARENT"),
+        ],
     );
 }
 
@@ -63,10 +72,14 @@ fn unknown_relationship_target_table_is_rejected() {
         "unknown_relationship_target_table",
     );
 
-    assert_validation_error(
+    assert_validation_error_with_targets(
         result,
         "diagram_walkers.table[0].connections.relationship[0].target",
         "unknown relationship target table: table.UNKNOWN_MEMBERS",
+        &[
+            ("table name", "MEMBERS"),
+            ("relationship name", "FK_MEMBERS_PARENT"),
+        ],
     );
 }
 
@@ -78,10 +91,14 @@ fn relationship_target_different_from_containing_table_is_rejected() {
         "relationship_target_different_from_containing_table",
     );
 
-    assert_validation_error(
+    assert_validation_error_with_targets(
         result,
         "diagram_walkers.table[0].connections.relationship[0].target",
         "relationship target must match containing table: table.PARENT_MEMBERS",
+        &[
+            ("table name", "MEMBERS"),
+            ("relationship name", "FK_MEMBERS_PARENT"),
+        ],
     );
 }
 
@@ -93,10 +110,14 @@ fn unknown_relationship_fk_column_is_rejected() {
         "unknown_relationship_fk_column",
     );
 
-    assert_validation_error(
+    assert_validation_error_with_targets(
         result,
         "diagram_walkers.table[0].connections.relationship[0].fk_columns.fk_column[0].fk_column_name",
         "unknown relationship fk_column_name: UNKNOWN_MEMBER_ID",
+        &[
+            ("table name", "MEMBERS"),
+            ("relationship name", "FK_MEMBERS_PARENT"),
+        ],
     );
 }
 
@@ -108,10 +129,15 @@ fn relationship_missing_column_fk_mapping_is_rejected() {
         "relationship_missing_column_fk_mapping",
     );
 
-    assert_validation_error(
+    assert_validation_error_with_targets(
         result,
         "diagram_walkers.table[0].connections.relationship[0].fk_columns.fk_column[0].fk_column_name",
         "fk column must reference relationship: MEMBER_NAME -> FK_MEMBERS_PARENT",
+        &[
+            ("table name", "MEMBERS"),
+            ("column name", "MEMBER_NAME"),
+            ("relationship name", "FK_MEMBERS_PARENT"),
+        ],
     );
 }
 
@@ -123,10 +149,15 @@ fn relationship_fk_column_without_column_relationship_is_rejected() {
         "relationship_fk_column_without_column_relationship",
     );
 
-    assert_validation_error(
+    assert_validation_error_with_targets(
         result,
         "diagram_walkers.table[0].connections.relationship[0].fk_columns.fk_column[0].fk_column_name",
         "fk column must reference relationship: MEMBER_ID -> FK_MEMBERS_PARENT",
+        &[
+            ("table name", "MEMBERS"),
+            ("column name", "MEMBER_ID"),
+            ("relationship name", "FK_MEMBERS_PARENT"),
+        ],
     );
 }
 
@@ -138,10 +169,11 @@ fn relationship_column_referred_table_mismatch_is_rejected() {
         "relationship_column_referred_table_mismatch",
     );
 
-    assert_validation_error(
+    assert_validation_error_with_targets(
         result,
         "diagram_walkers.table[0].columns.normal_column[0].referred_column",
         "referred_column table must match relationship source: table.MEMBERS.MEMBER_ID",
+        &[("table name", "MEMBERS"), ("column name", "MEMBER_ID")],
     );
 }
 
@@ -153,10 +185,11 @@ fn unknown_referred_column_table_is_rejected() {
         "unknown_referred_column_table",
     );
 
-    assert_validation_error(
+    assert_validation_error_with_targets(
         result,
         "diagram_walkers.table[0].columns.normal_column[0].referred_column",
         "unknown referred column table: table.UNKNOWN_MEMBERS.PARENT_MEMBER_ID",
+        &[("table name", "MEMBERS"), ("column name", "MEMBER_ID")],
     );
 }
 
@@ -168,10 +201,11 @@ fn unknown_referred_column_is_rejected() {
         "unknown_referred_column",
     );
 
-    assert_validation_error(
+    assert_validation_error_with_targets(
         result,
         "diagram_walkers.table[0].columns.normal_column[0].referred_column",
         "unknown referred column: table.PARENT_MEMBERS.UNKNOWN_MEMBER_ID",
+        &[("table name", "MEMBERS"), ("column name", "MEMBER_ID")],
     );
 }
 
@@ -183,10 +217,15 @@ fn unknown_referred_simple_unique_column_is_rejected() {
         "unknown_referred_simple_unique_column",
     );
 
-    assert_validation_error(
+    assert_validation_error_with_targets(
         result,
         "diagram_walkers.table[0].connections.relationship[0].referred_simple_unique_column",
         "unknown referred simple unique column: table.PARENT_MEMBERS.UNKNOWN_MEMBER_CODE",
+        &[
+            ("table name", "MEMBERS"),
+            ("relationship name", "FK_MEMBERS_PARENT"),
+            ("source table name", "PARENT_MEMBERS"),
+        ],
     );
 }
 
@@ -198,10 +237,14 @@ fn invalid_referred_simple_unique_column_is_rejected() {
         "invalid_referred_simple_unique_column",
     );
 
-    assert_validation_error(
+    assert_validation_error_with_targets(
         result,
         "diagram_walkers.table[0].connections.relationship[0].referred_simple_unique_column",
         "invalid referred simple unique column: PARENT_MEMBER_CODE",
+        &[
+            ("table name", "MEMBERS"),
+            ("relationship name", "FK_MEMBERS_PARENT"),
+        ],
     );
 }
 
@@ -222,10 +265,15 @@ fn unknown_referred_compound_unique_key_is_rejected() {
         "unknown_referred_compound_unique_key",
     );
 
-    assert_validation_error(
+    assert_validation_error_with_targets(
         result,
         "diagram_walkers.table[0].connections.relationship[0].referred_compound_unique_key",
         "unknown referred compound unique key: UK_UNKNOWN_MEMBERS_CODE",
+        &[
+            ("table name", "MEMBERS"),
+            ("relationship name", "FK_MEMBERS_PARENT"),
+            ("source table name", "PARENT_MEMBERS"),
+        ],
     );
 }
 
@@ -237,10 +285,14 @@ fn simultaneous_referred_unique_targets_are_rejected() {
         "simultaneous_referred_unique_targets",
     );
 
-    assert_validation_error(
+    assert_validation_error_with_targets(
         result,
         "diagram_walkers.table[0].connections.relationship[0].referred_simple_unique_column",
         "referred_simple_unique_column and referred_compound_unique_key cannot both be specified",
+        &[
+            ("table name", "MEMBERS"),
+            ("relationship name", "FK_MEMBERS_PARENT"),
+        ],
     );
 }
 
@@ -252,10 +304,11 @@ fn unknown_normal_column_relationship_is_rejected() {
         "unknown_normal_column_relationship",
     );
 
-    assert_validation_error(
+    assert_validation_error_with_targets(
         result,
         "diagram_walkers.table[0].columns.normal_column[0].relationship",
         "unknown relationship: FK_UNKNOWN_MEMBERS_PARENT",
+        &[("table name", "MEMBERS"), ("column name", "MEMBER_ID")],
     );
 }
 
@@ -267,9 +320,10 @@ fn unknown_column_group_reference_is_rejected() {
         "unknown_column_group_reference",
     );
 
-    assert_validation_error(
+    assert_validation_error_with_targets(
         result,
         "diagram_walkers.table[0].columns.column_group[2]",
         "unknown column group: UNKNOWN_COLUMNS",
+        &[("table name", "MEMBERS")],
     );
 }

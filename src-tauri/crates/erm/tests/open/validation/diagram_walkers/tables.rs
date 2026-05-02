@@ -1,5 +1,5 @@
 use crate::open::support;
-use crate::open::validation::support::assert_validation_error;
+use crate::open::validation::support::assert_validation_error_with_targets;
 
 const DIAGRAM_WALKERS_FIXTURE: &str = "./tests/open/fixtures/diagram/diagram_walkers.erm";
 const DIAGRAM_WALKERS_DETAILS_FIXTURE: &str =
@@ -18,10 +18,11 @@ fn duplicate_column_physical_name_in_same_table_is_rejected() {
         "duplicate_column_physical_name_in_same_table",
     );
 
-    assert_validation_error(
+    assert_validation_error_with_targets(
         result,
         "diagram_walkers.table[0].columns.normal_column[1].physical_name",
         "duplicate column physical_name: MEMBER_ID",
+        &[("table name", "MEMBERS"), ("column name", "MEMBER_ID")],
     );
 }
 
@@ -42,10 +43,14 @@ fn duplicate_index_name_in_same_table_is_rejected() {
         "duplicate_index_name_in_same_table",
     );
 
-    assert_validation_error(
+    assert_validation_error_with_targets(
         result,
         "diagram_walkers.table[0].indexes[1].name",
         "duplicate index name: IDX_MEMBERS_NAME",
+        &[
+            ("table name", "MEMBERS"),
+            ("index name", "IDX_MEMBERS_NAME"),
+        ],
     );
 }
 
@@ -57,10 +62,14 @@ fn duplicate_compound_unique_key_name_in_same_table_is_rejected() {
         "duplicate_compound_unique_key_name_in_same_table",
     );
 
-    assert_validation_error(
+    assert_validation_error_with_targets(
         result,
         "diagram_walkers.table[0].compound_unique_key_list.compound_unique_key[1].name",
         "duplicate compound unique key name: UK_MEMBERS_NAME",
+        &[
+            ("table name", "MEMBERS"),
+            ("compound unique key name", "UK_MEMBERS_NAME"),
+        ],
     );
 }
 
@@ -72,10 +81,11 @@ fn primary_key_name_without_primary_key_column_is_rejected() {
         "primary_key_name_without_primary_key_column",
     );
 
-    assert_validation_error(
+    assert_validation_error_with_targets(
         result,
         "diagram_walkers.table[0].primary_key_name",
         "primary_key_name requires at least one primary key column",
+        &[("table name", "MEMBERS")],
     );
 }
 
@@ -87,10 +97,14 @@ fn auto_increment_without_key_column_is_rejected() {
         "auto_increment_without_key_column",
     );
 
-    assert_validation_error(
+    assert_validation_error_with_targets(
         result,
         "diagram_walkers.table[1].columns.normal_column[0].auto_increment",
         "auto_increment column must be a key column: PARENT_MEMBER_ID",
+        &[
+            ("table name", "PARENT_MEMBERS"),
+            ("column name", "PARENT_MEMBER_ID"),
+        ],
     );
 }
 
@@ -102,10 +116,11 @@ fn decimal_greater_than_length_is_rejected() {
         "decimal_greater_than_length",
     );
 
-    assert_validation_error(
+    assert_validation_error_with_targets(
         result,
         "diagram_walkers.table[0].columns.normal_column[0].decimal",
         "decimal must be less than or equal to length: 19 > 18",
+        &[("table name", "MEMBERS"), ("column name", "MEMBER_ID")],
     );
 }
 
@@ -117,10 +132,11 @@ fn length_for_unsupported_column_type_is_rejected() {
         "length_for_unsupported_column_type",
     );
 
-    assert_validation_error(
+    assert_validation_error_with_targets(
         result,
         "diagram_walkers.table[0].columns.normal_column[0].length",
         "column type does not support length: datetime",
+        &[("table name", "MEMBERS"), ("column name", "MEMBER_ID")],
     );
 }
 
@@ -132,10 +148,11 @@ fn length_for_base_numeric_column_type_is_rejected() {
         "length_for_base_numeric_column_type",
     );
 
-    assert_validation_error(
+    assert_validation_error_with_targets(
         result,
         "diagram_walkers.table[0].columns.normal_column[0].length",
         "column type does not support length: bigint",
+        &[("table name", "MEMBERS"), ("column name", "MEMBER_ID")],
     );
 }
 
@@ -147,10 +164,11 @@ fn decimal_for_unsupported_column_type_is_rejected() {
         "decimal_for_unsupported_column_type",
     );
 
-    assert_validation_error(
+    assert_validation_error_with_targets(
         result,
         "diagram_walkers.table[0].columns.normal_column[1].decimal",
         "column type does not support decimal: varchar(n)",
+        &[("table name", "MEMBERS"), ("column name", "MEMBER_NAME")],
     );
 }
 
@@ -171,10 +189,14 @@ fn unknown_index_column_id_is_rejected() {
         "unknown_index_column_id",
     );
 
-    assert_validation_error(
+    assert_validation_error_with_targets(
         result,
         "diagram_walkers.table[0].indexes[0].columns[0].column_id",
         "unknown index column_id: UNKNOWN_MEMBER_NAME",
+        &[
+            ("table name", "MEMBERS"),
+            ("index name", "IDX_MEMBERS_NAME"),
+        ],
     );
 }
 
@@ -195,9 +217,13 @@ fn unknown_compound_unique_key_column_id_is_rejected() {
         "unknown_compound_unique_key_column_id",
     );
 
-    assert_validation_error(
+    assert_validation_error_with_targets(
         result,
         "diagram_walkers.table[0].compound_unique_key_list.compound_unique_key[0].columns[0].column_id",
         "unknown compound unique key column_id: UNKNOWN_MEMBER_NAME",
+        &[
+            ("table name", "MEMBERS"),
+            ("compound unique key name", "UK_MEMBERS_NAME"),
+        ],
     );
 }

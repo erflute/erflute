@@ -1,6 +1,6 @@
 pub mod diagram_walkers;
 
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
 use crate::dtos::diagram::Diagram;
 use crate::dtos::diagram::diagram_walkers::tables::columns::ColumnItem;
@@ -42,7 +42,8 @@ pub fn validate_column_group_references(diagram: &Diagram) -> Result<(), Validat
                         "diagram_walkers.table[{table_index}].columns.column_group[{item_index}]"
                     ),
                     format!("unknown column group: {column_group_name}"),
-                ));
+                )
+                .with_target("table name", table.physical_name.as_str()));
             }
         }
     }
@@ -55,14 +56,18 @@ pub fn validate_duplicate_column_group_names(diagram: &Diagram) -> Result<(), Va
         return Ok(());
     };
 
-    let mut group_names = HashSet::new();
+    let mut group_names = HashMap::new();
 
     for (group_index, group) in column_groups.iter().enumerate() {
-        if !group_names.insert(group.column_group_name.as_str()) {
+        if group_names
+            .insert(group.column_group_name.as_str(), group)
+            .is_some()
+        {
             return Err(ValidationError::new(
                 format!("column_groups[{group_index}].column_group_name"),
                 format!("duplicate column group name: {}", group.column_group_name),
-            ));
+            )
+            .with_target("column group name", group.column_group_name.as_str()));
         }
     }
 
@@ -81,10 +86,13 @@ pub fn validate_duplicate_column_group_column_physical_names(
             continue;
         };
 
-        let mut column_names = HashSet::new();
+        let mut column_names = HashMap::new();
 
         for (column_index, column) in normal_columns.iter().enumerate() {
-            if !column_names.insert(column.physical_name.as_str()) {
+            if column_names
+                .insert(column.physical_name.as_str(), column)
+                .is_some()
+            {
                 return Err(ValidationError::new(
                     format!(
                         "column_groups[{group_index}].columns.normal_column[{column_index}].physical_name"
@@ -93,7 +101,9 @@ pub fn validate_duplicate_column_group_column_physical_names(
                         "duplicate column group column physical_name: {}",
                         column.physical_name
                     ),
-                ));
+                )
+                .with_target("column group name", group.column_group_name.as_str())
+                .with_target("column name", column.physical_name.as_str()));
             }
         }
     }

@@ -1,18 +1,36 @@
 pub mod diagram;
 
 pub use erm_macros::Validate;
-use thiserror::Error;
+use std::fmt;
 
-#[derive(Debug, Error, PartialEq)]
-#[error("Validation error at {path}: {message}")]
+#[derive(Debug, PartialEq)]
 pub struct ValidationError {
     pub path: String,
     pub message: String,
+    pub targets: Vec<ValidationErrorTarget>,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct ValidationErrorTarget {
+    pub label: String,
+    pub value: String,
 }
 
 impl ValidationError {
     pub fn new(path: String, message: String) -> Self {
-        Self { path, message }
+        Self {
+            path,
+            message,
+            targets: Vec::new(),
+        }
+    }
+
+    pub fn with_target(mut self, label: impl Into<String>, value: impl fmt::Debug) -> Self {
+        self.targets.push(ValidationErrorTarget {
+            label: label.into(),
+            value: format!("{value:#?}"),
+        });
+        self
     }
 
     pub fn prepend_path(mut self, segment: impl AsRef<str>) -> Self {
@@ -23,6 +41,39 @@ impl ValidationError {
         }
         self
     }
+}
+
+impl fmt::Display for ValidationError {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(formatter, "Validation error\n\n{}", self.message)?;
+
+        if !self.targets.is_empty() {
+            write!(formatter, "\n\nTarget:")?;
+
+            for target in &self.targets {
+                write!(
+                    formatter,
+                    "\n- {}: {}",
+                    target.label,
+                    format_target_value(&target.value)
+                )?;
+            }
+        }
+
+        write!(formatter, "\n\nTechnical details:\n- path: {}", self.path)?;
+
+        Ok(())
+    }
+}
+
+impl std::error::Error for ValidationError {}
+
+fn format_target_value(value: &str) -> String {
+    value
+        .strip_prefix('"')
+        .and_then(|value| value.strip_suffix('"'))
+        .unwrap_or(value)
+        .to_string()
 }
 
 pub trait Validate {

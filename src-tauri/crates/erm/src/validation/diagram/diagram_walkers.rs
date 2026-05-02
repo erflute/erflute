@@ -1,6 +1,6 @@
 pub mod tables;
 
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
 use crate::dtos::diagram::diagram_walkers::DiagramWalkers;
 use crate::dtos::diagram::diagram_walkers::tables::Table;
@@ -16,14 +16,18 @@ pub fn validate_duplicate_table_physical_names(
         return Ok(());
     };
 
-    let mut table_names = HashSet::new();
+    let mut table_names = HashMap::new();
 
     for (table_index, table) in tables.iter().enumerate() {
-        if !table_names.insert(table.physical_name.as_str()) {
+        if table_names
+            .insert(table.physical_name.as_str(), table)
+            .is_some()
+        {
             return Err(ValidationError::new(
                 format!("table[{table_index}].physical_name"),
                 format!("duplicate table physical_name: {}", table.physical_name),
-            ));
+            )
+            .with_target("table name", table.physical_name.as_str()));
         }
     }
 
@@ -37,7 +41,7 @@ pub fn validate_duplicate_relationship_names(
         return Ok(());
     };
 
-    let mut relationship_names = HashSet::new();
+    let mut relationship_names = HashMap::new();
 
     for (table_index, table) in tables.iter().enumerate() {
         let Some(relationships) = &table.connections.relationships else {
@@ -45,13 +49,18 @@ pub fn validate_duplicate_relationship_names(
         };
 
         for (relationship_index, relationship) in relationships.iter().enumerate() {
-            if !relationship_names.insert(relationship.name.as_str()) {
+            if relationship_names
+                .insert(relationship.name.as_str(), relationship)
+                .is_some()
+            {
                 return Err(ValidationError::new(
                     format!(
                         "table[{table_index}].connections.relationship[{relationship_index}].name"
                     ),
                     format!("duplicate relationship name: {}", relationship.name),
-                ));
+                )
+                .with_target("table name", table.physical_name.as_str())
+                .with_target("relationship name", relationship.name.as_str()));
             }
         }
     }
@@ -93,7 +102,9 @@ pub fn validate_cross_table_references(
                             "table[{table_index}].columns.normal_column[{item_index}].relationship"
                         ),
                         format!("unknown relationship: {relationship_name}"),
-                    ));
+                    )
+                    .with_target("table name", table.physical_name.as_str())
+                    .with_target("column name", column.physical_name.as_str()));
                 }
 
                 find_relationship(tables, relationship_name)
@@ -110,7 +121,9 @@ pub fn validate_cross_table_references(
                             "table[{table_index}].columns.normal_column[{item_index}].referred_column"
                         ),
                         format!("invalid referred_column: {referred_column}"),
-                    ));
+                    )
+                    .with_target("table name", table.physical_name.as_str())
+                    .with_target("column name", column.physical_name.as_str()));
                 };
 
                 let Some(referred_table) = find_table(tables, referred_table_name) else {
@@ -119,7 +132,9 @@ pub fn validate_cross_table_references(
                             "table[{table_index}].columns.normal_column[{item_index}].referred_column"
                         ),
                         format!("unknown referred column table: {referred_column}"),
-                    ));
+                    )
+                    .with_target("table name", table.physical_name.as_str())
+                    .with_target("column name", column.physical_name.as_str()));
                 };
 
                 let referred_column_names = normal_column_names(referred_table);
@@ -130,7 +145,9 @@ pub fn validate_cross_table_references(
                             "table[{table_index}].columns.normal_column[{item_index}].referred_column"
                         ),
                         format!("unknown referred column: {referred_column}"),
-                    ));
+                    )
+                    .with_target("table name", table.physical_name.as_str())
+                    .with_target("column name", column.physical_name.as_str()));
                 }
             }
 
@@ -141,6 +158,7 @@ pub fn validate_cross_table_references(
 
                 if source_table_exists {
                     validate_relationship_column_source(
+                        table.physical_name.as_str(),
                         table_index,
                         item_index,
                         column,
@@ -163,7 +181,9 @@ pub fn validate_cross_table_references(
                         "table[{table_index}].connections.relationship[{relationship_index}].source"
                     ),
                     format!("invalid relationship source: {}", relationship.source),
-                ));
+                )
+                .with_target("table name", table.physical_name.as_str())
+                .with_target("relationship name", relationship.name.as_str()));
             };
 
             let Some(target_table_name) = table_reference_name(&relationship.target) else {
@@ -172,7 +192,9 @@ pub fn validate_cross_table_references(
                         "table[{table_index}].connections.relationship[{relationship_index}].target"
                     ),
                     format!("invalid relationship target: {}", relationship.target),
-                ));
+                )
+                .with_target("table name", table.physical_name.as_str())
+                .with_target("relationship name", relationship.name.as_str()));
             };
 
             let Some(source_table) = find_table(tables, source_table_name) else {
@@ -181,7 +203,9 @@ pub fn validate_cross_table_references(
                         "table[{table_index}].connections.relationship[{relationship_index}].source"
                     ),
                     format!("unknown relationship source table: {}", relationship.source),
-                ));
+                )
+                .with_target("table name", table.physical_name.as_str())
+                .with_target("relationship name", relationship.name.as_str()));
             };
 
             if find_table(tables, target_table_name).is_none() {
@@ -190,7 +214,9 @@ pub fn validate_cross_table_references(
                         "table[{table_index}].connections.relationship[{relationship_index}].target"
                     ),
                     format!("unknown relationship target table: {}", relationship.target),
-                ));
+                )
+                .with_target("table name", table.physical_name.as_str())
+                .with_target("relationship name", relationship.name.as_str()));
             }
 
             if let Some(column_reference) = &relationship.referred_simple_unique_column {
@@ -201,7 +227,9 @@ pub fn validate_cross_table_references(
                             "table[{table_index}].connections.relationship[{relationship_index}].referred_simple_unique_column"
                         ),
                         format!("invalid referred simple unique column: {column_reference}"),
-                    ));
+                    )
+                    .with_target("table name", table.physical_name.as_str())
+                    .with_target("relationship name", relationship.name.as_str()));
                 };
 
                 // Traditional ERM files may store the target table name in this reference.
@@ -216,7 +244,10 @@ pub fn validate_cross_table_references(
                             "table[{table_index}].connections.relationship[{relationship_index}].referred_simple_unique_column"
                         ),
                         format!("unknown referred simple unique column: {column_reference}"),
-                    ));
+                    )
+                    .with_target("table name", table.physical_name.as_str())
+                    .with_target("relationship name", relationship.name.as_str())
+                    .with_target("source table name", source_table.physical_name.as_str()));
                 }
             }
 
@@ -229,7 +260,10 @@ pub fn validate_cross_table_references(
                             "table[{table_index}].connections.relationship[{relationship_index}].referred_compound_unique_key"
                         ),
                         format!("unknown referred compound unique key: {key_name}"),
-                    ));
+                    )
+                    .with_target("table name", table.physical_name.as_str())
+                    .with_target("relationship name", relationship.name.as_str())
+                    .with_target("source table name", source_table.physical_name.as_str()));
                 }
             }
         }
@@ -291,6 +325,7 @@ fn find_table<'a>(tables: &'a [Table], table_name: &str) -> Option<&'a Table> {
 }
 
 fn validate_relationship_column_source(
+    table_name: &str,
     table_index: usize,
     item_index: usize,
     column: &NormalColumn,
@@ -303,7 +338,9 @@ fn validate_relationship_column_source(
                 "relationship column requires referred_column: {}",
                 column.physical_name
             ),
-        ));
+        )
+        .with_target("table name", table_name)
+        .with_target("column name", column.physical_name.as_str()));
     };
 
     let Some(source_table_name) = table_reference_name(relationship_source) else {
@@ -318,7 +355,9 @@ fn validate_relationship_column_source(
         return Err(ValidationError::new(
             format!("table[{table_index}].columns.normal_column[{item_index}].referred_column"),
             format!("referred_column table must match relationship source: {referred_column}"),
-        ));
+        )
+        .with_target("table name", table_name)
+        .with_target("column name", column.physical_name.as_str()));
     }
 
     Ok(())
