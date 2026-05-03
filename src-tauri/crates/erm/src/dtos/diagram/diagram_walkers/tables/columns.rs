@@ -1,7 +1,10 @@
+pub use crate::column_type::ColumnType;
+
 use crate::entities::diagram::diagram_walkers::tables::columns as entities;
+use crate::validation::Validate;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, PartialEq, Serialize, Deserialize, Default)]
+#[derive(Debug, PartialEq, Serialize, Deserialize, Default, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct NormalColumn {
     pub physical_name: String,
@@ -13,7 +16,7 @@ pub struct NormalColumn {
     pub description: Option<String>,
 
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub column_type: Option<String>,
+    pub column_type: Option<ColumnType>,
 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub length: Option<u16>,
@@ -71,14 +74,14 @@ impl From<entities::NormalColumn> for NormalColumn {
     }
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, Deserialize, Validate)]
 #[serde(untagged)]
 pub enum ColumnItem {
     Normal(NormalColumn),
     Group(String),
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct Columns {
     #[serde(default, skip_serializing_if = "Option::is_none")]

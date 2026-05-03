@@ -20,6 +20,7 @@ target
 !.vscode/extensions.json
 .idea
 .DS_Store
+.codex
 *.suo
 *.ntvs*
 *.njsproj

@@ -1,7 +1,12 @@
+pub use crate::entities::diagram::diagram_walkers::tables::connections::{
+    ChildCardinality, OnAction, ParentCardinality,
+};
+
 use crate::entities::diagram::diagram_walkers::tables::connections as entities;
+use crate::validation::Validate;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct Bendpoint {
     pub relative: bool,
@@ -19,7 +24,7 @@ impl From<entities::Bendpoint> for Bendpoint {
     }
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct FkColumn {
     pub fk_column_name: String,
@@ -33,7 +38,7 @@ impl From<entities::FkColumn> for FkColumn {
     }
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize, Default)]
+#[derive(Debug, PartialEq, Serialize, Deserialize, Default, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct FkColumns {
     #[serde(default)]
@@ -48,7 +53,7 @@ impl From<entities::FkColumns> for FkColumns {
     }
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct Relationship {
     pub name: String,
@@ -62,17 +67,17 @@ pub struct Relationship {
 
     pub fk_columns: FkColumns,
 
-    pub parent_cardinality: String,
+    pub parent_cardinality: ParentCardinality,
 
-    pub child_cardinality: String,
+    pub child_cardinality: ChildCardinality,
 
     pub reference_for_pk: bool,
 
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub on_delete_action: Option<String>,
+    pub on_delete_action: Option<OnAction>,
 
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub on_update_action: Option<String>,
+    pub on_update_action: Option<OnAction>,
 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub referred_simple_unique_column: Option<String>,
@@ -102,7 +107,7 @@ impl From<entities::Relationship> for Relationship {
     }
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize, Default)]
+#[derive(Debug, PartialEq, Serialize, Deserialize, Default, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct Connections {
     #[serde(default, skip_serializing_if = "Option::is_none")]

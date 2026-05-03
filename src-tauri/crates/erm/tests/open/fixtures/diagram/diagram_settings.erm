@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<diagram>
+  <diagram_settings>
+    <database>MySQL</database>
+    <capital>true</capital>
+    <table_style>standard</table_style>
+    <notation>IE</notation>
+    <notation_level>1</notation_level>
+    <notation_expand_group>false</notation_expand_group>
+    <view_mode>1</view_mode>
+    <outline_view_mode>2</outline_view_mode>
+    <view_order_by>3</view_order_by>
+    <auto_ime_change>false</auto_ime_change>
+    <validate_physical_name>true</validate_physical_name>
+    <use_bezier_curve>false</use_bezier_curve>
+    <suspend_validator>false</suspend_validator>
+    <titleFontEm>1.5</titleFontEm>
+    <masterDataBasePath>master.db</masterDataBasePath>
+    <use_view_object>true</use_view_object>
+    <export_settings>
+      <category_name_to_export>main</category_name_to_export>
+      <ddl_output>ddl</ddl_output>
+      <excel_output>excel</excel_output>
+      <excel_template>template</excel_template>
+      <image_output>image</image_output>
+      <put_diagram_on_excel>true</put_diagram_on_excel>
+      <use_logical_name_as_sheet>false</use_logical_name_as_sheet>
+      <open_after_saved>false</open_after_saved>
+      <create_comment>true</create_comment>
+      <create_foreignKey>true</create_foreignKey>
+      <create_index>true</create_index>
+      <create_sequence>true</create_sequence>
+      <create_table>true</create_table>
+      <create_tablespace>true</create_tablespace>
+      <create_trigger>true</create_trigger>
+      <create_view>true</create_view>
+      <drop_index>false</drop_index>
+      <drop_sequence>false</drop_sequence>
+      <drop_table>false</drop_table>
+      <drop_tablespace>false</drop_tablespace>
+      <drop_trigger>false</drop_trigger>
+      <drop_view>false</drop_view>
+      <inline_column_comment>false</inline_column_comment>
+      <inline_table_comment>false</inline_table_comment>
+      <comment_value_description>false</comment_value_description>
+      <comment_value_logical_name>false</comment_value_logical_name>
+      <comment_value_logical_name_description>true</comment_value_logical_name_description>
+      <comment_replace_line_feed>false</comment_replace_line_feed>
+      <comment_replace_string>line</comment_replace_string>
+    </export_settings>
+    <category_settings>
+      <free_layout>false</free_layout>
+      <show_referred_tables>true</show_referred_tables>
+    </category_settings>
+    <model_properties />
+    <table_properties />
+    <environment_settings />
+    <design_settings />
+  </diagram_settings>
+</diagram>

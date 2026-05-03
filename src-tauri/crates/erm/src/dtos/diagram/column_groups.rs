@@ -1,7 +1,10 @@
+pub use crate::column_type::ColumnType;
+
 use crate::entities::diagram::column_groups as entities;
+use crate::validation::Validate;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, PartialEq, Serialize, Deserialize, Default)]
+#[derive(Debug, PartialEq, Serialize, Deserialize, Default, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct NormalColumn {
     pub physical_name: String,
@@ -12,7 +15,7 @@ pub struct NormalColumn {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
 
-    pub column_type: String,
+    pub column_type: ColumnType,
 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub length: Option<u16>,
@@ -54,7 +57,7 @@ impl From<entities::NormalColumn> for NormalColumn {
     }
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct Columns {
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -71,7 +74,7 @@ impl From<entities::Columns> for Columns {
     }
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct ColumnGroup {
     pub column_group_name: String,

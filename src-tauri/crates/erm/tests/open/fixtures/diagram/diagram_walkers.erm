@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<diagram>
+  <presenter>ERFlute</presenter>
+  <diagram_settings>
+    <database>MySQL</database>
+    <capital>true</capital>
+    <table_style>standard</table_style>
+    <notation>IE</notation>
+    <notation_level>1</notation_level>
+    <notation_expand_group>false</notation_expand_group>
+    <view_mode>1</view_mode>
+    <outline_view_mode>2</outline_view_mode>
+    <view_order_by>3</view_order_by>
+    <auto_ime_change>false</auto_ime_change>
+    <validate_physical_name>true</validate_physical_name>
+    <use_bezier_curve>false</use_bezier_curve>
+    <suspend_validator>false</suspend_validator>
+    <use_view_object>true</use_view_object>
+    <export_settings />
+    <category_settings />
+    <model_properties />
+    <table_properties />
+  </diagram_settings>
+  <diagram_walkers>
+    <table>
+      <physical_name>MEMBERS</physical_name>
+      <logical_name>Members</logical_name>
+      <description>Member master table</description>
+      <height>108</height>
+      <width>194</width>
+      <font_name>Ubuntu</font_name>
+      <font_size>9</font_size>
+      <x>160</x>
+      <y>106</y>
+      <color>
+        <r>128</r>
+        <g>129</g>
+        <b>130</b>
+      </color>
+      <connections />
+      <table_constraint>ENGINE=InnoDB</table_constraint>
+      <primary_key_name>PK_MEMBERS</primary_key_name>
+      <option>member option</option>
+      <columns>
+        <normal_column>
+          <physical_name>MEMBER_ID</physical_name>
+          <primary_key>true</primary_key>
+        </normal_column>
+      </columns>
+      <indexes />
+      <compound_unique_key_list />
+      <table_properties />
+    </table>
+    <table>
+      <physical_name>MEMBER_STATUS</physical_name>
+      <logical_name>Member Status</logical_name>
+      <description>Status master table</description>
+      <font_name>Ubuntu</font_name>
+      <font_size>10</font_size>
+      <x>400</x>
+      <y>120</y>
+      <color>
+        <r>10</r>
+        <g>20</g>
+        <b>30</b>
+      </color>
+      <connections />
+      <columns />
+      <indexes />
+      <compound_unique_key_list />
+      <table_properties />
+    </table>
+  </diagram_walkers>
+</diagram>

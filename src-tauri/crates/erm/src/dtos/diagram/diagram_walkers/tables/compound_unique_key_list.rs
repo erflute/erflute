@@ -1,7 +1,8 @@
 use crate::entities::diagram::diagram_walkers::tables::compound_unique_key_list as entities;
+use crate::validation::Validate;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct Column {
     pub column_id: String,
@@ -15,7 +16,7 @@ impl From<entities::Column> for Column {
     }
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct CompoundUniqueKey {
     pub name: String,
@@ -31,7 +32,7 @@ impl From<entities::CompoundUniqueKey> for CompoundUniqueKey {
     }
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct CompoundUniqueKeyList {
     #[serde(default, skip_serializing_if = "Option::is_none")]

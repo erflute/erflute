@@ -8,21 +8,65 @@ use erm::dtos::diagram::diagram_walkers::tables;
 use erm::dtos::diagram::diagram_walkers::tables::columns;
 use erm::dtos::diagram::diagram_walkers::tables::compound_unique_key_list;
 use erm::dtos::diagram::diagram_walkers::tables::connections;
+use erm::dtos::diagram::page_settings;
 use erm::open;
 
 // TODO: Add test cases of detailed condition for each field in https://github.com/s-kai273/erflute/issues/22
 
 #[test]
-fn test_read_erm_file() {
-    let diagram = open("./tests/fixtures/testerd.erm").expect("failed to parse");
+fn test_read_snapshot() {
+    let diagram = open("./tests/open/fixtures/read_snapshot.erm").expect("failed to parse");
     assert_eq!(
         diagram,
         diagram::Diagram {
+            presenter: Some("ERFlute".to_string()),
+            page_settings: Some(page_settings::PageSettings {
+                direction_horizontal: true,
+                scale: 100,
+                paper_size: "A4 210 x 297 mm".to_string(),
+                top_margin: 30,
+                left_margin: 30,
+                bottom_margin: 30,
+                right_margin: 30,
+            }),
+            category_index: None,
+            current_ermodel: None,
+            zoom: None,
+            x: None,
+            y: None,
+            default_color: None,
+            color: Some(diagram::Color {
+                r: 255,
+                g: 255,
+                b: 255,
+            }),
+            font_name: Some("".to_string()),
+            font_size: Some(9),
             diagram_settings: diagram_settings::DiagramSettings {
                 database: "MySQL".to_string(),
+                capital: true,
+                table_style: "".to_string(),
+                notation: "".to_string(),
+                notation_level: 0,
+                notation_expand_group: true,
                 view_mode: 1,
+                outline_view_mode: 1,
+                view_order_by: 1,
+                auto_ime_change: false,
+                validate_physical_name: true,
+                use_bezier_curve: false,
+                suspend_validator: false,
+                title_font_em: Some(1.5),
+                master_data_base_path: Some("".to_string()),
+                use_view_object: false,
+                export_settings: diagram_settings::ExportSettings {},
+                category_settings: diagram_settings::CategorySettings {},
+                model_properties: diagram_settings::ModelProperties {},
+                table_properties: diagram_settings::TableProperties {},
+                environment_settings: Some(diagram_settings::EnvironmentSettings {}),
+                design_settings: None,
             },
-            diagram_walkers: diagram_walkers::DiagramWalkers {
+            diagram_walkers: Some(diagram_walkers::DiagramWalkers {
                 tables: Some(vec![
                     tables::Table {
                         physical_name: "MEMBERS".to_string(),
@@ -50,7 +94,7 @@ fn test_read_erm_file() {
                                 columns::ColumnItem::Normal(columns::NormalColumn {
                                     physical_name: "MEMBER_ID".to_string(),
                                     logical_name: Some("会員ID".to_string()),
-                                    column_type: Some("bigint".to_string()),
+                                    column_type: Some(columns::ColumnType::BigInt),
                                     unsigned: Some(true),
                                     not_null: Some(true),
                                     primary_key: Some(true),
@@ -60,7 +104,7 @@ fn test_read_erm_file() {
                                 columns::ColumnItem::Normal(columns::NormalColumn {
                                     physical_name: "LAST_NAME".to_string(),
                                     logical_name: Some("苗字".to_string()),
-                                    column_type: Some("varchar(n)".to_string()),
+                                    column_type: Some(columns::ColumnType::VarCharN),
                                     length: Some(32),
                                     not_null: Some(true),
                                     ..Default::default()
@@ -68,7 +112,7 @@ fn test_read_erm_file() {
                                 columns::ColumnItem::Normal(columns::NormalColumn {
                                     physical_name: "FIRST_NAME".to_string(),
                                     logical_name: Some("名前".to_string()),
-                                    column_type: Some("varchar(n)".to_string()),
+                                    column_type: Some(columns::ColumnType::VarCharN),
                                     length: Some(32),
                                     not_null: Some(true),
                                     ..Default::default()
@@ -108,11 +152,11 @@ fn test_read_erm_file() {
                                             fk_column_name: "MEMBER_ID".to_string(),
                                         }],
                                     },
-                                    parent_cardinality: "1".to_string(),
-                                    child_cardinality: "0..1".to_string(),
+                                    parent_cardinality: connections::ParentCardinality::One,
+                                    child_cardinality: connections::ChildCardinality::ZeroOrOne,
                                     reference_for_pk: true,
-                                    on_delete_action: Some("RESTRICT".to_string()),
-                                    on_update_action: Some("RESTRICT".to_string()),
+                                    on_delete_action: Some(connections::OnAction::Restrict),
+                                    on_update_action: Some(connections::OnAction::Restrict),
                                     referred_simple_unique_column: None,
                                     referred_compound_unique_key: None,
                                 },
@@ -126,11 +170,11 @@ fn test_read_erm_file() {
                                             fk_column_name: "GENDER_ID".to_string(),
                                         }]
                                     },
-                                    parent_cardinality: "1".to_string(),
-                                    child_cardinality: "0..n".to_string(),
+                                    parent_cardinality: connections::ParentCardinality::One,
+                                    child_cardinality: connections::ChildCardinality::ZeroOrMore,
                                     reference_for_pk: true,
-                                    on_delete_action: Some("RESTRICT".to_string()),
-                                    on_update_action: Some("RESTRICT".to_string()),
+                                    on_delete_action: Some(connections::OnAction::Restrict),
+                                    on_update_action: Some(connections::OnAction::Restrict),
                                     referred_simple_unique_column: None,
                                     referred_compound_unique_key: None,
                                 }
@@ -144,7 +188,7 @@ fn test_read_erm_file() {
                                 columns::ColumnItem::Normal(columns::NormalColumn {
                                     physical_name: "MEMBER_PROFILE_ID".to_string(),
                                     logical_name: Some("会員プロフィールID".to_string()),
-                                    column_type: Some("bigint".to_string()),
+                                    column_type: Some(columns::ColumnType::BigInt),
                                     unsigned: Some(true),
                                     not_null: Some(true),
                                     primary_key: Some(true),
@@ -161,14 +205,14 @@ fn test_read_erm_file() {
                                 columns::ColumnItem::Normal(columns::NormalColumn {
                                     physical_name: "SELF_INTRODUCTION".to_string(),
                                     logical_name: Some("自己紹介".to_string()),
-                                    column_type: Some("text".to_string()),
+                                    column_type: Some(columns::ColumnType::Text),
                                     not_null: Some(true),
                                     ..Default::default()
                                 }),
                                 columns::ColumnItem::Normal(columns::NormalColumn {
                                     physical_name: "PROFILE_IMG_URL".to_string(),
                                     logical_name: Some("プロフィール画像URL".to_string()),
-                                    column_type: Some("varchar(n)".to_string()),
+                                    column_type: Some(columns::ColumnType::VarCharN),
                                     length: Some(2048),
                                     not_null: Some(true),
                                     ..Default::default()
@@ -213,7 +257,7 @@ fn test_read_erm_file() {
                                 columns::ColumnItem::Normal(columns::NormalColumn {
                                     physical_name: "GENDER_ID".to_string(),
                                     logical_name: Some("性別ID".to_string()),
-                                    column_type: Some("integer".to_string()),
+                                    column_type: Some(columns::ColumnType::Int),
                                     unsigned: Some(true),
                                     not_null: Some(true),
                                     primary_key: Some(true),
@@ -223,7 +267,7 @@ fn test_read_erm_file() {
                                 columns::ColumnItem::Normal(columns::NormalColumn {
                                     physical_name: "GENDER".to_string(),
                                     logical_name: Some("性別".to_string()),
-                                    column_type: Some("character(n)".to_string()),
+                                    column_type: Some(columns::ColumnType::CharN),
                                     length: Some(2),
                                     description: Some("「男性」または「女性」".to_string()),
                                     not_null: Some(true),
@@ -262,11 +306,11 @@ fn test_read_erm_file() {
                                         fk_column_name: "MEMBER_ID".to_string(),
                                     }],
                                 },
-                                parent_cardinality: "0..1".to_string(),
-                                child_cardinality: "0..n".to_string(),
+                                parent_cardinality: connections::ParentCardinality::ZeroOrOne,
+                                child_cardinality: connections::ChildCardinality::ZeroOrMore,
                                 reference_for_pk: true,
-                                on_delete_action: Some("RESTRICT".to_string()),
-                                on_update_action: Some("RESTRICT".to_string()),
+                                on_delete_action: Some(connections::OnAction::Restrict),
+                                on_update_action: Some(connections::OnAction::Restrict),
                                 referred_simple_unique_column: None,
                                 referred_compound_unique_key: None,
                             }])
@@ -279,7 +323,7 @@ fn test_read_erm_file() {
                                 columns::ColumnItem::Normal(columns::NormalColumn {
                                     physical_name: "POST_ID".to_string(),
                                     logical_name: Some("投稿ID".to_string()),
-                                    column_type: Some("bigint".to_string()),
+                                    column_type: Some(columns::ColumnType::BigInt),
                                     unsigned: Some(true),
                                     not_null: Some(true),
                                     primary_key: Some(true),
@@ -296,7 +340,7 @@ fn test_read_erm_file() {
                                 columns::ColumnItem::Normal(columns::NormalColumn {
                                     physical_name: "TITLE".to_string(),
                                     logical_name: Some("タイトル".to_string()),
-                                    column_type: Some("varchar(n)".to_string()),
+                                    column_type: Some(columns::ColumnType::VarCharN),
                                     length: Some(128),
                                     not_null: Some(true),
                                     ..Default::default()
@@ -304,20 +348,20 @@ fn test_read_erm_file() {
                                 columns::ColumnItem::Normal(columns::NormalColumn {
                                     physical_name: "TEXT".to_string(),
                                     logical_name: Some("本文".to_string()),
-                                    column_type: Some("text".to_string()),
+                                    column_type: Some(columns::ColumnType::Text),
                                     ..Default::default()
                                 }),
                                 columns::ColumnItem::Normal(columns::NormalColumn {
                                     physical_name: "IMG_URL".to_string(),
                                     logical_name: Some("画像URL".to_string()),
-                                    column_type: Some("varchar(n)".to_string()),
+                                    column_type: Some(columns::ColumnType::VarCharN),
                                     length: Some(2048),
                                     ..Default::default()
                                 }),
                                 columns::ColumnItem::Normal(columns::NormalColumn {
                                     physical_name: "VIEW_COUNT".to_string(),
                                     logical_name: Some("閲覧数".to_string()),
-                                    column_type: Some("bigint".to_string()),
+                                    column_type: Some(columns::ColumnType::BigInt),
                                     not_null: Some(true),
                                     default_value: Some("0".to_string()),
                                     ..Default::default()
@@ -325,7 +369,7 @@ fn test_read_erm_file() {
                                 columns::ColumnItem::Normal(columns::NormalColumn {
                                     physical_name: "LIKE_COUNT".to_string(),
                                     logical_name: Some("いいね数".to_string()),
-                                    column_type: Some("bigint".to_string()),
+                                    column_type: Some(columns::ColumnType::BigInt),
                                     not_null: Some(true),
                                     default_value: Some("0".to_string()),
                                     ..Default::default()
@@ -333,20 +377,20 @@ fn test_read_erm_file() {
                                 columns::ColumnItem::Normal(columns::NormalColumn {
                                     physical_name: "PUBLIC_START_AT".to_string(),
                                     logical_name: Some("公開開始時間".to_string()),
-                                    column_type: Some("datetime".to_string()),
+                                    column_type: Some(columns::ColumnType::Datetime),
                                     not_null: Some(true),
                                     ..Default::default()
                                 }),
                                 columns::ColumnItem::Normal(columns::NormalColumn {
                                     physical_name: "PUBLIC_END_AT".to_string(),
                                     logical_name: Some("公開終了時間".to_string()),
-                                    column_type: Some("datetime".to_string()),
+                                    column_type: Some(columns::ColumnType::Datetime),
                                     ..Default::default()
                                 }),
                                 columns::ColumnItem::Normal(columns::NormalColumn {
                                     physical_name: "DELETED".to_string(),
                                     logical_name: Some("削除済".to_string()),
-                                    column_type: Some("boolean".to_string()),
+                                    column_type: Some(columns::ColumnType::Boolean),
                                     not_null: Some(true),
                                     default_value: Some("FALSE".to_string()),
                                     ..Default::default()
@@ -386,11 +430,11 @@ fn test_read_erm_file() {
                                             fk_column_name: "POST_THREAD_ID".to_string(),
                                         }],
                                     },
-                                    parent_cardinality: "1".to_string(),
-                                    child_cardinality: "1..n".to_string(),
+                                    parent_cardinality: connections::ParentCardinality::One,
+                                    child_cardinality: connections::ChildCardinality::OneOrMore,
                                     reference_for_pk: true,
-                                    on_delete_action: Some("RESTRICT".to_string()),
-                                    on_update_action: Some("RESTRICT".to_string()),
+                                    on_delete_action: Some(connections::OnAction::Restrict),
+                                    on_update_action: Some(connections::OnAction::Restrict),
                                     referred_simple_unique_column: None,
                                     referred_compound_unique_key: None,
                                 },
@@ -404,11 +448,11 @@ fn test_read_erm_file() {
                                             fk_column_name: "MEMBER_ID".to_string(),
                                         }],
                                     },
-                                    parent_cardinality: "0..1".to_string(),
-                                    child_cardinality: "0..n".to_string(),
+                                    parent_cardinality: connections::ParentCardinality::ZeroOrOne,
+                                    child_cardinality: connections::ChildCardinality::ZeroOrMore,
                                     reference_for_pk: true,
-                                    on_delete_action: Some("RESTRICT".to_string()),
-                                    on_update_action: Some("RESTRICT".to_string()),
+                                    on_delete_action: Some(connections::OnAction::Restrict),
+                                    on_update_action: Some(connections::OnAction::Restrict),
                                     referred_simple_unique_column: None,
                                     referred_compound_unique_key: None,
                                 },
@@ -422,7 +466,7 @@ fn test_read_erm_file() {
                                 columns::ColumnItem::Normal(columns::NormalColumn {
                                     physical_name: "POST_REPLY_ID".to_string(),
                                     logical_name: Some("投稿返信ID".to_string()),
-                                    column_type: Some("bigint".to_string()),
+                                    column_type: Some(columns::ColumnType::BigInt),
                                     unsigned: Some(true),
                                     not_null: Some(true),
                                     primary_key: Some(true),
@@ -448,14 +492,14 @@ fn test_read_erm_file() {
                                 columns::ColumnItem::Normal(columns::NormalColumn {
                                     physical_name: "TEXT".to_string(),
                                     logical_name: Some("本文".to_string()),
-                                    column_type: Some("text".to_string()),
+                                    column_type: Some(columns::ColumnType::Text),
                                     not_null: Some(true),
                                     ..Default::default()
                                 }),
                                 columns::ColumnItem::Normal(columns::NormalColumn {
                                     physical_name: "VIEW_COUNT".to_string(),
                                     logical_name: Some("閲覧数".to_string()),
-                                    column_type: Some("bigint".to_string()),
+                                    column_type: Some(columns::ColumnType::BigInt),
                                     not_null: Some(true),
                                     default_value: Some("0".to_string()),
                                     ..Default::default()
@@ -463,7 +507,7 @@ fn test_read_erm_file() {
                                 columns::ColumnItem::Normal(columns::NormalColumn {
                                     physical_name: "LIKE_COUNT".to_string(),
                                     logical_name: Some("いいね数".to_string()),
-                                    column_type: Some("bigint".to_string()),
+                                    column_type: Some(columns::ColumnType::BigInt),
                                     not_null: Some(true),
                                     default_value: Some("0".to_string()),
                                     ..Default::default()
@@ -502,11 +546,11 @@ fn test_read_erm_file() {
                                         fk_column_name: "POST_ID".to_string(),
                                     }],
                                 },
-                                parent_cardinality: "1".to_string(),
-                                child_cardinality: "0..1".to_string(),
+                                parent_cardinality: connections::ParentCardinality::One,
+                                child_cardinality: connections::ChildCardinality::ZeroOrOne,
                                 reference_for_pk: true,
-                                on_delete_action: Some("RESTRICT".to_string()),
-                                on_update_action: Some("RESTRICT".to_string()),
+                                on_delete_action: Some(connections::OnAction::Restrict),
+                                on_update_action: Some(connections::OnAction::Restrict),
                                 referred_simple_unique_column: None,
                                 referred_compound_unique_key: None,
                             }])
@@ -519,7 +563,7 @@ fn test_read_erm_file() {
                                 columns::ColumnItem::Normal(columns::NormalColumn {
                                     physical_name: "POST_THREAD_ID".to_string(),
                                     logical_name: Some("投稿スレッドID".to_string()),
-                                    column_type: Some("bigint".to_string()),
+                                    column_type: Some(columns::ColumnType::BigInt),
                                     unsigned: Some(true),
                                     not_null: Some(true),
                                     primary_key: Some(true),
@@ -543,42 +587,42 @@ fn test_read_erm_file() {
                         },
                     }
                 ]),
-            },
+            }),
             column_groups: Some(vec![column_groups::ColumnGroup {
-                    column_group_name: "COMMON".to_string(),
-                    columns: column_groups::Columns {
-                        normal_columns: Some(vec![
-                            column_groups::NormalColumn {
-                                physical_name: "CREATED_AT".to_string(),
-                                logical_name: Some("作成時間".to_string()),
-                                column_type: "datetime".to_string(),
-                                not_null: Some(true),
-                                ..Default::default()
-                            },
-                            column_groups::NormalColumn {
-                                physical_name: "CREATED_BY".to_string(),
-                                logical_name: Some("作成会員ID".to_string()),
-                                column_type: "bigint".to_string(),
-                                not_null: Some(true),
-                                ..Default::default()
-                            },
-                            column_groups::NormalColumn {
-                                physical_name: "UPDATED_AT".to_string(),
-                                logical_name: Some("更新時間".to_string()),
-                                column_type: "datetime".to_string(),
-                                not_null: Some(true),
-                                ..Default::default()
-                            },
-                            column_groups::NormalColumn {
-                                physical_name: "UPDATED_BY".to_string(),
-                                logical_name: Some("更新会員ID".to_string()),
-                                column_type: "bigint".to_string(),
-                                not_null: Some(true),
-                                ..Default::default()
-                            }
-                        ])
-                    }
-                }])
+                column_group_name: "COMMON".to_string(),
+                columns: column_groups::Columns {
+                    normal_columns: Some(vec![
+                        column_groups::NormalColumn {
+                            physical_name: "CREATED_AT".to_string(),
+                            logical_name: Some("作成時間".to_string()),
+                            column_type: column_groups::ColumnType::Datetime,
+                            not_null: Some(true),
+                            ..Default::default()
+                        },
+                        column_groups::NormalColumn {
+                            physical_name: "CREATED_BY".to_string(),
+                            logical_name: Some("作成会員ID".to_string()),
+                            column_type: column_groups::ColumnType::BigInt,
+                            not_null: Some(true),
+                            ..Default::default()
+                        },
+                        column_groups::NormalColumn {
+                            physical_name: "UPDATED_AT".to_string(),
+                            logical_name: Some("更新時間".to_string()),
+                            column_type: column_groups::ColumnType::Datetime,
+                            not_null: Some(true),
+                            ..Default::default()
+                        },
+                        column_groups::NormalColumn {
+                            physical_name: "UPDATED_BY".to_string(),
+                            logical_name: Some("更新会員ID".to_string()),
+                            column_type: column_groups::ColumnType::BigInt,
+                            not_null: Some(true),
+                            ..Default::default()
+                        }
+                    ])
+                }
+            }])
         }
     )
 }
