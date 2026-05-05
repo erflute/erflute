@@ -10,7 +10,7 @@ it("renders the problems heading and count", () => {
   expect(screen.getByText("4")).toBeInTheDocument();
 });
 
-it("renders problem titles with source codes and locations", () => {
+it("renders problem titles with their severity", () => {
   render(<ProblemsPanel />);
 
   expect(
@@ -19,8 +19,6 @@ it("renders problem titles with source codes and locations", () => {
   expect(screen.getAllByLabelText("Error")).toHaveLength(2);
   expect(screen.getByLabelText("Warning")).toBeInTheDocument();
   expect(screen.getByLabelText("Information")).toBeInTheDocument();
-  expect(screen.getByText("ER validation(TABLE_NAME_REQUIRED)")).toBeInTheDocument();
-  expect(screen.getByText("[Ln 15, Col 8]")).toBeInTheDocument();
 });
 
 it("does not show problem details before a problem is opened", () => {

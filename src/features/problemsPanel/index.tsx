@@ -15,35 +15,24 @@ const sampleProblems: ProblemItem[] = [
     severity: "error",
     title: "Table name is required",
     body: "The table definition does not have a physical name. Add a physical table name before saving the diagram.",
-    source: "ER validation",
-    code: "TABLE_NAME_REQUIRED",
-    location: { line: 15, column: 8 },
   },
   {
     id: "duplicate-column",
     severity: "error",
     title: "Duplicate column name",
     body: "Two columns in this table use the same physical name. Rename one of the columns so generated SQL can be created without conflicts.",
-    source: "ER validation",
-    code: "DUPLICATE_COLUMN_NAME",
-    location: { line: 28, column: 12 },
   },
   {
     id: "missing-primary-key",
     severity: "warning",
     title: "Primary key is not defined",
     body: "This table does not define a primary key. The diagram can still be edited, but relations and exported DDL may be less reliable.",
-    source: "ER validation",
-    code: "PRIMARY_KEY_MISSING",
-    location: { line: 42, column: 4 },
   },
   {
     id: "empty-description",
     severity: "info",
     title: "Description is empty",
     body: "Consider adding a description so other users can understand the purpose of this table.",
-    source: "ER validation",
-    code: "DESCRIPTION_EMPTY",
   },
 ];
 
@@ -71,13 +60,6 @@ const severityProfiles: Record<
     className: "text-sky-600",
   },
 };
-
-function formatLocation(problem: ProblemItem) {
-  if (!problem.location) {
-    return null;
-  }
-  return `Ln ${problem.location.line}, Col ${problem.location.column}`;
-}
 
 export function ProblemsPanel() {
   const [openProblemIds, setOpenProblemIds] = useState<Set<string>>(new Set());
@@ -112,7 +94,6 @@ export function ProblemsPanel() {
         {sampleProblems.map((problem) => {
           const severityProfile = severityProfiles[problem.severity];
           const isOpen = openProblemIds.has(problem.id);
-          const location = formatLocation(problem);
           const ExpandIcon = isOpen ? ChevronDown : ChevronRight;
           const detailsId = `problem-${problem.id}-details`;
 
@@ -134,14 +115,6 @@ export function ProblemsPanel() {
                   aria-label={severityProfile.label}
                 />
                 <span className="min-w-0 flex-1 truncate">{problem.title}</span>
-                <span className="shrink-0 text-xs text-slate-500">
-                  {problem.source}({problem.code})
-                </span>
-                {location && (
-                  <span className="shrink-0 text-xs text-slate-500">
-                    [{location}]
-                  </span>
-                )}
               </button>
               {isOpen && (
                 <div
