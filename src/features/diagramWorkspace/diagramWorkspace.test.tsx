@@ -51,13 +51,15 @@ it("renders the entry screen with the problems panel when no diagram is loaded",
   expect(screen.queryByRole("navigation")).not.toBeInTheDocument();
 });
 
-it("renders a resize separator between the diagram and problems panel", () => {
+it("renders a resize separator over the diagram and problems panel", () => {
   render(<DiagramWorkspace diagram={<div>Diagram area</div>} />);
 
   expect(screen.getByText("Diagram area")).toBeInTheDocument();
-  expect(
-    screen.getByRole("separator", { name: "Resize problems panel" }),
-  ).toBeInTheDocument();
+  const separator = screen.getByRole("separator", {
+    name: "Resize problems panel",
+  });
+  expect(separator).toBeInTheDocument();
+  expect(separator).toHaveStyle({ bottom: "224px" });
   expect(screen.getByRole("region", { name: "Problems" })).toHaveStyle({
     height: "224px",
   });
@@ -79,6 +81,7 @@ it("resizes the problems panel when the separator is dragged", () => {
   expect(screen.getByRole("region", { name: "Problems" })).toHaveStyle({
     height: "280px",
   });
+  expect(separator).toHaveStyle({ bottom: "280px" });
 });
 
 it("does not resize the problems panel below its minimum height", () => {

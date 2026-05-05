@@ -9,7 +9,6 @@ import type { DiagramWorkspaceProps } from "./types";
 
 const defaultProblemsPanelHeight = 224;
 const minProblemsPanelHeight = 120;
-const minMainContentHeight = 160;
 const maxProblemsPanelRatio = 0.6;
 
 function clamp(value: number, min: number, max: number) {
@@ -19,10 +18,7 @@ function clamp(value: number, min: number, max: number) {
 function getMaxProblemsPanelHeight(workspaceHeight: number) {
   return Math.max(
     minProblemsPanelHeight,
-    Math.min(
-      workspaceHeight * maxProblemsPanelRatio,
-      workspaceHeight - minMainContentHeight,
-    ),
+    workspaceHeight * maxProblemsPanelRatio,
   );
 }
 
@@ -87,8 +83,8 @@ export function DiagramWorkspace({
   return (
     <div className="flex h-screen w-screen bg-slate-100">
       {isLoaded && <Toolbar />}
-      <main ref={workspaceRef} className="flex min-w-0 flex-1 flex-col">
-        <div className="min-h-0 flex-1">
+      <main ref={workspaceRef} className="relative min-w-0 flex-1 overflow-hidden">
+        <div className="h-full w-full">
           {isLoaded ? diagram : <EntryScreen />}
         </div>
         <div
@@ -99,12 +95,15 @@ export function DiagramWorkspace({
           aria-valuemax={Math.round(maxProblemsPanelHeight)}
           aria-valuenow={Math.round(problemsPanelHeight)}
           tabIndex={0}
-          className="group relative h-2 shrink-0 cursor-row-resize bg-slate-100 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-400"
+          className="group absolute inset-x-0 z-20 h-2 cursor-row-resize bg-slate-100/90 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-400"
+          style={{ bottom: problemsPanelHeight }}
           onPointerDown={handleResizeStart}
         >
           <div className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-slate-300 transition group-hover:h-0.5 group-hover:bg-blue-500" />
         </div>
-        <ProblemsPanel height={problemsPanelHeight} />
+        <div className="absolute inset-x-0 bottom-0 z-10">
+          <ProblemsPanel height={problemsPanelHeight} />
+        </div>
       </main>
     </div>
   );
