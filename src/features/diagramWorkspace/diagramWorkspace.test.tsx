@@ -35,13 +35,20 @@ function mockWorkspaceRect(separator: HTMLElement, height: number) {
   });
 }
 
-it("renders the entry screen when no diagram is loaded", () => {
+it("renders the entry screen with the problems panel when no diagram is loaded", () => {
   useErmFileStore.setState({ isLoaded: false });
 
   render(<DiagramWorkspace diagram={<div>Diagram area</div>} />);
 
   expect(screen.getByText("Open or Create your diagram")).toBeInTheDocument();
   expect(screen.queryByText("Diagram area")).not.toBeInTheDocument();
+  expect(
+    screen.getByRole("separator", { name: "Resize problems panel" }),
+  ).toBeInTheDocument();
+  expect(screen.getByRole("region", { name: "Problems" })).toHaveStyle({
+    height: "224px",
+  });
+  expect(screen.queryByRole("navigation")).not.toBeInTheDocument();
 });
 
 it("renders a resize separator between the diagram and problems panel", () => {

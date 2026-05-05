@@ -9,7 +9,7 @@ import type { DiagramWorkspaceProps } from "./types";
 
 const defaultProblemsPanelHeight = 224;
 const minProblemsPanelHeight = 120;
-const minDiagramHeight = 160;
+const minMainContentHeight = 160;
 const maxProblemsPanelRatio = 0.6;
 
 function clamp(value: number, min: number, max: number) {
@@ -21,7 +21,7 @@ function getMaxProblemsPanelHeight(workspaceHeight: number) {
     minProblemsPanelHeight,
     Math.min(
       workspaceHeight * maxProblemsPanelRatio,
-      workspaceHeight - minDiagramHeight,
+      workspaceHeight - minMainContentHeight,
     ),
   );
 }
@@ -84,15 +84,13 @@ export function DiagramWorkspace({
       )
     : defaultProblemsPanelHeight;
 
-  if (!isLoaded) {
-    return <EntryScreen />;
-  }
-
   return (
     <div className="flex h-screen w-screen bg-slate-100">
-      <Toolbar />
+      {isLoaded && <Toolbar />}
       <main ref={workspaceRef} className="flex min-w-0 flex-1 flex-col">
-        <div className="min-h-0 flex-1">{diagram}</div>
+        <div className="min-h-0 flex-1">
+          {isLoaded ? diagram : <EntryScreen />}
+        </div>
         <div
           role="separator"
           aria-label="Resize problems panel"
