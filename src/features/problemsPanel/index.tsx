@@ -61,7 +61,11 @@ const severityProfiles: Record<
   },
 };
 
-export function ProblemsPanel() {
+type ProblemsPanelProps = {
+  height: number;
+};
+
+export function ProblemsPanel({ height }: ProblemsPanelProps) {
   const [openProblemIds, setOpenProblemIds] = useState<Set<string>>(new Set());
 
   const toggleProblem = (problemId: string) => {
@@ -78,8 +82,9 @@ export function ProblemsPanel() {
 
   return (
     <section
-      className="flex h-56 shrink-0 flex-col border-t border-slate-300 bg-white text-slate-900 shadow-[0_-1px_3px_rgba(15,23,42,0.06)]"
+      className="flex shrink-0 flex-col border-t border-slate-300 bg-white text-slate-900 shadow-[0_-1px_3px_rgba(15,23,42,0.06)]"
       aria-label="Problems"
+      style={{ height }}
     >
       <header className="flex h-9 shrink-0 items-center border-b border-slate-300 bg-slate-200/80 px-4">
         <div className="flex h-full items-center border-b-2 border-blue-600 text-[11px] font-semibold tracking-wide text-slate-700">

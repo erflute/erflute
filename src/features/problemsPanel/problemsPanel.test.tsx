@@ -2,8 +2,12 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ProblemsPanel } from ".";
 
+function renderProblemsPanel() {
+  render(<ProblemsPanel height={224} />);
+}
+
 it("renders the problems heading and count", () => {
-  render(<ProblemsPanel />);
+  renderProblemsPanel();
 
   expect(screen.getByRole("region", { name: "Problems" })).toBeInTheDocument();
   expect(screen.getByText("PROBLEMS")).toBeInTheDocument();
@@ -11,7 +15,7 @@ it("renders the problems heading and count", () => {
 });
 
 it("renders problem titles with their severity", () => {
-  render(<ProblemsPanel />);
+  renderProblemsPanel();
 
   expect(
     screen.getByRole("button", { name: /Table name is required/i }),
@@ -22,7 +26,7 @@ it("renders problem titles with their severity", () => {
 });
 
 it("does not show problem details before a problem is opened", () => {
-  render(<ProblemsPanel />);
+  renderProblemsPanel();
 
   expect(
     screen.queryByText(/The table definition does not have a physical name/i),
@@ -31,7 +35,7 @@ it("does not show problem details before a problem is opened", () => {
 
 it("opens problem details when a problem is clicked", async () => {
   const user = userEvent.setup();
-  render(<ProblemsPanel />);
+  renderProblemsPanel();
 
   await user.click(screen.getByRole("button", { name: /Table name is required/i }));
 
@@ -42,7 +46,7 @@ it("opens problem details when a problem is clicked", async () => {
 
 it("closes problem details when an open problem is clicked again", async () => {
   const user = userEvent.setup();
-  render(<ProblemsPanel />);
+  renderProblemsPanel();
 
   const problem = screen.getByRole("button", { name: /Table name is required/i });
   await user.click(problem);
