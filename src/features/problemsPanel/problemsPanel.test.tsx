@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { ProblemsPanel } from ".";
 
 function renderProblemsPanel() {
-  render(<ProblemsPanel height={224} />);
+  render(<ProblemsPanel height={224} onClose={() => undefined} />);
 }
 
 it("renders the problems heading and count", () => {

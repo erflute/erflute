@@ -1,4 +1,5 @@
 import { act, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { useErmFileStore } from "@/stores/ermFileStore";
 import { DiagramWorkspace } from ".";
 
@@ -118,4 +119,17 @@ it("does not resize the problems panel above its maximum height", () => {
   expect(screen.getByRole("region", { name: "Problems" })).toHaveStyle({
     height: "480px",
   });
+});
+
+it("hides the problems panel and resize separator when the close button is clicked", async () => {
+  const user = userEvent.setup();
+  render(<DiagramWorkspace diagram={<div>Diagram area</div>} />);
+
+  await user.click(screen.getByRole("button", { name: "Close problems panel" }));
+
+  expect(screen.queryByRole("region", { name: "Problems" })).not.toBeInTheDocument();
+  expect(
+    screen.queryByRole("separator", { name: "Resize problems panel" }),
+  ).not.toBeInTheDocument();
+  expect(screen.getByText("Diagram area")).toBeInTheDocument();
 });

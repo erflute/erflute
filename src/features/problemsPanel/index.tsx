@@ -5,6 +5,7 @@ import {
   CircleX,
   Info,
   TriangleAlert,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ProblemItem, ProblemSeverity } from "./types";
@@ -63,9 +64,10 @@ const severityProfiles: Record<
 
 type ProblemsPanelProps = {
   height: number;
+  onClose: () => void;
 };
 
-export function ProblemsPanel({ height }: ProblemsPanelProps) {
+export function ProblemsPanel({ height, onClose }: ProblemsPanelProps) {
   const [openProblemIds, setOpenProblemIds] = useState<Set<string>>(new Set());
 
   const toggleProblem = (problemId: string) => {
@@ -86,13 +88,21 @@ export function ProblemsPanel({ height }: ProblemsPanelProps) {
       aria-label="Problems"
       style={{ height }}
     >
-      <header className="flex h-9 shrink-0 items-center border-b border-slate-300 bg-slate-200/80 px-4">
+      <header className="flex h-9 shrink-0 items-center justify-between border-b border-slate-300 bg-slate-200/80 px-4">
         <div className="flex h-full items-center border-b-2 border-blue-600 text-[11px] font-semibold tracking-wide text-slate-700">
           PROBLEMS
           <span className="ml-2 rounded-full bg-slate-300 px-1.5 py-0.5 text-[10px] font-semibold leading-none text-slate-700">
             {sampleProblems.length}
           </span>
         </div>
+        <button
+          type="button"
+          className="flex size-7 items-center justify-center rounded-sm border-0 bg-transparent p-0 text-slate-500 shadow-none transition hover:bg-slate-300/70 hover:text-slate-800 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-400"
+          aria-label="Close problems panel"
+          onClick={onClose}
+        >
+          <X className="size-4" aria-hidden />
+        </button>
       </header>
 
       <div className="min-h-0 flex-1 overflow-y-auto py-1" role="list">

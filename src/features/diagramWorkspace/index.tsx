@@ -30,6 +30,7 @@ export function DiagramWorkspace({
   const [problemsPanelHeight, setProblemsPanelHeight] = useState(
     defaultProblemsPanelHeight,
   );
+  const [problemsPanelVisible, setProblemsPanelVisible] = useState(true);
 
   const handleResizeStart = (event: PointerEvent<HTMLDivElement>) => {
     const workspace = workspaceRef.current;
@@ -87,23 +88,30 @@ export function DiagramWorkspace({
         <div className="h-full w-full">
           {isLoaded ? diagram : <EntryScreen />}
         </div>
-        <div
-          role="separator"
-          aria-label="Resize problems panel"
-          aria-orientation="horizontal"
-          aria-valuemin={minProblemsPanelHeight}
-          aria-valuemax={Math.round(maxProblemsPanelHeight)}
-          aria-valuenow={Math.round(problemsPanelHeight)}
-          tabIndex={0}
-          className="group absolute inset-x-0 z-20 h-2 cursor-row-resize bg-slate-100/90 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-400"
-          style={{ bottom: problemsPanelHeight }}
-          onPointerDown={handleResizeStart}
-        >
-          <div className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-slate-300 transition group-hover:h-0.5 group-hover:bg-blue-500" />
-        </div>
-        <div className="absolute inset-x-0 bottom-0 z-10">
-          <ProblemsPanel height={problemsPanelHeight} />
-        </div>
+        {problemsPanelVisible && (
+          <>
+            <div
+              role="separator"
+              aria-label="Resize problems panel"
+              aria-orientation="horizontal"
+              aria-valuemin={minProblemsPanelHeight}
+              aria-valuemax={Math.round(maxProblemsPanelHeight)}
+              aria-valuenow={Math.round(problemsPanelHeight)}
+              tabIndex={0}
+              className="group absolute inset-x-0 z-20 h-2 cursor-row-resize bg-slate-100/90 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-400"
+              style={{ bottom: problemsPanelHeight }}
+              onPointerDown={handleResizeStart}
+            >
+              <div className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-slate-300 transition group-hover:h-0.5 group-hover:bg-blue-500" />
+            </div>
+            <div className="absolute inset-x-0 bottom-0 z-10">
+              <ProblemsPanel
+                height={problemsPanelHeight}
+                onClose={() => setProblemsPanelVisible(false)}
+              />
+            </div>
+          </>
+        )}
       </main>
     </div>
   );
