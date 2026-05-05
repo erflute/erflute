@@ -16,6 +16,9 @@ it("renders problem titles with source codes and locations", () => {
   expect(
     screen.getByRole("button", { name: /Table name is required/i }),
   ).toBeInTheDocument();
+  expect(screen.getAllByLabelText("Error")).toHaveLength(2);
+  expect(screen.getByLabelText("Warning")).toBeInTheDocument();
+  expect(screen.getByLabelText("Information")).toBeInTheDocument();
   expect(screen.getByText("ER validation(TABLE_NAME_REQUIRED)")).toBeInTheDocument();
   expect(screen.getByText("[Ln 15, Col 8]")).toBeInTheDocument();
 });

@@ -11,8 +11,9 @@ import {
 import { useErrorDialogStore } from "@/stores/errorDialogStore";
 import type { ErrorDialogContent, ShowErrorDialogOptions } from "./types";
 
-const defaultTitle = "Something went wrong";
-const defaultMessage = "An unexpected error occurred.";
+const defaultTitle = "Fatal error";
+const defaultMessage =
+  "The application could not continue the requested operation.";
 
 function normalizeError(
   error: unknown,
