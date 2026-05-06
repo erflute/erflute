@@ -6,6 +6,8 @@ type ViewModeStore = {
   setReadOnly: (value: boolean) => void;
   diagramMode: DiagramMode | null;
   setDiagramMode: (mode: DiagramMode | null) => void;
+  isProblemsPanelVisible: boolean;
+  setProblemsPanelVisible: (value: boolean) => void;
 };
 
 export const useViewModeStore = create<ViewModeStore>((set) => ({
@@ -14,4 +16,6 @@ export const useViewModeStore = create<ViewModeStore>((set) => ({
   setReadOnly: (value) => set({ isReadOnly: value }),
   diagramMode: null,
   setDiagramMode: (mode) => set({ diagramMode: mode }),
+  isProblemsPanelVisible: false,
+  setProblemsPanelVisible: (value) => set({ isProblemsPanelVisible: value }),
 }));

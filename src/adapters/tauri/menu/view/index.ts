@@ -1,7 +1,12 @@
-import { Submenu } from "@tauri-apps/api/menu";
+import { PredefinedMenuItem, Submenu } from "@tauri-apps/api/menu";
+import { problemsMenu } from "./problems";
 import { viewModeMenu } from "./viewMode";
+
+const separator = await PredefinedMenuItem.new({
+  item: "Separator",
+});
 
 export const viewMenu = await Submenu.new({
   text: "View",
-  items: [viewModeMenu],
+  items: [viewModeMenu, separator, problemsMenu],
 });
