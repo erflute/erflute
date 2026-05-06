@@ -16,6 +16,6 @@ export const useViewModeStore = create<ViewModeStore>((set) => ({
   setReadOnly: (value) => set({ isReadOnly: value }),
   diagramMode: null,
   setDiagramMode: (mode) => set({ diagramMode: mode }),
-  isProblemsPanelVisible: true,
+  isProblemsPanelVisible: false,
   setProblemsPanelVisible: (value) => set({ isProblemsPanelVisible: value }),
 }));

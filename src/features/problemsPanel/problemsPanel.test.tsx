@@ -10,7 +10,8 @@ afterEach(() => {
   useViewModeStore.setState(initialViewModeState);
 });
 
-function renderProblemsPanel() {
+function renderProblemsPanel(isProblemsPanelVisible = true) {
+  useViewModeStore.setState({ isProblemsPanelVisible });
   render(<ProblemsPanel />);
 }
 
@@ -86,11 +87,11 @@ it("hides the problems panel and resize separator when the close button is click
 });
 
 it("does not render the problems panel when it is hidden in the view mode store", () => {
-  useViewModeStore.setState({ isProblemsPanelVisible: false });
+  renderProblemsPanel(false);
 
-  renderProblemsPanel();
-
-  expect(screen.queryByRole("region", { name: "Problems" })).not.toBeInTheDocument();
+  expect(
+    screen.queryByRole("region", { name: "Problems" }),
+  ).not.toBeInTheDocument();
   expect(
     screen.queryByRole("separator", { name: "Resize problems panel" }),
   ).not.toBeInTheDocument();
