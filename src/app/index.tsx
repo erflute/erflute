@@ -1,4 +1,4 @@
-import { DiagramWorkspace } from "@/features/diagramWorkspace";
+import { DiagramWorkspace } from "./diagramWorkspace";
 import { useSetupMenu } from "./useSetupMenu";
 import "./index.css";
 import { ErrorBoundary } from "./errorBoundary";
