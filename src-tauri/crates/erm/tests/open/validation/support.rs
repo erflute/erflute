@@ -13,7 +13,12 @@ pub(super) fn assert_validation_error_with_targets(
     let problem = problems
         .iter()
         .find(|problem| problem.path == path && problem.title == message)
-        .expect("expected validation problem");
+        .unwrap_or_else(|| {
+            panic!(
+                "expected validation problem was not found\nexpected path: {path}\nexpected message: {message}\nactual problems:\n{}",
+                format_validation_problems(&problems),
+            )
+        });
 
     assert_eq!(problem.path, path);
     assert_eq!(problem.title, message);
@@ -31,4 +36,36 @@ pub(super) fn assert_validation_error_with_targets(
         assert!(display.contains(label));
         assert!(display.contains(value));
     }
+}
+
+fn format_validation_problems(problems: &[ValidationProblem]) -> String {
+    if problems.is_empty() {
+        return "  <none>".to_string();
+    }
+
+    problems
+        .iter()
+        .enumerate()
+        .map(|(index, problem)| {
+            let targets = if problem.targets.is_empty() {
+                "targets: <none>".to_string()
+            } else {
+                format!(
+                    "targets: {}",
+                    problem
+                        .targets
+                        .iter()
+                        .map(|target| format!("{}={}", target.label, target.value))
+                        .collect::<Vec<_>>()
+                        .join(", "),
+                )
+            };
+
+            format!(
+                "  {index}. path: {}\n     title: {}\n     {targets}",
+                problem.path, problem.title,
+            )
+        })
+        .collect::<Vec<_>>()
+        .join("\n")
 }
