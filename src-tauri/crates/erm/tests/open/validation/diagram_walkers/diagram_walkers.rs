@@ -12,7 +12,7 @@ const DETAILS_ASSERTIONS: support::FixtureAssertions =
 
 #[test]
 fn duplicate_table_physical_name_is_rejected() {
-    let result = ASSERTIONS.open_replaced_fixture(
+    let result = ASSERTIONS.validate_replaced_fixture(
         "<physical_name>MEMBER_STATUS</physical_name>",
         "<physical_name>MEMBERS</physical_name>",
         "duplicate_table_physical_name",
@@ -28,7 +28,7 @@ fn duplicate_table_physical_name_is_rejected() {
 
 #[test]
 fn duplicate_relationship_name_is_rejected() {
-    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
+    let result = DETAILS_ASSERTIONS.validate_replaced_fixture(
         "        </relationship>",
         "        </relationship>\n        <relationship>\n          <name>FK_MEMBERS_PARENT</name>\n          <source>table.PARENT_MEMBERS</source>\n          <target>table.MEMBERS</target>\n          <fk_columns>\n            <fk_column>\n              <fk_column_name>MEMBER_ID</fk_column_name>\n            </fk_column>\n          </fk_columns>\n          <parent_cardinality>0..1</parent_cardinality>\n          <child_cardinality>0..n</child_cardinality>\n          <reference_for_pk>false</reference_for_pk>\n          <referred_simple_unique_column>table.PARENT_MEMBERS.PARENT_MEMBER_CODE</referred_simple_unique_column>\n        </relationship>",
         "duplicate_relationship_name",
@@ -47,7 +47,7 @@ fn duplicate_relationship_name_is_rejected() {
 
 #[test]
 fn unknown_relationship_source_table_is_rejected() {
-    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
+    let result = DETAILS_ASSERTIONS.validate_replaced_fixture(
         "<source>table.PARENT_MEMBERS</source>",
         "<source>table.UNKNOWN_MEMBERS</source>",
         "unknown_relationship_source_table",
@@ -66,7 +66,7 @@ fn unknown_relationship_source_table_is_rejected() {
 
 #[test]
 fn unknown_relationship_target_table_is_rejected() {
-    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
+    let result = DETAILS_ASSERTIONS.validate_replaced_fixture(
         "<target>table.MEMBERS</target>",
         "<target>table.UNKNOWN_MEMBERS</target>",
         "unknown_relationship_target_table",
@@ -85,7 +85,7 @@ fn unknown_relationship_target_table_is_rejected() {
 
 #[test]
 fn reference_for_pk_without_source_primary_key_is_rejected() {
-    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
+    let result = DETAILS_ASSERTIONS.validate_replaced_fixture(
         "<reference_for_pk>false</reference_for_pk>",
         "<reference_for_pk>true</reference_for_pk>",
         "reference_for_pk_without_source_primary_key",
@@ -105,7 +105,7 @@ fn reference_for_pk_without_source_primary_key_is_rejected() {
 
 #[test]
 fn relationship_without_primary_key_or_unique_reference_is_rejected() {
-    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
+    let result = DETAILS_ASSERTIONS.validate_replaced_fixture(
         "          <referred_simple_unique_column>table.PARENT_MEMBERS.PARENT_MEMBER_CODE</referred_simple_unique_column>\n",
         "",
         "relationship_without_primary_key_or_unique_reference",
@@ -125,7 +125,7 @@ fn relationship_without_primary_key_or_unique_reference_is_rejected() {
 
 #[test]
 fn relationship_target_different_from_containing_table_is_rejected() {
-    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
+    let result = DETAILS_ASSERTIONS.validate_replaced_fixture(
         "<target>table.MEMBERS</target>",
         "<target>table.PARENT_MEMBERS</target>",
         "relationship_target_different_from_containing_table",
@@ -144,7 +144,7 @@ fn relationship_target_different_from_containing_table_is_rejected() {
 
 #[test]
 fn unknown_relationship_fk_column_is_rejected() {
-    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
+    let result = DETAILS_ASSERTIONS.validate_replaced_fixture(
         "<fk_column_name>MEMBER_ID</fk_column_name>",
         "<fk_column_name>UNKNOWN_MEMBER_ID</fk_column_name>",
         "unknown_relationship_fk_column",
@@ -163,7 +163,7 @@ fn unknown_relationship_fk_column_is_rejected() {
 
 #[test]
 fn relationship_missing_column_fk_mapping_is_rejected() {
-    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
+    let result = DETAILS_ASSERTIONS.validate_replaced_fixture(
         "<fk_column_name>MEMBER_ID</fk_column_name>",
         "<fk_column_name>MEMBER_NAME</fk_column_name>",
         "relationship_missing_column_fk_mapping",
@@ -183,7 +183,7 @@ fn relationship_missing_column_fk_mapping_is_rejected() {
 
 #[test]
 fn relationship_fk_column_without_column_relationship_is_rejected() {
-    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
+    let result = DETAILS_ASSERTIONS.validate_replaced_fixture(
         "          <relationship>FK_MEMBERS_PARENT</relationship>\n",
         "",
         "relationship_fk_column_without_column_relationship",
@@ -203,7 +203,7 @@ fn relationship_fk_column_without_column_relationship_is_rejected() {
 
 #[test]
 fn relationship_column_referred_table_mismatch_is_rejected() {
-    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
+    let result = DETAILS_ASSERTIONS.validate_replaced_fixture(
         "<referred_column>table.PARENT_MEMBERS.PARENT_MEMBER_ID</referred_column>",
         "<referred_column>table.MEMBERS.MEMBER_ID</referred_column>",
         "relationship_column_referred_table_mismatch",
@@ -219,7 +219,7 @@ fn relationship_column_referred_table_mismatch_is_rejected() {
 
 #[test]
 fn unknown_referred_column_table_is_rejected() {
-    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
+    let result = DETAILS_ASSERTIONS.validate_replaced_fixture(
         "<referred_column>table.PARENT_MEMBERS.PARENT_MEMBER_ID</referred_column>",
         "<referred_column>table.UNKNOWN_MEMBERS.PARENT_MEMBER_ID</referred_column>",
         "unknown_referred_column_table",
@@ -235,7 +235,7 @@ fn unknown_referred_column_table_is_rejected() {
 
 #[test]
 fn unknown_referred_column_is_rejected() {
-    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
+    let result = DETAILS_ASSERTIONS.validate_replaced_fixture(
         "<referred_column>table.PARENT_MEMBERS.PARENT_MEMBER_ID</referred_column>",
         "<referred_column>table.PARENT_MEMBERS.UNKNOWN_MEMBER_ID</referred_column>",
         "unknown_referred_column",
@@ -251,7 +251,7 @@ fn unknown_referred_column_is_rejected() {
 
 #[test]
 fn unknown_referred_simple_unique_column_is_rejected() {
-    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
+    let result = DETAILS_ASSERTIONS.validate_replaced_fixture(
         "<referred_simple_unique_column>table.PARENT_MEMBERS.PARENT_MEMBER_CODE</referred_simple_unique_column>",
         "<referred_simple_unique_column>table.PARENT_MEMBERS.UNKNOWN_MEMBER_CODE</referred_simple_unique_column>",
         "unknown_referred_simple_unique_column",
@@ -271,7 +271,7 @@ fn unknown_referred_simple_unique_column_is_rejected() {
 
 #[test]
 fn invalid_referred_simple_unique_column_is_rejected() {
-    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
+    let result = DETAILS_ASSERTIONS.validate_replaced_fixture(
         "<referred_simple_unique_column>table.PARENT_MEMBERS.PARENT_MEMBER_CODE</referred_simple_unique_column>",
         "<referred_simple_unique_column>PARENT_MEMBER_CODE</referred_simple_unique_column>",
         "invalid_referred_simple_unique_column",
@@ -290,7 +290,7 @@ fn invalid_referred_simple_unique_column_is_rejected() {
 
 #[test]
 fn referred_simple_unique_column_with_target_table_name_is_accepted() {
-    DETAILS_ASSERTIONS.assert_replaced_fixture_parse_success(
+    DETAILS_ASSERTIONS.assert_replaced_fixture_validation_success(
         "<referred_simple_unique_column>table.PARENT_MEMBERS.PARENT_MEMBER_CODE</referred_simple_unique_column>",
         "<referred_simple_unique_column>table.MEMBERS.PARENT_MEMBER_CODE</referred_simple_unique_column>",
         "referred_simple_unique_column_with_target_table_name",
@@ -299,7 +299,7 @@ fn referred_simple_unique_column_with_target_table_name_is_accepted() {
 
 #[test]
 fn unknown_referred_compound_unique_key_is_rejected() {
-    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
+    let result = DETAILS_ASSERTIONS.validate_replaced_fixture(
         "<referred_simple_unique_column>table.PARENT_MEMBERS.PARENT_MEMBER_CODE</referred_simple_unique_column>",
         "<referred_compound_unique_key>UK_UNKNOWN_MEMBERS_CODE</referred_compound_unique_key>",
         "unknown_referred_compound_unique_key",
@@ -319,7 +319,7 @@ fn unknown_referred_compound_unique_key_is_rejected() {
 
 #[test]
 fn simultaneous_referred_unique_targets_are_rejected() {
-    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
+    let result = DETAILS_ASSERTIONS.validate_replaced_fixture(
         "<referred_simple_unique_column>table.PARENT_MEMBERS.PARENT_MEMBER_CODE</referred_simple_unique_column>",
         "<referred_compound_unique_key>UK_PARENT_MEMBERS_CODE</referred_compound_unique_key>\n          <referred_simple_unique_column>table.PARENT_MEMBERS.PARENT_MEMBER_CODE</referred_simple_unique_column>",
         "simultaneous_referred_unique_targets",
@@ -338,7 +338,7 @@ fn simultaneous_referred_unique_targets_are_rejected() {
 
 #[test]
 fn unknown_normal_column_relationship_is_rejected() {
-    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
+    let result = DETAILS_ASSERTIONS.validate_replaced_fixture(
         "<relationship>FK_MEMBERS_PARENT</relationship>",
         "<relationship>FK_UNKNOWN_MEMBERS_PARENT</relationship>",
         "unknown_normal_column_relationship",
@@ -354,7 +354,7 @@ fn unknown_normal_column_relationship_is_rejected() {
 
 #[test]
 fn unknown_column_group_reference_is_rejected() {
-    let result = DETAILS_ASSERTIONS.open_replaced_fixture(
+    let result = DETAILS_ASSERTIONS.validate_replaced_fixture(
         "<column_group>COMMON_COLUMNS</column_group>",
         "<column_group>UNKNOWN_COLUMNS</column_group>",
         "unknown_column_group_reference",

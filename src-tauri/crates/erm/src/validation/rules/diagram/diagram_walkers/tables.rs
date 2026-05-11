@@ -3,7 +3,7 @@ use std::collections::{HashMap, HashSet};
 use crate::dtos::diagram::diagram_walkers::tables::Table;
 use crate::dtos::diagram::diagram_walkers::tables::columns::{ColumnItem, NormalColumn};
 use crate::validation::ValidationError;
-use crate::validation::diagram::validate_column_length_and_decimal_values;
+use crate::validation::rules::diagram::validate_column_length_and_decimal_values;
 
 pub fn validate_duplicate_column_physical_names(table: &Table) -> Result<(), ValidationError> {
     let Some(items) = &table.columns.items else {

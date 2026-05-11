@@ -3,14 +3,21 @@ pub mod dtos;
 pub mod entities;
 pub mod errors;
 mod reader;
-mod validation;
+pub mod validation;
 
 use dtos::diagram::Diagram;
 use errors::Error;
 use reader::read_file;
+use validation::problems::ValidationProblem;
 
 pub fn open(filename: &str) -> Result<Diagram, Error> {
-    let diagram = Diagram::from(read_file(&filename)?);
-    validation::validate(&diagram)?;
-    Ok(diagram)
+    Ok(Diagram::from(read_file(filename)?))
+}
+
+pub fn validate_diagram(filename: &str) -> Result<Vec<ValidationProblem>, Error> {
+    let diagram = open(filename)?;
+    Ok(validation::collect_validation_errors(&diagram)
+        .into_iter()
+        .map(Into::into)
+        .collect())
 }

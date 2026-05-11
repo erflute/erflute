@@ -1,9 +1,16 @@
 use erm::dtos::diagram::Diagram;
+use erm::validation::problems::ValidationProblem;
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
 fn load_diagram(filename: &str) -> Result<Diagram, String> {
     erm::open(filename).map_err(|e| format!("failed to open {}:\n\t{}", filename, e))
+}
+
+#[tauri::command]
+fn validate_diagram(filename: &str) -> Result<Vec<ValidationProblem>, String> {
+    erm::validate_diagram(filename)
+        .map_err(|e| format!("failed to validate {}:\n\t{}", filename, e))
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -13,7 +20,7 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_os::init())
-        .invoke_handler(tauri::generate_handler![load_diagram])
+        .invoke_handler(tauri::generate_handler![load_diagram, validate_diagram])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
