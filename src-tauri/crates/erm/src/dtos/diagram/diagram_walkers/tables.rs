@@ -37,7 +37,7 @@ impl From<entities::Color> for Color {
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize, Validate)]
-#[validate(rules(
+#[validate(rules([
     validate_duplicate_column_physical_names,
     validate_duplicate_index_names,
     validate_duplicate_compound_unique_key_names,
@@ -46,7 +46,7 @@ impl From<entities::Color> for Color {
     validate_index_column_references,
     validate_compound_unique_key_column_references,
     validate_local_relationship_consistency
-))]
+]))]
 #[serde(rename_all = "camelCase")]
 pub struct Table {
     pub physical_name: String,

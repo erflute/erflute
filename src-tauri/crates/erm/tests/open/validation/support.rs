@@ -1,6 +1,7 @@
 use pretty_assertions::assert_eq;
 
 use erm::errors::Error;
+use erm::validation::ValidationSeverity;
 use erm::validation::problems::ValidationProblem;
 
 pub(super) fn assert_validation_error_with_targets(
@@ -22,6 +23,7 @@ pub(super) fn assert_validation_error_with_targets(
 
     assert_eq!(problem.path, path);
     assert_eq!(problem.title, message);
+    assert_eq!(problem.severity, ValidationSeverity::Error);
     assert_eq!(problem.targets.len(), targets.len());
 
     let display = &problem.body;

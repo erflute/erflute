@@ -1,7 +1,80 @@
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{Data, DeriveInput, Error, Fields, LitStr, Result, parse_macro_input, spanned::Spanned};
+use syn::{
+    Data, DeriveInput, Error, Fields, LitStr, Path, Result, Token, bracketed, parenthesized,
+    parse::{Parse, ParseStream},
+    parse_macro_input,
+    spanned::Spanned,
+};
 
+struct RuleSpec {
+    path: Path,
+    severity: Path,
+}
+
+struct RulesArgs {
+    rules: Vec<RuleSpec>,
+}
+
+// Parses both default-error rules and grouped-severity rules:
+// - rules(validate_a, validate_b)
+// - rules([validate_a, validate_b])
+// - rules([validate_a, validate_b], Warning)
+// - rules([validate_a, validate_b], crate::validation::ValidationSeverity::Warning)
+impl Parse for RulesArgs {
+    fn parse(input: ParseStream<'_>) -> Result<Self> {
+        if input.peek(syn::token::Bracket) {
+            let content;
+            bracketed!(content in input);
+            let paths = content.parse_terminated(Path::parse_mod_style, Token![,])?;
+            let severity = if input.is_empty() {
+                default_severity_path()
+            } else {
+                input.parse::<Token![,]>()?;
+                input.parse::<Path>()?
+            };
+
+            return Ok(Self {
+                rules: paths
+                    .into_iter()
+                    .map(|path| RuleSpec {
+                        path,
+                        severity: severity.clone(),
+                    })
+                    .collect(),
+            });
+        }
+
+        let paths = input.parse_terminated(Path::parse_mod_style, Token![,])?;
+        Ok(Self {
+            rules: paths
+                .into_iter()
+                .map(|path| RuleSpec {
+                    path,
+                    severity: default_severity_path(),
+                })
+                .collect(),
+        })
+    }
+}
+
+/// Derives validation traversal and supports `#[validate(...)]` metadata.
+///
+/// Struct-level rules:
+/// - `#[validate(rule = validate_name)]`
+/// - `#[validate(rule = validate_name, severity = Warning)]`
+/// - `#[validate(rule = validate_name, severity = crate::validation::ValidationSeverity::Warning)]`
+/// - `#[validate(rules(validate_a, validate_b))]`
+/// - `#[validate(rules([validate_a, validate_b]))]`
+/// - `#[validate(rules([validate_a, validate_b], Warning))]`
+/// - `#[validate(rules([validate_a, validate_b], crate::validation::ValidationSeverity::Warning))]`
+///
+/// Field-level path override:
+/// - `#[validate(path = "table")]`
+///
+/// Rule functions must accept `&Self` and return
+/// `Result<(), crate::validation::ValidationError>`. Severity defaults to
+/// `crate::validation::ValidationSeverity::Error`.
 #[proc_macro_derive(Validate, attributes(validate))]
 pub fn derive_validate(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
@@ -16,17 +89,23 @@ fn expand_validate(input: DeriveInput) -> Result<proc_macro2::TokenStream> {
     let DeriveInput {
         ident, attrs, data, ..
     } = input;
-    let rule_paths = collect_rule_paths(&attrs)?;
+    let rule_specs = collect_rule_specs(&attrs)?;
 
-    let rule_calls = rule_paths.iter().map(|path| {
+    let rule_calls = rule_specs.iter().map(|rule| {
+        let path = &rule.path;
+        let severity = severity_tokens(&rule.severity);
         quote! {
-            #path(self)?;
+            #path(self).map_err(|error| {
+                error.with_severity(#severity)
+            })?;
         }
     });
-    let collect_rule_calls = rule_paths.iter().map(|path| {
+    let collect_rule_calls = rule_specs.iter().map(|rule| {
+        let path = &rule.path;
+        let severity = severity_tokens(&rule.severity);
         quote! {
             if let Err(error) = #path(self) {
-                errors.push(error);
+                errors.push(error.with_severity(#severity));
             }
         }
     });
@@ -194,27 +273,55 @@ fn expand_enum_variant_error_collections(
     })
 }
 
-fn collect_rule_paths(attrs: &[syn::Attribute]) -> Result<Vec<syn::Path>> {
-    let mut rule_paths = Vec::new();
+fn collect_rule_specs(attrs: &[syn::Attribute]) -> Result<Vec<RuleSpec>> {
+    let mut rule_specs = Vec::new();
 
     for attr in attrs.iter().filter(|attr| attr.path().is_ident("validate")) {
+        let mut attr_rule_specs = Vec::new();
         attr.parse_nested_meta(|meta| {
             if meta.path.is_ident("rule") {
                 let value = meta.value()?;
-                rule_paths.push(value.parse()?);
+                attr_rule_specs.push(RuleSpec {
+                    path: value.parse()?,
+                    severity: default_severity_path(),
+                });
+                Ok(())
+            } else if meta.path.is_ident("severity") {
+                let value = meta.value()?;
+                let severity = value.parse::<Path>()?;
+                let Some(rule) = attr_rule_specs.last_mut() else {
+                    return Err(
+                        meta.error("severity must follow rule in the same validate attribute")
+                    );
+                };
+                rule.severity = severity;
                 Ok(())
             } else if meta.path.is_ident("rules") {
-                meta.parse_nested_meta(|rule| {
-                    rule_paths.push(rule.path);
-                    Ok(())
-                })
+                let content;
+                parenthesized!(content in meta.input);
+                let args = content.parse::<RulesArgs>()?;
+                attr_rule_specs.extend(args.rules);
+                Ok(())
             } else {
                 Err(meta.error("unsupported validate attribute"))
             }
         })?;
+        rule_specs.extend(attr_rule_specs);
     }
 
-    Ok(rule_paths)
+    Ok(rule_specs)
+}
+
+fn default_severity_path() -> Path {
+    syn::parse_quote!(Error)
+}
+
+fn severity_tokens(severity: &Path) -> proc_macro2::TokenStream {
+    if severity.segments.len() == 1 {
+        quote! { crate::validation::ValidationSeverity::#severity }
+    } else {
+        quote! { #severity }
+    }
 }
 
 fn field_path(field: &syn::Field) -> Result<String> {

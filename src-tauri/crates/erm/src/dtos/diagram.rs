@@ -34,12 +34,12 @@ impl From<crate::entities::diagram::Color> for Color {
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize, Validate)]
-#[validate(rules(
+#[validate(rules([
     validate_duplicate_column_group_names,
     validate_duplicate_column_group_column_physical_names,
     validate_column_group_column_length_and_decimal,
     validate_column_group_references
-))]
+]))]
 #[serde(rename_all = "camelCase")]
 pub struct Diagram {
     #[serde(default, skip_serializing_if = "Option::is_none")]

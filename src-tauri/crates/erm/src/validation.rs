@@ -10,7 +10,16 @@ use std::fmt;
 pub struct ValidationError {
     pub path: String,
     pub message: String,
+    pub severity: ValidationSeverity,
     pub targets: Vec<ValidationErrorTarget>,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub enum ValidationSeverity {
+    Error,
+    Warning,
+    Info,
 }
 
 #[derive(Debug, PartialEq, Serialize)]
@@ -25,8 +34,14 @@ impl ValidationError {
         Self {
             path,
             message,
+            severity: ValidationSeverity::Error,
             targets: Vec::new(),
         }
+    }
+
+    pub fn with_severity(mut self, severity: ValidationSeverity) -> Self {
+        self.severity = severity;
+        self
     }
 
     pub fn with_target(mut self, label: impl Into<String>, value: impl fmt::Debug) -> Self {

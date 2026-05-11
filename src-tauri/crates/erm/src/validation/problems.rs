@@ -1,6 +1,6 @@
 use serde::Serialize;
 
-use crate::validation::{ValidationError, ValidationErrorTarget};
+use crate::validation::{ValidationError, ValidationErrorTarget, ValidationSeverity};
 
 #[derive(Debug, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -13,11 +13,7 @@ pub struct ValidationProblem {
     pub targets: Vec<ValidationErrorTarget>,
 }
 
-#[derive(Debug, PartialEq, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub enum ValidationProblemSeverity {
-    Error,
-}
+pub type ValidationProblemSeverity = ValidationSeverity;
 
 impl From<ValidationError> for ValidationProblem {
     fn from(error: ValidationError) -> Self {
@@ -25,7 +21,7 @@ impl From<ValidationError> for ValidationProblem {
         let body = problem_body(&error);
         Self {
             id,
-            severity: ValidationProblemSeverity::Error,
+            severity: error.severity,
             title: error.message.clone(),
             body,
             path: error.path,
