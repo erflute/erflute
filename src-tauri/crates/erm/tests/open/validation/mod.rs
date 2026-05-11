@@ -23,7 +23,7 @@ fn validation_problems_are_collected_without_rejecting_the_diagram() {
     let path = std::env::temp_dir().join(format!("{TEMP_PREFIX}_{}.erm", std::process::id()));
     fs::write(&path, content).expect("failed to write fixture");
 
-    let diagram = erm::open_unvalidated(path.to_str().expect("invalid fixture path"));
+    let diagram = erm::open(path.to_str().expect("invalid fixture path"));
     let problems = erm::validate_diagram(path.to_str().expect("invalid fixture path"));
 
     fs::remove_file(&path).expect("failed to remove fixture");

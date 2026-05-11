@@ -25,7 +25,6 @@ pub(super) fn assert_validation_error_with_targets(
     assert_eq!(problem.targets.len(), targets.len());
 
     let display = &problem.body;
-    assert!(display.contains("Validation error\n\n"));
     assert!(display.contains(message));
     assert!(display.contains("Technical details:"));
     assert!(display.contains(path));

@@ -11,13 +11,13 @@ const problems = [
     id: "duplicate-column",
     severity: "error" as const,
     title: "duplicate column physical_name: MEMBER_ID",
-    body: "Validation error\n\nduplicate column physical_name: MEMBER_ID",
+    body: "duplicate column physical_name: MEMBER_ID\n\nTechnical details:\n- path: diagram_walkers.table[0].columns.normal_column[1].physical_name",
   },
   {
     id: "invalid-decimal",
     severity: "error" as const,
     title: "decimal must be less than or equal to length: 19 > 18",
-    body: "Validation error\n\ndecimal must be less than or equal to length: 19 > 18",
+    body: "decimal must be less than or equal to length: 19 > 18\n\nTechnical details:\n- path: diagram_walkers.table[0].columns.normal_column[0].decimal",
   },
 ];
 
@@ -55,9 +55,7 @@ it("renders problem titles with their severity", () => {
 it("does not show problem details before a problem is opened", () => {
   renderProblemsPanel();
 
-  expect(
-    screen.queryByText(/Validation error/i),
-  ).not.toBeInTheDocument();
+  expect(screen.queryByText(/Technical details/i)).not.toBeInTheDocument();
 });
 
 it("opens problem details when a problem is clicked", async () => {
@@ -70,9 +68,8 @@ it("opens problem details when a problem is clicked", async () => {
     }),
   );
 
-  expect(
-    screen.getByText(/Validation error/i),
-  ).toBeInTheDocument();
+  expect(screen.getByText(/Technical details/i)).toBeInTheDocument();
+  expect(screen.queryByText(/Validation error/i)).not.toBeInTheDocument();
 });
 
 it("closes problem details when an open problem is clicked again", async () => {
@@ -85,9 +82,7 @@ it("closes problem details when an open problem is clicked again", async () => {
   await user.click(problem);
   await user.click(problem);
 
-  expect(
-    screen.queryByText(/Validation error/i),
-  ).not.toBeInTheDocument();
+  expect(screen.queryByText(/Technical details/i)).not.toBeInTheDocument();
 });
 
 it("renders an empty state when the diagram has no problems", () => {

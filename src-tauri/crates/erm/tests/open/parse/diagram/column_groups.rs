@@ -1,7 +1,7 @@
 use pretty_assertions::assert_eq;
 
 use erm::dtos::diagram::column_groups;
-use erm::open_unvalidated;
+use erm::open;
 
 use crate::open::support;
 
@@ -12,7 +12,7 @@ const ASSERTIONS: support::FixtureAssertions =
 
 #[test]
 fn column_groups_tags_keep_valid_values() {
-    let diagram = open_unvalidated(COLUMN_GROUPS_FIXTURE).expect("failed to parse");
+    let diagram = open(COLUMN_GROUPS_FIXTURE).expect("failed to parse");
 
     assert_eq!(
         diagram.column_groups,

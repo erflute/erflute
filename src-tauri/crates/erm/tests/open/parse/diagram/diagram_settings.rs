@@ -1,7 +1,7 @@
 use pretty_assertions::assert_eq;
 
 use erm::dtos::diagram::diagram_settings;
-use erm::open_unvalidated;
+use erm::open;
 
 use crate::open::support;
 
@@ -12,7 +12,7 @@ const ASSERTIONS: support::FixtureAssertions =
 
 #[test]
 fn diagram_settings_tags_keep_valid_values() {
-    let diagram = open_unvalidated(DIAGRAM_SETTINGS_FIXTURE).expect("failed to parse");
+    let diagram = open(DIAGRAM_SETTINGS_FIXTURE).expect("failed to parse");
 
     assert_eq!(
         diagram.diagram_settings,

@@ -2,7 +2,7 @@ use pretty_assertions::assert_eq;
 
 use erm::dtos::diagram::diagram_walkers;
 use erm::dtos::diagram::diagram_walkers::tables;
-use erm::open_unvalidated;
+use erm::open;
 
 use crate::open::support;
 
@@ -13,7 +13,7 @@ const ASSERTIONS: support::FixtureAssertions =
 
 #[test]
 fn diagram_walkers_table_tags_keep_valid_values() {
-    let diagram = open_unvalidated(DIAGRAM_WALKERS_FIXTURE).expect("failed to parse");
+    let diagram = open(DIAGRAM_WALKERS_FIXTURE).expect("failed to parse");
     let diagram_walkers = diagram.diagram_walkers.expect("missing diagram walkers");
     let tables = diagram_walkers.tables.expect("missing tables");
 

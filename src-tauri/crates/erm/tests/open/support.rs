@@ -2,7 +2,7 @@ use std::fs;
 
 use erm::dtos::diagram::Diagram;
 use erm::errors::Error;
-use erm::open_unvalidated;
+use erm::open;
 use erm::validate_diagram;
 use erm::validation::problems::ValidationProblem;
 
@@ -194,7 +194,7 @@ pub(crate) fn assert_parse_error(content: String, temp_prefix: &str, test_name: 
 
     fs::write(&path, content).expect("failed to write fixture");
 
-    let result = open_unvalidated(path.to_str().expect("invalid fixture path"));
+    let result = open(path.to_str().expect("invalid fixture path"));
 
     fs::remove_file(&path).expect("failed to remove fixture");
     assert!(result.is_err());
@@ -209,7 +209,7 @@ fn open_content(content: String, temp_prefix: &str, test_name: &str) -> Result<D
 
     fs::write(&path, content).expect("failed to write fixture");
 
-    let result = open_unvalidated(path.to_str().expect("invalid fixture path"));
+    let result = open(path.to_str().expect("invalid fixture path"));
 
     fs::remove_file(&path).expect("failed to remove fixture");
     result

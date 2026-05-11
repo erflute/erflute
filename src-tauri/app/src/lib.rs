@@ -4,7 +4,7 @@ use erm::validation::problems::ValidationProblem;
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
 fn load_diagram(filename: &str) -> Result<Diagram, String> {
-    erm::open_unvalidated(filename).map_err(|e| format!("failed to open {}:\n\t{}", filename, e))
+    erm::open(filename).map_err(|e| format!("failed to open {}:\n\t{}", filename, e))
 }
 
 #[tauri::command]
