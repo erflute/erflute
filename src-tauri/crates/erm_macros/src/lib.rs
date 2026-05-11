@@ -13,24 +13,38 @@ pub fn derive_validate(input: TokenStream) -> TokenStream {
 }
 
 fn expand_validate(input: DeriveInput) -> Result<proc_macro2::TokenStream> {
-    let ident = input.ident;
-    let rule_paths = collect_rule_paths(&input.attrs)?;
+    let DeriveInput {
+        ident, attrs, data, ..
+    } = input;
+    let rule_paths = collect_rule_paths(&attrs)?;
 
     let rule_calls = rule_paths.iter().map(|path| {
         quote! {
             #path(self)?;
         }
     });
+    let collect_rule_calls = rule_paths.iter().map(|path| {
+        quote! {
+            if let Err(error) = #path(self) {
+                errors.push(error);
+            }
+        }
+    });
 
-    let child_validations = match input.data {
-        Data::Struct(data) => expand_struct_fields(data.fields)?,
-        Data::Enum(data) => expand_enum_variants(data.variants)?,
+    let child_validations = match &data {
+        Data::Struct(data) => expand_struct_fields(&data.fields)?,
+        Data::Enum(data) => expand_enum_variants(&data.variants)?,
         Data::Union(data) => {
             return Err(Error::new(
                 data.union_token.span(),
                 "Validate cannot be derived for unions",
             ));
         }
+    };
+    let child_error_collections = match &data {
+        Data::Struct(data) => expand_struct_field_error_collections(&data.fields)?,
+        Data::Enum(data) => expand_enum_variant_error_collections(&data.variants)?,
+        Data::Union(_) => unreachable!("unions are rejected before collection expansion"),
     };
 
     Ok(quote! {
@@ -41,10 +55,19 @@ fn expand_validate(input: DeriveInput) -> Result<proc_macro2::TokenStream> {
                 Ok(())
             }
         }
+
+        impl crate::validation::CollectValidationErrors for #ident {
+            fn collect_validation_errors(&self) -> Vec<crate::validation::ValidationError> {
+                let mut errors = Vec::new();
+                #(#collect_rule_calls)*
+                #child_error_collections
+                errors
+            }
+        }
     })
 }
 
-fn expand_struct_fields(fields: Fields) -> Result<proc_macro2::TokenStream> {
+fn expand_struct_fields(fields: &Fields) -> Result<proc_macro2::TokenStream> {
     let validations = fields
         .iter()
         .enumerate()
@@ -71,8 +94,38 @@ fn expand_struct_fields(fields: Fields) -> Result<proc_macro2::TokenStream> {
     })
 }
 
+fn expand_struct_field_error_collections(fields: &Fields) -> Result<proc_macro2::TokenStream> {
+    let collections = fields
+        .iter()
+        .enumerate()
+        .map(|(index, field)| {
+            let path = field_path(field)?;
+            let access = field
+                .ident
+                .as_ref()
+                .map(|ident| quote! { #ident })
+                .unwrap_or_else(|| {
+                    let index = syn::Index::from(index);
+                    quote! { #index }
+                });
+
+            Ok(quote! {
+                errors.extend(
+                    crate::validation::CollectValidationErrors::collect_validation_errors(&self.#access)
+                        .into_iter()
+                        .map(|error| error.prepend_path(#path)),
+                );
+            })
+        })
+        .collect::<Result<Vec<_>>>()?;
+
+    Ok(quote! {
+        #(#collections)*
+    })
+}
+
 fn expand_enum_variants(
-    variants: syn::punctuated::Punctuated<syn::Variant, syn::token::Comma>,
+    variants: &syn::punctuated::Punctuated<syn::Variant, syn::token::Comma>,
 ) -> Result<proc_macro2::TokenStream> {
     let arms = variants
         .iter()
@@ -88,6 +141,42 @@ fn expand_enum_variants(
                 Ok(quote! {
                     Self::#ident(value) => {
                         crate::validation::Validate::validate(value)?;
+                    }
+                })
+            }
+            Fields::Named(_) | Fields::Unnamed(_) => Err(Error::new(
+                variant.span(),
+                "Validate can only be derived for unit enum variants or single-value tuple variants",
+            )),
+        })
+        .collect::<Result<Vec<_>>>()?;
+
+    Ok(quote! {
+        match self {
+            #(#arms)*
+        }
+    })
+}
+
+fn expand_enum_variant_error_collections(
+    variants: &syn::punctuated::Punctuated<syn::Variant, syn::token::Comma>,
+) -> Result<proc_macro2::TokenStream> {
+    let arms = variants
+        .iter()
+        .map(|variant| match &variant.fields {
+            Fields::Unit => {
+                let ident = &variant.ident;
+                Ok(quote! {
+                    Self::#ident => {}
+                })
+            }
+            Fields::Unnamed(fields) if fields.unnamed.len() == 1 => {
+                let ident = &variant.ident;
+                Ok(quote! {
+                    Self::#ident(value) => {
+                        errors.extend(
+                            crate::validation::CollectValidationErrors::collect_validation_errors(value),
+                        );
                     }
                 })
             }

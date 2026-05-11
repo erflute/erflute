@@ -11,7 +11,7 @@ use indexes::Index;
 use serde::{Deserialize, Serialize};
 
 use crate::validation::Validate;
-use crate::validation::diagram::diagram_walkers::tables::{
+use crate::validation::rules::diagram::diagram_walkers::tables::{
     validate_auto_increment_columns_are_key_columns, validate_column_length_and_decimal,
     validate_compound_unique_key_column_references, validate_duplicate_column_physical_names,
     validate_duplicate_compound_unique_key_names, validate_duplicate_index_names,

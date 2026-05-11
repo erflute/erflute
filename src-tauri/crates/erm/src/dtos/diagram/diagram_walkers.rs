@@ -2,7 +2,7 @@ pub mod tables;
 
 use crate::entities::diagram::diagram_walkers as entities;
 use crate::validation::Validate;
-use crate::validation::diagram::diagram_walkers::{
+use crate::validation::rules::diagram::diagram_walkers::{
     validate_cross_table_references, validate_duplicate_relationship_names,
     validate_duplicate_table_physical_names,
 };

@@ -1,17 +1,35 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { useProblemsStore } from "@/stores/problemsStore";
 import { useViewModeStore } from "@/stores/viewModeStore";
 import { ProblemsPanel } from ".";
 
 const initialViewModeState = useViewModeStore.getState();
+const initialProblemsState = useProblemsStore.getState();
+const problems = [
+  {
+    id: "duplicate-column",
+    severity: "error" as const,
+    title: "duplicate column physical_name: MEMBER_ID",
+    body: "Validation error\n\nduplicate column physical_name: MEMBER_ID",
+  },
+  {
+    id: "invalid-decimal",
+    severity: "error" as const,
+    title: "decimal must be less than or equal to length: 19 > 18",
+    body: "Validation error\n\ndecimal must be less than or equal to length: 19 > 18",
+  },
+];
 
 afterEach(() => {
   jest.restoreAllMocks();
   useViewModeStore.setState(initialViewModeState);
+  useProblemsStore.setState(initialProblemsState);
 });
 
 function renderProblemsPanel(isProblemsPanelVisible = true) {
   useViewModeStore.setState({ isProblemsPanelVisible });
+  useProblemsStore.setState({ problems });
   render(<ProblemsPanel />);
 }
 
@@ -20,25 +38,25 @@ it("renders the problems heading and count", () => {
 
   expect(screen.getByRole("region", { name: "Problems" })).toBeInTheDocument();
   expect(screen.getByText("PROBLEMS")).toBeInTheDocument();
-  expect(screen.getByText("4")).toBeInTheDocument();
+  expect(screen.getByText("2")).toBeInTheDocument();
 });
 
 it("renders problem titles with their severity", () => {
   renderProblemsPanel();
 
   expect(
-    screen.getByRole("button", { name: /Table name is required/i }),
+    screen.getByRole("button", {
+      name: /duplicate column physical_name: MEMBER_ID/i,
+    }),
   ).toBeInTheDocument();
   expect(screen.getAllByLabelText("Error")).toHaveLength(2);
-  expect(screen.getByLabelText("Warning")).toBeInTheDocument();
-  expect(screen.getByLabelText("Information")).toBeInTheDocument();
 });
 
 it("does not show problem details before a problem is opened", () => {
   renderProblemsPanel();
 
   expect(
-    screen.queryByText(/The table definition does not have a physical name/i),
+    screen.queryByText(/Validation error/i),
   ).not.toBeInTheDocument();
 });
 
@@ -47,11 +65,13 @@ it("opens problem details when a problem is clicked", async () => {
   renderProblemsPanel();
 
   await user.click(
-    screen.getByRole("button", { name: /Table name is required/i }),
+    screen.getByRole("button", {
+      name: /duplicate column physical_name: MEMBER_ID/i,
+    }),
   );
 
   expect(
-    screen.getByText(/The table definition does not have a physical name/i),
+    screen.getByText(/Validation error/i),
   ).toBeInTheDocument();
 });
 
@@ -60,14 +80,24 @@ it("closes problem details when an open problem is clicked again", async () => {
   renderProblemsPanel();
 
   const problem = screen.getByRole("button", {
-    name: /Table name is required/i,
+    name: /duplicate column physical_name: MEMBER_ID/i,
   });
   await user.click(problem);
   await user.click(problem);
 
   expect(
-    screen.queryByText(/The table definition does not have a physical name/i),
+    screen.queryByText(/Validation error/i),
   ).not.toBeInTheDocument();
+});
+
+it("renders an empty state when the diagram has no problems", () => {
+  useViewModeStore.setState({ isProblemsPanelVisible: true });
+  useProblemsStore.setState({ problems: [] });
+
+  render(<ProblemsPanel />);
+
+  expect(screen.getByText("0")).toBeInTheDocument();
+  expect(screen.getByRole("status")).toHaveTextContent("No problems found.");
 });
 
 it("hides the problems panel and resize separator when the close button is clicked", async () => {

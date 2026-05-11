@@ -9,35 +9,9 @@ import {
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useProblemsStore } from "@/stores/problemsStore";
 import { useViewModeStore } from "@/stores/viewModeStore";
-import type { ProblemItem, ProblemSeverity } from "./types";
-
-const sampleProblems: ProblemItem[] = [
-  {
-    id: "missing-table-name",
-    severity: "error",
-    title: "Table name is required",
-    body: "The table definition does not have a physical name. Add a physical table name before saving the diagram.",
-  },
-  {
-    id: "duplicate-column",
-    severity: "error",
-    title: "Duplicate column name",
-    body: "Two columns in this table use the same physical name. Rename one of the columns so generated SQL can be created without conflicts.",
-  },
-  {
-    id: "missing-primary-key",
-    severity: "warning",
-    title: "Primary key is not defined",
-    body: "This table does not define a primary key. The diagram can still be edited, but relations and exported DDL may be less reliable.",
-  },
-  {
-    id: "empty-description",
-    severity: "info",
-    title: "Description is empty",
-    body: "Consider adding a description so other users can understand the purpose of this table.",
-  },
-];
+import type { ProblemSeverity } from "./types";
 
 const severityProfiles: Record<
   ProblemSeverity,
@@ -92,6 +66,7 @@ function ProblemsPanelContent() {
   const setProblemsPanelVisible = useViewModeStore(
     (state) => state.setProblemsPanelVisible,
   );
+  const problems = useProblemsStore((state) => state.problems);
   const [height, setHeight] = useState(defaultProblemsPanelHeight);
   const [openProblemIds, setOpenProblemIds] = useState<Set<string>>(new Set());
 
@@ -172,7 +147,7 @@ function ProblemsPanelContent() {
             <div className="flex h-full items-center border-b-2 border-blue-600 text-[11px] font-semibold tracking-wide text-slate-700">
               PROBLEMS
               <span className="ml-2 rounded-full bg-slate-300 px-1.5 py-0.5 text-[10px] font-semibold leading-none text-slate-700">
-                {sampleProblems.length}
+                {problems.length}
               </span>
             </div>
             <button
@@ -186,7 +161,12 @@ function ProblemsPanelContent() {
           </header>
 
           <div className="min-h-0 flex-1 overflow-y-auto py-1" role="list">
-            {sampleProblems.map((problem) => {
+            {problems.length === 0 && (
+              <div className="px-4 py-3 text-sm text-slate-500" role="status">
+                No problems found.
+              </div>
+            )}
+            {problems.map((problem) => {
               const severityProfile = severityProfiles[problem.severity];
               const isOpen = openProblemIds.has(problem.id);
               const ExpandIcon = isOpen ? ChevronDown : ChevronRight;
@@ -219,7 +199,7 @@ function ProblemsPanelContent() {
                   {isOpen && (
                     <div
                       id={detailsId}
-                      className="mx-3 mb-1 ml-12 rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm leading-5 text-slate-700"
+                      className="mx-3 mb-1 ml-12 whitespace-pre-line rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm leading-5 text-slate-700"
                     >
                       {problem.body}
                     </div>

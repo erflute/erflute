@@ -9,13 +9,14 @@ use erm::dtos::diagram::diagram_walkers::tables::columns;
 use erm::dtos::diagram::diagram_walkers::tables::compound_unique_key_list;
 use erm::dtos::diagram::diagram_walkers::tables::connections;
 use erm::dtos::diagram::page_settings;
-use erm::open;
+use erm::open_unvalidated;
 
 // TODO: Add test cases of detailed condition for each field in https://github.com/s-kai273/erflute/issues/22
 
 #[test]
 fn test_read_snapshot() {
-    let diagram = open("./tests/open/fixtures/read_snapshot.erm").expect("failed to parse");
+    let diagram =
+        open_unvalidated("./tests/open/fixtures/read_snapshot.erm").expect("failed to parse");
     assert_eq!(
         diagram,
         diagram::Diagram {

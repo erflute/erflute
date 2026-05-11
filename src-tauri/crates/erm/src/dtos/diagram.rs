@@ -10,7 +10,7 @@ use page_settings::PageSettings;
 use serde::{Deserialize, Serialize};
 
 use crate::validation::Validate;
-use crate::validation::diagram::{
+use crate::validation::rules::diagram::{
     validate_column_group_column_length_and_decimal, validate_column_group_references,
     validate_duplicate_column_group_column_physical_names, validate_duplicate_column_group_names,
 };

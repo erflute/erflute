@@ -1,7 +1,7 @@
 use pretty_assertions::assert_eq;
 
 use erm::dtos::diagram::page_settings;
-use erm::open;
+use erm::open_unvalidated;
 
 use crate::open::support;
 
@@ -12,7 +12,7 @@ const ASSERTIONS: support::FixtureAssertions =
 
 #[test]
 fn page_settings_tags_keep_valid_values() {
-    let diagram = open(PAGE_SETTINGS_FIXTURE).expect("failed to parse");
+    let diagram = open_unvalidated(PAGE_SETTINGS_FIXTURE).expect("failed to parse");
 
     assert_eq!(
         diagram.page_settings,

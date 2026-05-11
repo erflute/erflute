@@ -6,6 +6,7 @@ import {
   mapTablesFrom,
 } from "@/domain/mappers/tableMapper";
 import type { DiagramResponse } from "@/types/api/diagram";
+import type { ProblemResponse } from "@/types/api/problems";
 import type { ColumnGroup } from "@/types/domain/columnGroup";
 import type { Relationship } from "@/types/domain/relationship";
 import { type Settings } from "@/types/domain/settings";
@@ -27,4 +28,10 @@ export async function loadDiagram(filename: string): Promise<{
     relationships: mapRelationshipsFrom(tables),
     columnGroups: mapColumnGroupsFrom(columnGroups),
   };
+}
+
+export async function validateDiagram(
+  filename: string,
+): Promise<ProblemResponse[]> {
+  return invoke<ProblemResponse[]>("validate_diagram", { filename });
 }

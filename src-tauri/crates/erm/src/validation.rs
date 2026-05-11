@@ -1,16 +1,20 @@
-pub mod diagram;
+pub mod problems;
+pub(crate) mod rules;
 
 pub use erm_macros::Validate;
+use serde::Serialize;
 use std::fmt;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ValidationError {
     pub path: String,
     pub message: String,
     pub targets: Vec<ValidationErrorTarget>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ValidationErrorTarget {
     pub label: String,
     pub value: String,
@@ -80,6 +84,10 @@ pub trait Validate {
     fn validate(&self) -> Result<(), ValidationError>;
 }
 
+pub trait CollectValidationErrors {
+    fn collect_validation_errors(&self) -> Vec<ValidationError>;
+}
+
 impl<T: Validate> Validate for Option<T> {
     fn validate(&self) -> Result<(), ValidationError> {
         if let Some(value) = self {
@@ -87,6 +95,14 @@ impl<T: Validate> Validate for Option<T> {
         }
 
         Ok(())
+    }
+}
+
+impl<T: CollectValidationErrors> CollectValidationErrors for Option<T> {
+    fn collect_validation_errors(&self) -> Vec<ValidationError> {
+        self.as_ref()
+            .map(CollectValidationErrors::collect_validation_errors)
+            .unwrap_or_default()
     }
 }
 
@@ -102,12 +118,32 @@ impl<T: Validate> Validate for Vec<T> {
     }
 }
 
+impl<T: CollectValidationErrors> CollectValidationErrors for Vec<T> {
+    fn collect_validation_errors(&self) -> Vec<ValidationError> {
+        self.iter()
+            .enumerate()
+            .flat_map(|(index, value)| {
+                value
+                    .collect_validation_errors()
+                    .into_iter()
+                    .map(move |error| error.prepend_path(format!("[{index}]")))
+            })
+            .collect()
+    }
+}
+
 macro_rules! impl_noop_validate {
     ($($ty:ty),+ $(,)?) => {
         $(
             impl Validate for $ty {
                 fn validate(&self) -> Result<(), ValidationError> {
                     Ok(())
+                }
+            }
+
+            impl CollectValidationErrors for $ty {
+                fn collect_validation_errors(&self) -> Vec<ValidationError> {
+                    Vec::new()
                 }
             }
         )+
@@ -137,4 +173,8 @@ impl_noop_validate!(
 
 pub fn validate<T: Validate>(value: &T) -> Result<(), ValidationError> {
     value.validate()
+}
+
+pub fn collect_validation_errors<T: CollectValidationErrors>(value: &T) -> Vec<ValidationError> {
+    value.collect_validation_errors()
 }

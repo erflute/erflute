@@ -7,7 +7,4 @@ pub enum Error {
 
     #[error("Parse error: {0}")]
     Parse(#[from] quick_xml::de::DeError),
-
-    #[error("{0}")]
-    Validation(#[from] crate::validation::ValidationError),
 }

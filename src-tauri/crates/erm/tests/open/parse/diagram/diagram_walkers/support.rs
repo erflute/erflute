@@ -1,7 +1,7 @@
 use erm::dtos::diagram::Diagram;
 use erm::dtos::diagram::diagram_walkers::tables;
 use erm::errors::Error;
-use erm::open;
+use erm::open_unvalidated;
 
 use crate::open::support as diagram_support;
 
@@ -10,7 +10,7 @@ pub(super) const DIAGRAM_WALKERS_DETAILS_FIXTURE: &str =
 const TEMP_PREFIX: &str = "erm_diagram_walkers_details";
 
 pub(super) fn first_table() -> tables::Table {
-    let diagram = open(DIAGRAM_WALKERS_DETAILS_FIXTURE).expect("failed to parse");
+    let diagram = open_unvalidated(DIAGRAM_WALKERS_DETAILS_FIXTURE).expect("failed to parse");
     diagram
         .diagram_walkers
         .expect("missing diagram walkers")

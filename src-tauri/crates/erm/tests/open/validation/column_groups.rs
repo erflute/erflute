@@ -8,7 +8,7 @@ const ASSERTIONS: support::FixtureAssertions =
 
 #[test]
 fn duplicate_column_group_name_is_rejected() {
-    let result = ASSERTIONS.open_replaced_fixture(
+    let result = ASSERTIONS.validate_replaced_fixture(
         "<column_group_name>AUDIT</column_group_name>",
         "<column_group_name>COMMON</column_group_name>",
         "duplicate_column_group_name",
@@ -24,7 +24,7 @@ fn duplicate_column_group_name_is_rejected() {
 
 #[test]
 fn duplicate_column_physical_name_in_same_column_group_is_rejected() {
-    let result = ASSERTIONS.open_replaced_fixture(
+    let result = ASSERTIONS.validate_replaced_fixture(
         "<physical_name>UPDATED_BY</physical_name>",
         "<physical_name>CREATED_AT</physical_name>",
         "duplicate_column_physical_name_in_same_column_group",
@@ -43,7 +43,7 @@ fn duplicate_column_physical_name_in_same_column_group_is_rejected() {
 
 #[test]
 fn column_group_column_decimal_greater_than_length_is_rejected() {
-    let result = ASSERTIONS.open_replaced_fixture(
+    let result = ASSERTIONS.validate_replaced_fixture(
         "<decimal>0</decimal>",
         "<decimal>7</decimal>",
         "column_group_column_decimal_greater_than_length",
@@ -62,7 +62,7 @@ fn column_group_column_decimal_greater_than_length_is_rejected() {
 
 #[test]
 fn column_group_column_length_for_unsupported_column_type_is_rejected() {
-    let result = ASSERTIONS.open_replaced_fixture(
+    let result = ASSERTIONS.validate_replaced_fixture(
         "<type>decimal(p,s)</type>",
         "<type>datetime</type>",
         "column_group_column_length_for_unsupported_column_type",
@@ -81,7 +81,7 @@ fn column_group_column_length_for_unsupported_column_type_is_rejected() {
 
 #[test]
 fn column_group_column_decimal_for_unsupported_column_type_is_rejected() {
-    let result = ASSERTIONS.open_replaced_fixture(
+    let result = ASSERTIONS.validate_replaced_fixture(
         "<type>decimal(p,s)</type>",
         "<type>varchar(n)</type>",
         "column_group_column_decimal_for_unsupported_column_type",

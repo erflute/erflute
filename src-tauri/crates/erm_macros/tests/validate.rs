@@ -1,5 +1,6 @@
 use erm_macros::Validate;
 
+use crate::validation::CollectValidationErrors as _;
 use crate::validation::Validate as _;
 
 mod validation {
@@ -31,12 +32,24 @@ mod validation {
         fn validate(&self) -> Result<(), ValidationError>;
     }
 
+    pub trait CollectValidationErrors {
+        fn collect_validation_errors(&self) -> Vec<ValidationError>;
+    }
+
     impl<T: Validate> Validate for Option<T> {
         fn validate(&self) -> Result<(), ValidationError> {
             if let Some(value) = self {
                 value.validate()?;
             }
             Ok(())
+        }
+    }
+
+    impl<T: CollectValidationErrors> CollectValidationErrors for Option<T> {
+        fn collect_validation_errors(&self) -> Vec<ValidationError> {
+            self.as_ref()
+                .map(CollectValidationErrors::collect_validation_errors)
+                .unwrap_or_default()
         }
     }
 
@@ -51,9 +64,29 @@ mod validation {
         }
     }
 
+    impl<T: CollectValidationErrors> CollectValidationErrors for Vec<T> {
+        fn collect_validation_errors(&self) -> Vec<ValidationError> {
+            self.iter()
+                .enumerate()
+                .flat_map(|(index, value)| {
+                    value
+                        .collect_validation_errors()
+                        .into_iter()
+                        .map(move |error| error.prepend_path(format!("[{index}]")))
+                })
+                .collect()
+        }
+    }
+
     impl Validate for String {
         fn validate(&self) -> Result<(), ValidationError> {
             Ok(())
+        }
+    }
+
+    impl CollectValidationErrors for String {
+        fn collect_validation_errors(&self) -> Vec<ValidationError> {
+            Vec::new()
         }
     }
 }
@@ -163,4 +196,18 @@ fn multiple_struct_level_rules_are_called_in_order() {
 
     assert_eq!(error.path, "name");
     assert_eq!(error.message, "second rule");
+}
+
+#[test]
+fn validation_errors_are_collected_from_rules_and_children() {
+    let errors = Parent {
+        children: Some(vec![Child {
+            name: "invalid".to_string(),
+        }]),
+    }
+    .collect_validation_errors();
+
+    assert_eq!(errors.len(), 1);
+    assert_eq!(errors[0].path, "child[0].name");
+    assert_eq!(errors[0].message, "invalid child");
 }
