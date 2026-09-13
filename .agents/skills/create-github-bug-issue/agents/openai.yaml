@@ -1,0 +1,15 @@
+interface:
+  display_name: "Create GitHub Bug Issue"
+  short_description: "Turn verified bugs into GitHub issues"
+  default_prompt: "Use $create-github-bug-issue to turn the bugs from this discussion into reviewed GitHub issues."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "github"
+      description: "GitHub MCP server"
+      transport: "streamable_http"
+      url: "https://api.githubcopilot.com/mcp/"
+
+policy:
+  allow_implicit_invocation: true
