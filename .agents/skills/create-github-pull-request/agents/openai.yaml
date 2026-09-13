@@ -1,0 +1,15 @@
+interface:
+  display_name: "Create GitHub Pull Request"
+  short_description: "Create reviewed draft PRs from the current branch"
+  default_prompt: "Use $create-github-pull-request to preview and create a draft PR from the current branch."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "github"
+      description: "GitHub MCP server"
+      transport: "streamable_http"
+      url: "https://api.githubcopilot.com/mcp/"
+
+policy:
+  allow_implicit_invocation: true

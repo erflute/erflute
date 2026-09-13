@@ -1,0 +1,7 @@
+interface:
+  display_name: "Review to PR"
+  short_description: "Publish approved Codex findings as one PR review"
+  default_prompt: "Use $review-to-pr to review the current branch and preview a GitHub pull request review."
+
+policy:
+  allow_implicit_invocation: false

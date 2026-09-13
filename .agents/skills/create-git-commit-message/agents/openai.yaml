@@ -1,0 +1,7 @@
+interface:
+  display_name: "Create Git Commit Message"
+  short_description: "Draft commit messages from repository changes"
+  default_prompt: "Use $create-git-commit-message to draft a commit message for the current changes."
+
+policy:
+  allow_implicit_invocation: true
